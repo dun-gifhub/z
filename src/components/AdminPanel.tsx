@@ -306,6 +306,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     }
   };
 
+  // ------- Reset Bảng Xếp Hạng TOÀN THỜI GIAN (điểm kỷ lục mọi thời đại về 0đ) -------
+  const [resetAllTimeLoading, setResetAllTimeLoading] = useState(false);
+  const handleResetAllTimeLeaderboard = async () => {
+    if (!confirm('Xóa Bảng Xếp Hạng TOÀN THỜI GIAN và đưa điểm kỷ lục mọi thời đại của TẤT CẢ người chơi về 0đ? Thao tác này KHÔNG THỂ hoàn tác!')) return;
+    setResetAllTimeLoading(true);
+    try {
+      const res = await fetch('/api/admin/leaderboard/reset-alltime', { method: 'POST', headers: adminHeaders });
+      if (res.ok) {
+        setSettingsMsg('✓ Đã reset Bảng Xếp Hạng Toàn Thời Gian về 0đ!');
+        setTimeout(() => setSettingsMsg(null), 3000);
+      }
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setResetAllTimeLoading(false);
+    }
+  };
+
   // ------- Locked screen: shown until the correct admin password is entered -------
   if (!authed) {
     return (
@@ -879,6 +897,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               className="px-5 py-2.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
             >
               {resetLoading ? 'Đang reset...' : 'Reset Ngay (Về 0đ)'}
+            </button>
+          </div>
+
+          <div className="p-5 bg-slate-900 border border-rose-900/50 rounded-2xl space-y-3">
+            <h3 className="font-cinzel text-sm font-bold text-rose-300 flex items-center gap-1.5">
+              <RotateCcw className="w-4 h-4" />
+              <span>RESET BẢNG XẾP HẠNG TOÀN THỜI GIAN</span>
+            </h3>
+            <p className="text-[11px] text-slate-500">
+              Đưa điểm kỷ lục "Tất Cả Thời Gian" của TOÀN BỘ người chơi về 0đ. Khác với reset tuần ở trên
+              (chỉ ảnh hưởng bảng xếp hạng tuần), thao tác này xoá sạch thành tích cao nhất mọi thời đại và
+              KHÔNG THỂ hoàn tác — chỉ dùng khi thật sự cần (ví dụ: bắt đầu mùa giải mới).
+            </p>
+            <button
+              onClick={handleResetAllTimeLeaderboard}
+              disabled={resetAllTimeLoading}
+              className="px-5 py-2.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
+            >
+              {resetAllTimeLoading ? 'Đang reset...' : 'Reset Ngay (Về 0đ)'}
             </button>
           </div>
         </div>

@@ -10,7 +10,7 @@ export interface DBUser {
   email: string;
   passwordHash: string;
   avatar: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'guest';
   createdAt: string;
 }
 
@@ -148,6 +148,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   is_premium BOOLEAN DEFAULT FALSE,
   premium_plan VARCHAR(20),
   premium_expires_at TIMESTAMP WITH TIME ZONE,
+  daily_solution_views INTEGER DEFAULT 0,
+  daily_solution_views_date DATE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -202,6 +204,9 @@ CREATE INDEX IF NOT EXISTS idx_profiles_highest_score ON profiles(highest_score 
 CREATE INDEX IF NOT EXISTS idx_profiles_all_time_highest_score ON profiles(all_time_highest_score DESC);
 CREATE INDEX IF NOT EXISTS idx_match_history_user ON match_history(user_id);
 CREATE INDEX IF NOT EXISTS idx_premium_requests_status ON premium_requests(status);
+-- Các cột thêm sau này: dùng ALTER ... IF NOT EXISTS để không phá dữ liệu đã có trên Neon.
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS daily_solution_views INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS daily_solution_views_date DATE;
 `;
 
 // ---------- row <-> object mappers ----------
@@ -238,6 +243,10 @@ function rowToProfile(r: any): UserProfile {
     isPremium: r.is_premium,
     premiumPlan: r.premium_plan,
     premiumExpiresAt: r.premium_expires_at ? new Date(r.premium_expires_at).toISOString() : null,
+    dailySolutionViews: r.daily_solution_views || 0,
+    dailySolutionViewsDate: r.daily_solution_views_date
+      ? new Date(r.daily_solution_views_date).toISOString().slice(0, 10)
+      : undefined,
   };
 }
 
@@ -426,7 +435,7 @@ class DatabaseManager {
     return this.data.users.find(u => u.id === id);
   }
 
-  public async createUser(username: string, email: string, password: string, avatar: string): Promise<DBUser> {
+  public async createUser(username: string, email: string, password: string, avatar: string, role: 'user' | 'guest' = 'user'): Promise<DBUser> {
     const salt = bcrypt.genSaltSync(10);
     const passwordHash = bcrypt.hashSync(password, salt);
     const newUser: DBUser = {
@@ -435,7 +444,7 @@ class DatabaseManager {
       email,
       passwordHash,
       avatar: avatar || '🧙‍♂️',
-      role: 'user',
+      role,
       createdAt: new Date().toISOString(),
     };
 
@@ -460,6 +469,8 @@ class DatabaseManager {
       isPremium: false,
       premiumPlan: null,
       premiumExpiresAt: null,
+      dailySolutionViews: 0,
+      dailySolutionViewsDate: undefined,
     };
     this.data.profiles[newUser.id] = newProfile;
 
@@ -480,6 +491,33 @@ class DatabaseManager {
     });
 
     return newUser;
+  }
+
+  // ==========================================
+  // TÀI KHOẢN KHÁCH (CHƠI NHANH) - CHỈ TỒN TẠI 1 NGÀY
+  // ==========================================
+  // Xoá khỏi hệ thống mọi tài khoản "Chơi Nhanh" (role='guest') đã được tạo hơn
+  // 24 giờ trước, cùng toàn bộ hồ sơ / lịch sử trận đấu liên quan (nhờ ON DELETE
+  // CASCADE trong schema). Trả về số tài khoản đã xoá.
+  public async cleanupExpiredGuests(): Promise<number> {
+    const GUEST_TTL_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const expiredIds = this.data.users
+      .filter(u => u.role === 'guest' && now - new Date(u.createdAt).getTime() > GUEST_TTL_MS)
+      .map(u => u.id);
+
+    if (expiredIds.length === 0) return 0;
+
+    const expiredSet = new Set(expiredIds);
+    this.data.users = this.data.users.filter(u => !expiredSet.has(u.id));
+    for (const id of expiredIds) delete this.data.profiles[id];
+    this.data.matchHistory = this.data.matchHistory.filter(m => !expiredSet.has(m.userId));
+
+    await this.persist(async () => {
+      await pool!.query(`DELETE FROM users WHERE role = 'guest' AND created_at < NOW() - INTERVAL '1 day'`);
+    });
+
+    return expiredIds.length;
   }
 
   public getProfile(userId: string): UserProfile | undefined {
@@ -585,6 +623,17 @@ class DatabaseManager {
     });
   }
 
+  // Xoá bảng xếp hạng TOÀN THỜI GIAN (điểm kỷ lục mọi thời đại) về 0đ cho toàn bộ người dùng.
+  // Chỉ nên dùng khi thật sự muốn xoá sạch thành tích cũ (ví dụ: bắt đầu mùa giải mới).
+  // Điểm kỷ lục TUẦN NÀY (highestScore) không bị ảnh hưởng bởi thao tác này.
+  public async resetAllTimeLeaderboard(): Promise<void> {
+    for (const p of Object.values(this.data.profiles)) p.allTimeHighestScore = 0;
+
+    await this.persist(async () => {
+      await pool!.query(`UPDATE profiles SET all_time_highest_score = 0, updated_at = NOW()`);
+    });
+  }
+
   public getAllUsers(): Omit<DBUser, 'passwordHash'>[] {
     return this.data.users.map(({ passwordHash, ...safe }) => safe);
   }
@@ -678,6 +727,50 @@ class DatabaseManager {
     if (!profile || !profile.isPremium) return false;
     if (!profile.premiumExpiresAt) return true; // gói vĩnh viễn (không có ngày hết hạn)
     return new Date(profile.premiumExpiresAt).getTime() > Date.now();
+  }
+
+  // ==========================================
+  // HẠN MỨC XEM LỜI GIẢI MIỄN PHÍ (không có gói Premium)
+  // ==========================================
+  // Người chơi thường (chưa mua gói) vẫn được xem tối đa 10 lời giải chi tiết/ngày.
+  // Bộ đếm tự reset về 0 mỗi khi sang ngày mới (theo giờ máy chủ).
+  private static readonly FREE_SOLUTION_VIEWS_PER_DAY = 10;
+
+  public canViewSolution(userId: string): boolean {
+    if (this.isPremiumActive(userId)) return true;
+    const profile = this.data.profiles[userId];
+    if (!profile) return false;
+    const today = new Date().toISOString().slice(0, 10);
+    if (profile.dailySolutionViewsDate !== today) return true; // ngày mới -> chưa dùng lượt nào
+    return (profile.dailySolutionViews || 0) < DatabaseManager.FREE_SOLUTION_VIEWS_PER_DAY;
+  }
+
+  public getRemainingFreeSolutionViews(userId: string): number {
+    const profile = this.data.profiles[userId];
+    if (!profile) return 0;
+    const today = new Date().toISOString().slice(0, 10);
+    const used = profile.dailySolutionViewsDate === today ? (profile.dailySolutionViews || 0) : 0;
+    return Math.max(0, DatabaseManager.FREE_SOLUTION_VIEWS_PER_DAY - used);
+  }
+
+  // Gọi đúng 1 lần mỗi khi 1 lời giải chi tiết THỰC SỰ được hiển thị cho người chơi
+  // KHÔNG có gói Premium, để trừ vào hạn mức miễn phí trong ngày.
+  public consumeFreeSolutionView(userId: string): void {
+    const profile = this.data.profiles[userId];
+    if (!profile) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (profile.dailySolutionViewsDate !== today) {
+      profile.dailySolutionViewsDate = today;
+      profile.dailySolutionViews = 0;
+    }
+    profile.dailySolutionViews = (profile.dailySolutionViews || 0) + 1;
+
+    this.persist(async () => {
+      await pool!.query(
+        `UPDATE profiles SET daily_solution_views=$2, daily_solution_views_date=$3, updated_at=NOW() WHERE user_id=$1`,
+        [userId, profile.dailySolutionViews, profile.dailySolutionViewsDate]
+      );
+    }).catch(err => console.error('❌ Lỗi lưu lượt xem lời giải miễn phí:', err));
   }
 
   public async grantPremium(userId: string, plan: PremiumPlan, days = 30): Promise<UserProfile | undefined> {

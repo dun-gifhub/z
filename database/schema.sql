@@ -10,7 +10,8 @@
 -- server/questions/questionBank.ts). Chỉ dữ liệu ĐỘNG (do người dùng tạo ra
 -- khi chơi) mới cần lưu vào Neon để không bị mất khi server restart/redeploy.
 
--- 1. USERS TABLE (chỉ 1 tài khoản role = 'admin' duy nhất trong hệ thống)
+-- 1. USERS TABLE (role: 'admin' — chỉ 1 tài khoản duy nhất; 'user' — tài khoản đăng ký;
+--    'guest' — tài khoản "Chơi Nhanh" không cần đăng ký, tự động bị xoá sau 1 ngày)
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(64) PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -42,6 +43,9 @@ CREATE TABLE IF NOT EXISTS profiles (
     is_premium BOOLEAN DEFAULT FALSE,
     premium_plan VARCHAR(20), -- 'solution' | 'monthly'
     premium_expires_at TIMESTAMP WITH TIME ZONE,
+    -- Hạn mức xem lời giải chi tiết MIỄN PHÍ cho người không có gói Premium (tối đa 10 lượt/ngày)
+    daily_solution_views INTEGER DEFAULT 0,
+    daily_solution_views_date DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

@@ -191,6 +191,9 @@ export interface UserProfile {
   isPremium?: boolean;
   premiumPlan?: PremiumPlan | null;
   premiumExpiresAt?: string | null; // ISO date; null = no active plan
+  // ------- Hạn mức xem lời giải miễn phí (người không có gói Premium) -------
+  dailySolutionViews?: number; // số lời giải chi tiết đã xem hôm nay (tối đa 10/ngày)
+  dailySolutionViewsDate?: string; // ngày (YYYY-MM-DD) ứng với dailySolutionViews, để tự reset mỗi ngày mới
 }
 
 export interface PremiumRequest {

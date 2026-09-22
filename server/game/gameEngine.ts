@@ -689,14 +689,23 @@ export class GameEngine {
       }
       player.stats.categoryAccuracy[cat].total += 1;
 
-      // Lời giải chi tiết chỉ hiển thị đầy đủ cho thành viên đã đăng ký gói Premium.
-      // Người chơi thường vẫn thấy đáp án đúng để trận đấu công bằng, nhưng phần giải thích từng bước bị khóa.
-      // Xét theo (các) người chơi thật đang xem trận đấu này (bỏ qua AI, vì AI không có tài khoản Premium).
+      // Lời giải chi tiết hiển thị đầy đủ cho:
+      //  - Thành viên đã đăng ký gói Premium (không giới hạn), HOẶC
+      //  - Người chơi thường vẫn còn hạn mức xem MIỄN PHÍ trong ngày (tối đa 10 lượt/ngày).
+      // Người chơi thường vẫn luôn thấy đáp án đúng để trận đấu công bằng, nhưng phần
+      // giải thích từng bước chỉ bị khoá khi đã dùng hết hạn mức miễn phí và chưa có Premium.
       const humanPlayerIds = Object.values(state.players).filter(p => !p.isAi).map(p => p.id);
-      const canSeeSolution = humanPlayerIds.some(id => db.isPremiumActive(id));
+      const premiumViewerId = humanPlayerIds.find(id => db.isPremiumActive(id));
+      const canSeeSolution = !!premiumViewerId || (!player.isAi && db.canViewSolution(playerId));
+
+      // Nếu được xem lời giải nhờ hạn mức miễn phí (không phải nhờ Premium), trừ vào hạn mức hôm nay.
+      if (canSeeSolution && !premiumViewerId && !player.isAi) {
+        db.consumeFreeSolutionView(playerId);
+      }
+
       const revealedExplanation = canSeeSolution
         ? currentFullQuestion.explanation
-        : '🔒 Nâng cấp gói Premium (Hồ Sơ Pháp Sư) để xem lời giải chi tiết từng bước cho câu hỏi này!';
+        : `🔒 Bạn đã dùng hết lượt xem lời giải miễn phí hôm nay! Nâng cấp gói Premium (Hồ Sơ Pháp Sư) để xem lời giải chi tiết không giới hạn, hoặc quay lại vào ngày mai.`;
 
       state.lastAnswerResult = {
         correct: false,

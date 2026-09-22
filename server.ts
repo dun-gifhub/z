@@ -63,6 +63,19 @@ async function startServer() {
   setInterval(checkWeeklyLeaderboardReset, 60 * 60 * 1000);
 
   // ==========================================
+  // TỰ ĐỘNG XOÁ TÀI KHOẢN KHÁCH (CHƠI NHANH) SAU 1 NGÀY
+  // ==========================================
+  // Kiểm tra mỗi giờ: xoá mọi tài khoản "Chơi Nhanh" (không đăng ký Gmail/mật khẩu)
+  // đã được tạo hơn 24 giờ trước, cùng toàn bộ dữ liệu liên quan.
+  const checkExpiredGuests = () => {
+    db.cleanupExpiredGuests().then(count => {
+      if (count > 0) console.log(`🧹 Đã xoá ${count} tài khoản Khách hết hạn (quá 1 ngày).`);
+    });
+  };
+  checkExpiredGuests();
+  setInterval(checkExpiredGuests, 60 * 60 * 1000);
+
+  // ==========================================
   // AUTH REST APIS
   // ==========================================
   app.post('/api/auth/register', async (req, res) => {
@@ -80,7 +93,7 @@ async function startServer() {
       const newUser = await db.createUser(username, email || '', password, avatar || '🧙‍♂️');
       const profile = db.getProfile(newUser.id);
       return res.json({
-        user: { id: newUser.id, username: newUser.username, avatar: newUser.avatar, role: newUser.role },
+        user: { id: newUser.id, username: newUser.username, avatar: newUser.avatar, role: newUser.role, createdAt: newUser.createdAt },
         profile,
       });
     } catch (e: any) {
@@ -107,7 +120,7 @@ async function startServer() {
 
       const profile = db.getProfile(user.id);
       return res.json({
-        user: { id: user.id, username: user.username, avatar: user.avatar, role: user.role },
+        user: { id: user.id, username: user.username, avatar: user.avatar, role: user.role, createdAt: user.createdAt },
         profile,
       });
     } catch (e: any) {
@@ -120,10 +133,10 @@ async function startServer() {
       const randomGuestName = `Pháp Sư #${Math.floor(1000 + Math.random() * 9000)}`;
       const avatars = ['🧙‍♂️', '🔮', '⚡', '🐉', '✨', '🦊', '🦅', '🦉'];
       const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
-      const guestUser = await db.createUser(randomGuestName, '', Math.random().toString(), randomAvatar);
+      const guestUser = await db.createUser(randomGuestName, '', Math.random().toString(), randomAvatar, 'guest');
       const profile = db.getProfile(guestUser.id);
       return res.json({
-        user: { id: guestUser.id, username: guestUser.username, avatar: guestUser.avatar, role: guestUser.role },
+        user: { id: guestUser.id, username: guestUser.username, avatar: guestUser.avatar, role: guestUser.role, createdAt: guestUser.createdAt },
         profile,
       });
     } catch (e: any) {
@@ -334,6 +347,12 @@ async function startServer() {
   app.post('/api/admin/leaderboard/reset', requireAdmin, async (_req, res) => {
     await db.resetWeeklyLeaderboard();
     return res.json({ success: true, settings: db.getSettings() });
+  });
+
+  // ------- Reset Bảng Xếp Hạng TOÀN THỜI GIAN (xoá sạch điểm kỷ lục mọi thời đại) -------
+  app.post('/api/admin/leaderboard/reset-alltime', requireAdmin, async (_req, res) => {
+    await db.resetAllTimeLeaderboard();
+    return res.json({ success: true });
   });
 
   // ==========================================

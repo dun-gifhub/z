@@ -3,10 +3,22 @@ import { GameState, MathLevel, UserProfile, LeaderboardEntry } from '../../share
 import { sound } from '../utils/soundEffects.ts';
 
 export function useGameSocket() {
-  const [user, setUser] = useState<{ id: string; username: string; avatar: string; role: string } | null>(() => {
+  const GUEST_TTL_MS = 24 * 60 * 60 * 1000; // Tài khoản Khách (Chơi Nhanh) chỉ tồn tại 1 ngày
+
+  const [user, setUser] = useState<{ id: string; username: string; avatar: string; role: string; createdAt?: string } | null>(() => {
     try {
       const saved = localStorage.getItem('mathrune_user');
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      // Tài khoản Khách quá hạn 1 ngày -> bỏ qua, coi như chưa đăng nhập (sẽ tự tạo Khách mới)
+      if (parsed?.role === 'guest' && parsed?.createdAt) {
+        const age = Date.now() - new Date(parsed.createdAt).getTime();
+        if (age > GUEST_TTL_MS) {
+          localStorage.removeItem('mathrune_user');
+          return null;
+        }
+      }
+      return parsed;
     } catch {
       return null;
     }
@@ -252,6 +264,24 @@ export function useGameSocket() {
     setProfile(null);
     localStorage.removeItem('mathrune_user');
   };
+
+  // Tự động phát hiện tài khoản Khách (Chơi Nhanh) đã quá hạn 1 ngày trong lúc app
+  // đang mở (không chỉ lúc tải trang), rồi tự tạo tài khoản Khách mới thay thế.
+  useEffect(() => {
+    const checkGuestExpiry = () => {
+      if (user?.role === 'guest' && user?.createdAt) {
+        const age = Date.now() - new Date(user.createdAt).getTime();
+        if (age > GUEST_TTL_MS) {
+          logout();
+          loginAsGuest();
+        }
+      }
+    };
+    const intervalId = setInterval(checkGuestExpiry, 5 * 60 * 1000);
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
 
   // Game Socket Actions
   const startAiGame = (aiDifficulty: 'easy' | 'medium' | 'hard' | 'expert' = 'medium', mathLevel: MathLevel = 'CO_BAN') => {
