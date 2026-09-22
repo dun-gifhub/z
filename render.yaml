@@ -2,7 +2,7 @@ services:
   - type: web
     name: math-rune
     runtime: node
-    plan: starter # đổi thành "free" nếu chưa muốn trả phí (nhưng KHÔNG có disk -> mất dữ liệu khi restart)
+    plan: free # Giờ có thể dùng "free" thoải mái — dữ liệu lưu ở Neon (Postgres), không phụ thuộc ổ đĩa của Render nữa.
     buildCommand: npm install && npm run build
     startCommand: npm start
     healthCheckPath: /
@@ -11,9 +11,7 @@ services:
         value: production
       - key: NODE_VERSION
         value: "22"
-      - key: DATA_DIR
-        value: /var/data
-    disk:
-      name: math-rune-data
-      mountPath: /var/data
-      sizeGB: 1
+      - key: ADMIN_PASSWORD
+        sync: false # đặt thủ công trong Render Dashboard -> Environment
+      - key: DATABASE_URL
+        sync: false # dán connection string lấy từ https://console.neon.tech vào đây (Dashboard -> Environment)

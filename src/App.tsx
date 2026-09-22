@@ -43,6 +43,7 @@ export function App() {
     surrender,
     exitGame,
     updateEquippedRunes,
+    updateAvatar,
   } = useGameSocket();
 
   const [currentView, setCurrentView] = useState<AppView>('main');
@@ -147,6 +148,7 @@ export function App() {
               <ProfileView
                 profile={profile}
                 onBack={() => setCurrentView('main')}
+                onUpdateAvatar={updateAvatar}
               />
             )}
 

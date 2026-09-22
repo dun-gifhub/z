@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Sparkles, User, Key, Mail, ShieldAlert } from 'lucide-react';
+import { BASIC_AVATARS } from '../../shared/avatars.ts';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -9,7 +10,7 @@ interface AuthModalProps {
   onGuestLogin: () => Promise<any>;
 }
 
-const AVATARS = ['🧙‍♂️', '🧝‍♀️', '🔮', '⚡', '🐉', '✨', '🦊', '🦅', '🦉', '⚔️'];
+const AVATARS = BASIC_AVATARS;
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,

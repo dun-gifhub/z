@@ -36,14 +36,36 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Chờ Neon Postgres kết nối & tải dữ liệu xong trước khi nhận request
+  // (nếu chưa cấu hình DATABASE_URL, việc này trả về ngay và chạy tạm bằng RAM).
+  await db.waitUntilReady();
+
   // Create HTTP server for both Express and WebSocket
   const server = http.createServer(app);
   new WebSocketHandler(server);
 
   // ==========================================
+  // TỰ ĐỘNG RESET BẢNG XẾP HẠNG MỖI TUẦN MỘT LẦN
+  // ==========================================
+  // Kiểm tra mỗi giờ: nếu đã hơn 7 ngày kể từ lần reset gần nhất thì tự động
+  // xóa bảng xếp hạng tuần (đưa điểm về 0đ). Admin cũng có thể bấm reset thủ
+  // công bất cứ lúc nào trong Trang Quản Trị.
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const checkWeeklyLeaderboardReset = () => {
+    const last = new Date(db.getSettings().lastLeaderboardReset || 0).getTime();
+    if (Date.now() - last >= WEEK_MS) {
+      db.resetWeeklyLeaderboard().then(() => {
+        console.log('🏆 Đã tự động reset Bảng Xếp Hạng Tuần về 0đ.');
+      });
+    }
+  };
+  checkWeeklyLeaderboardReset();
+  setInterval(checkWeeklyLeaderboardReset, 60 * 60 * 1000);
+
+  // ==========================================
   // AUTH REST APIS
   // ==========================================
-  app.post('/api/auth/register', (req, res) => {
+  app.post('/api/auth/register', async (req, res) => {
     try {
       const { username, email, password, avatar } = req.body;
       if (!username || !password) {
@@ -55,7 +77,7 @@ async function startServer() {
         return res.status(400).json({ error: 'Tên người dùng đã được sử dụng.' });
       }
 
-      const newUser = db.createUser(username, email || '', password, avatar || '🧙‍♂️');
+      const newUser = await db.createUser(username, email || '', password, avatar || '🧙‍♂️');
       const profile = db.getProfile(newUser.id);
       return res.json({
         user: { id: newUser.id, username: newUser.username, avatar: newUser.avatar, role: newUser.role },
@@ -93,12 +115,12 @@ async function startServer() {
     }
   });
 
-  app.post('/api/auth/guest', (req, res) => {
+  app.post('/api/auth/guest', async (req, res) => {
     try {
       const randomGuestName = `Pháp Sư #${Math.floor(1000 + Math.random() * 9000)}`;
       const avatars = ['🧙‍♂️', '🔮', '⚡', '🐉', '✨', '🦊', '🦅', '🦉'];
       const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
-      const guestUser = db.createUser(randomGuestName, '', Math.random().toString(), randomAvatar);
+      const guestUser = await db.createUser(randomGuestName, '', Math.random().toString(), randomAvatar);
       const profile = db.getProfile(guestUser.id);
       return res.json({
         user: { id: guestUser.id, username: guestUser.username, avatar: guestUser.avatar, role: guestUser.role },
@@ -110,6 +132,13 @@ async function startServer() {
   });
 
   // ==========================================
+  // PUBLIC SITE SETTINGS (link hướng dẫn, giá gói Premium, thông tin chuyển khoản)
+  // ==========================================
+  app.get('/api/settings', (_req, res) => {
+    return res.json(db.getSettings());
+  });
+
+  // ==========================================
   // PROFILE & LEADERBOARD APIS
   // ==========================================
   app.get('/api/profile/:id', (req, res) => {
@@ -118,18 +147,47 @@ async function startServer() {
     return res.json(profile);
   });
 
-  app.put('/api/profile/:id/runes', (req, res) => {
+  app.put('/api/profile/:id/runes', async (req, res) => {
     const { runes } = req.body;
     if (!Array.isArray(runes) || runes.length === 0) {
       return res.status(400).json({ error: 'Cần chọn ít nhất 1 Rune để trang bị!' });
     }
-    const updated = db.updateProfile(req.params.id, { equippedRunes: runes });
+    const updated = await db.updateProfile(req.params.id, { equippedRunes: runes });
     return res.json(updated);
   });
 
   app.get('/api/profile/:id/history', (req, res) => {
     const history = db.getUserMatchHistory(req.params.id);
     return res.json(history);
+  });
+
+  app.put('/api/profile/:id/avatar', async (req, res) => {
+    const { avatar } = req.body;
+    if (!avatar) {
+      return res.status(400).json({ error: 'Vui lòng chọn pháp thân (avatar).' });
+    }
+    const result = await db.updateAvatar(req.params.id, avatar);
+    if (!result.success) {
+      return res.status(403).json({ error: result.error });
+    }
+    return res.json(result.profile);
+  });
+
+  // ==========================================
+  // PREMIUM SUBSCRIPTION APIS (Gói Xem Lời Giải / Gói Tháng)
+  // ==========================================
+  app.post('/api/premium/request', async (req, res) => {
+    const { userId, plan } = req.body;
+    if (!userId || (plan !== 'solution' && plan !== 'monthly')) {
+      return res.status(400).json({ error: 'Thông tin gói đăng ký không hợp lệ.' });
+    }
+    const user = db.findUserById(userId);
+    if (!user) return res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
+
+    const settings = db.getSettings();
+    const price = plan === 'monthly' ? settings.monthlyPackagePrice : settings.solutionPackagePrice;
+    const request = await db.createPremiumRequest(userId, user.username, plan, price);
+    return res.json({ success: true, request });
   });
 
   app.get('/api/leaderboard', (req, res) => {
@@ -170,11 +228,15 @@ async function startServer() {
 
   app.get('/api/admin/stats', requireAdmin, (_req, res) => {
     const allUsers = db.getAllUsers();
+    const premiumCount = allUsers.filter(u => db.isPremiumActive(u.id)).length;
+    const pendingPremiumRequests = db.getPremiumRequests().filter(r => r.status === 'pending').length;
     return res.json({
       totalUsers: allUsers.length,
       totalQuestions: CURATED_QUESTIONS.length + db.getCustomQuestions().length,
       totalCards: DECK_60_CARDS.length,
       totalRunes: ALL_RUNES.length,
+      totalPremiumUsers: premiumCount,
+      pendingPremiumRequests,
       systemStatus: 'Operational',
       activeMemoryUsage: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`,
     });
@@ -185,7 +247,7 @@ async function startServer() {
     return res.json(users);
   });
 
-  app.post('/api/admin/questions', requireAdmin, (req, res) => {
+  app.post('/api/admin/questions', requireAdmin, async (req, res) => {
     const { question, formula, options, answer, explanation, timeLimit, difficulty, category, level } = req.body;
     if (!question || !answer || !category) {
       return res.status(400).json({ error: 'Thiếu thông tin câu hỏi bắt buộc.' });
@@ -202,13 +264,76 @@ async function startServer() {
       category,
       level: level || 'THCS',
     };
-    db.addCustomQuestion(newQ);
+    await db.addCustomQuestion(newQ);
     return res.json({ success: true, question: newQ });
   });
 
-  app.delete('/api/admin/questions/:id', requireAdmin, (req, res) => {
-    db.deleteCustomQuestion(req.params.id);
+  app.delete('/api/admin/questions/:id', requireAdmin, async (req, res) => {
+    await db.deleteCustomQuestion(req.params.id);
     return res.json({ success: true });
+  });
+
+  // ------- Xóa tài khoản (chỉ 1 tài khoản Admin duy nhất, không thể tự xóa) -------
+  app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
+    const result = await db.deleteUser(req.params.id);
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
+    return res.json({ success: true });
+  });
+
+  // ------- Cài đặt hệ thống: link hướng dẫn, giá gói Premium, thông tin chuyển khoản -------
+  app.put('/api/admin/settings', requireAdmin, async (req, res) => {
+    const { guideLink, solutionPackagePrice, monthlyPackagePrice, bankAccountName, bankAccountNumber, bankName } = req.body;
+    const updated = await db.updateSettings({
+      ...(guideLink !== undefined && { guideLink }),
+      ...(solutionPackagePrice !== undefined && { solutionPackagePrice: Number(solutionPackagePrice) }),
+      ...(monthlyPackagePrice !== undefined && { monthlyPackagePrice: Number(monthlyPackagePrice) }),
+      ...(bankAccountName !== undefined && { bankAccountName }),
+      ...(bankAccountNumber !== undefined && { bankAccountNumber }),
+      ...(bankName !== undefined && { bankName }),
+    });
+    return res.json(updated);
+  });
+
+  // ------- Quản lý gói Premium: duyệt / từ chối yêu cầu, cấp / thu hồi thủ công -------
+  app.get('/api/admin/premium/requests', requireAdmin, (_req, res) => {
+    return res.json(db.getPremiumRequests());
+  });
+
+  app.post('/api/admin/premium/requests/:id/approve', requireAdmin, async (req, res) => {
+    const result = await db.resolvePremiumRequest(req.params.id, true);
+    if (!result.success) return res.status(400).json({ error: result.error });
+    return res.json({ success: true, profile: result.profile });
+  });
+
+  app.post('/api/admin/premium/requests/:id/reject', requireAdmin, async (req, res) => {
+    const result = await db.resolvePremiumRequest(req.params.id, false);
+    if (!result.success) return res.status(400).json({ error: result.error });
+    return res.json({ success: true });
+  });
+
+  app.post('/api/admin/premium/grant', requireAdmin, async (req, res) => {
+    const { userId, plan, days } = req.body;
+    if (!userId || (plan !== 'solution' && plan !== 'monthly')) {
+      return res.status(400).json({ error: 'Thông tin không hợp lệ.' });
+    }
+    const profile = await db.grantPremium(userId, plan, days ? Number(days) : 30);
+    if (!profile) return res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
+    return res.json(profile);
+  });
+
+  app.post('/api/admin/premium/revoke', requireAdmin, async (req, res) => {
+    const { userId } = req.body;
+    const profile = await db.revokePremium(userId);
+    if (!profile) return res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
+    return res.json(profile);
+  });
+
+  // ------- Reset Bảng Xếp Hạng tuần (thủ công - ngoài lịch tự động mỗi tuần) -------
+  app.post('/api/admin/leaderboard/reset', requireAdmin, async (_req, res) => {
+    await db.resetWeeklyLeaderboard();
+    return res.json({ success: true, settings: db.getSettings() });
   });
 
   // ==========================================

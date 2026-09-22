@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Swords,
   Globe,
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ChevronRight,
   HelpCircle,
+  BookOpen,
 } from 'lucide-react';
 import { MathLevel, AiDifficulty } from '../../shared/types.ts';
 
@@ -44,6 +45,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 }) => {
   const [showAiConfig, setShowAiConfig] = useState(false);
   const [aiDiff, setAiDiff] = useState<AiDifficulty>('medium');
+  const [guideLink, setGuideLink] = useState<string>('');
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => setGuideLink(data?.guideLink || ''))
+      .catch(() => {});
+  }, []);
 
   const diffLabels: Record<AiDifficulty, { label: string; desc: string; color: string }> = {
     easy: { label: 'Dễ', desc: 'Thích hợp tân thủ, AI bank sớm, độ chính xác toán 55%', color: 'from-emerald-500 to-teal-600' },
@@ -247,8 +256,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             </button>
           </div>
 
-          {/* Footer Action Buttons: How to Play & Admin */}
-          <div className="flex items-center justify-between pt-3 text-xs text-slate-400">
+          {/* Footer Action Buttons: How to Play, Guide Link & Admin */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 text-xs text-slate-400">
             <button
               onClick={onOpenHowToPlay}
               className="flex items-center gap-1.5 hover:text-amber-300 transition-colors"
@@ -256,6 +265,18 @@ export const MainMenu: React.FC<MainMenuProps> = ({
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Luật Chơi & Cơ Chế Bust</span>
             </button>
+
+            {guideLink && (
+              <a
+                href={guideLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 hover:text-emerald-300 transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Hướng Dẫn Chi Tiết</span>
+              </a>
+            )}
 
             <button
               onClick={onOpenAdmin}

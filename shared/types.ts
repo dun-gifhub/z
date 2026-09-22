@@ -168,6 +168,8 @@ export interface GameState {
   nextCardPreview?: { domainId: MathCategory; domainNameVi: string; pointValue: number; elementColor: string };
 }
 
+export type PremiumPlan = 'solution' | 'monthly';
+
 export interface UserProfile {
   id: string;
   username: string;
@@ -179,11 +181,37 @@ export interface UserProfile {
   wins: number;
   losses: number;
   winRate: number;
-  highestScore: number;
+  highestScore: number; // reset weekly - powers the "Tuần Này" leaderboard
+  allTimeHighestScore?: number; // never reset - powers the "Tất Cả Thời Gian" leaderboard
   rankTitle: string;
   equippedRunes: string[]; // 3 rune IDs
   unlockedSkins?: string[];
   createdAt: string;
+  // ------- Premium subscription -------
+  isPremium?: boolean;
+  premiumPlan?: PremiumPlan | null;
+  premiumExpiresAt?: string | null; // ISO date; null = no active plan
+}
+
+export interface PremiumRequest {
+  id: string;
+  userId: string;
+  username: string;
+  plan: PremiumPlan;
+  price: number;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  resolvedAt?: string;
+}
+
+export interface SiteSettings {
+  guideLink: string; // external link shown on the homepage (Zalo/Facebook/Youtube guide, etc.)
+  solutionPackagePrice: number; // one-time "xem lời giải chi tiết" package, in VND
+  monthlyPackagePrice: number; // monthly subscription price, in VND (cheaper per period)
+  bankAccountName: string;
+  bankAccountNumber: string;
+  bankName: string;
+  lastLeaderboardReset: string; // ISO date of the last weekly leaderboard reset
 }
 
 export interface LeaderboardEntry {

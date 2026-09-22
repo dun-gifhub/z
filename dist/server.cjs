@@ -24,12 +24,10 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 // server.ts
 var import_express = __toESM(require("express"), 1);
 var import_http = __toESM(require("http"), 1);
-var import_path2 = __toESM(require("path"), 1);
+var import_path = __toESM(require("path"), 1);
 var import_bcryptjs2 = __toESM(require("bcryptjs"), 1);
 
 // server/database/db.ts
-var import_fs = __toESM(require("fs"), 1);
-var import_path = __toESM(require("path"), 1);
 var import_bcryptjs = __toESM(require("bcryptjs"), 1);
 
 // shared/runes.ts
@@ -249,105 +247,419 @@ var ALL_RUNES = [
 ];
 var DEFAULT_RUNE_SELECTION = ["rune_shield"];
 
-// server/database/db.ts
-var DATA_DIR = import_path.default.join(process.cwd(), "data");
-var DB_FILE = import_path.default.join(DATA_DIR, "math_rune.json");
-if (!import_fs.default.existsSync(DATA_DIR)) {
-  try {
-    import_fs.default.mkdirSync(DATA_DIR, { recursive: true });
-  } catch (e) {
-    console.error("Failed to create data directory:", e);
-  }
+// shared/avatars.ts
+var BASIC_AVATARS = ["\u{1F9D9}\u200D\u2642\uFE0F", "\u{1F9DD}\u200D\u2640\uFE0F", "\u{1F52E}", "\u26A1", "\u{1F409}", "\u2728", "\u{1F98A}", "\u{1F985}", "\u{1F989}", "\u2694\uFE0F"];
+var VIP_AVATARS = ["\u{1F451}", "\u{1F984}", "\u{1F432}", "\u{1F48E}", "\u{1F31F}", "\u{1F531}", "\u{1F981}", "\u{1F9DE}\u200D\u2642\uFE0F"];
+var ALL_AVATARS = [...BASIC_AVATARS, ...VIP_AVATARS];
+function isVipAvatar(avatar) {
+  return VIP_AVATARS.includes(avatar);
 }
-var DEFAULT_DB = {
-  users: [
-    {
-      id: "admin-001",
-      username: "ArchmageAdmin",
-      email: "admin@mathrune.com",
-      passwordHash: import_bcryptjs.default.hashSync("admin123", 10),
-      avatar: "\u{1F9D9}\u200D\u2642\uFE0F",
-      role: "admin",
-      createdAt: (/* @__PURE__ */ new Date()).toISOString()
-    },
-    {
-      id: "bot-ai",
-      username: "Archimedes AI",
-      email: "ai@mathrune.com",
-      passwordHash: "none",
-      avatar: "\u{1F916}",
-      role: "user",
-      createdAt: (/* @__PURE__ */ new Date()).toISOString()
-    }
-  ],
-  profiles: {
-    "admin-001": {
-      id: "admin-001",
-      username: "ArchmageAdmin",
-      avatar: "\u{1F9D9}\u200D\u2642\uFE0F",
-      level: 10,
-      xp: 4500,
-      totalGames: 28,
-      wins: 24,
-      losses: 4,
-      winRate: 85.7,
-      highestScore: 320,
-      rankTitle: "\u0110\u1EA1i Ph\xE1p S\u01B0 To\xE1n H\u1ECDc",
-      equippedRunes: DEFAULT_RUNE_SELECTION,
-      createdAt: (/* @__PURE__ */ new Date()).toISOString()
-    },
-    "bot-ai": {
-      id: "bot-ai",
-      username: "Archimedes AI",
-      avatar: "\u{1F916}",
-      level: 5,
-      xp: 1200,
-      totalGames: 50,
-      wins: 25,
-      losses: 25,
-      winRate: 50,
-      highestScore: 210,
-      rankTitle: "K\u1EF3 Th\u1EE7 Thu\u1EADt To\xE1n",
-      equippedRunes: DEFAULT_RUNE_SELECTION,
-      createdAt: (/* @__PURE__ */ new Date()).toISOString()
-    }
-  },
-  matchHistory: [],
-  customQuestions: [],
-  rooms: {}
+
+// server/database/pool.ts
+var import_pg = __toESM(require("pg"), 1);
+var { Pool } = import_pg.default;
+var connectionString = process.env.DATABASE_URL;
+var hasDatabase = !!connectionString;
+var pool = hasDatabase ? new Pool({
+  connectionString,
+  ssl: { rejectUnauthorized: false },
+  max: 5,
+  idleTimeoutMillis: 3e4
+}) : null;
+if (pool) {
+  pool.on("error", (err) => {
+    console.error("\u274C L\u1ED7i k\u1EBFt n\u1ED1i Neon Postgres (idle client):", err.message);
+  });
+} else {
+  console.warn(
+    "\u26A0\uFE0F  Ch\u01B0a \u0111\u1EB7t DATABASE_URL \u2014 server \u0111ang ch\u1EA1y \u1EDF ch\u1EBF \u0111\u1ED9 T\u1EA0M (d\u1EEF li\u1EC7u ch\u1EC9 l\u01B0u trong RAM, s\u1EBD m\u1EA5t khi restart).\n   H\xE3y t\u1EA1o database mi\u1EC5n ph\xED t\u1EA1i https://neon.tech r\u1ED3i \u0111\u1EB7t bi\u1EBFn m\xF4i tr\u01B0\u1EDDng DATABASE_URL \u0111\u1EC3 l\u01B0u d\u1EEF li\u1EC7u v\u0129nh vi\u1EC5n."
+  );
+}
+
+// server/database/db.ts
+var DEFAULT_SETTINGS = {
+  guideLink: "",
+  solutionPackagePrice: 2e4,
+  monthlyPackagePrice: 15e3,
+  bankAccountName: "",
+  bankAccountNumber: "",
+  bankName: "",
+  lastLeaderboardReset: (/* @__PURE__ */ new Date()).toISOString()
 };
+function buildDefaultSeed() {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  return {
+    users: [
+      {
+        id: "admin-001",
+        username: "A3K23",
+        email: "dungdaumoi223@gmail.com",
+        passwordHash: import_bcryptjs.default.hashSync("A3k23maidinh", 10),
+        avatar: "\u{1F9D9}\u200D\u2642\uFE0F",
+        role: "admin",
+        createdAt: now
+      },
+      {
+        id: "bot-ai",
+        username: "Archimedes AI",
+        email: "ai@mathrune.com",
+        passwordHash: "none",
+        avatar: "\u{1F916}",
+        role: "user",
+        createdAt: now
+      }
+    ],
+    profiles: {
+      "admin-001": {
+        id: "admin-001",
+        username: "ArchmageAdmin",
+        avatar: "\u{1F9D9}\u200D\u2642\uFE0F",
+        level: 10,
+        xp: 4500,
+        totalGames: 28,
+        wins: 24,
+        losses: 4,
+        winRate: 85.7,
+        highestScore: 320,
+        allTimeHighestScore: 320,
+        rankTitle: "\u0110\u1EA1i Ph\xE1p S\u01B0 To\xE1n H\u1ECDc",
+        equippedRunes: DEFAULT_RUNE_SELECTION,
+        createdAt: now,
+        isPremium: false,
+        premiumPlan: null,
+        premiumExpiresAt: null
+      },
+      "bot-ai": {
+        id: "bot-ai",
+        username: "Archimedes AI",
+        avatar: "\u{1F916}",
+        level: 5,
+        xp: 1200,
+        totalGames: 50,
+        wins: 25,
+        losses: 25,
+        winRate: 50,
+        highestScore: 210,
+        allTimeHighestScore: 210,
+        rankTitle: "K\u1EF3 Th\u1EE7 Thu\u1EADt To\xE1n",
+        equippedRunes: DEFAULT_RUNE_SELECTION,
+        createdAt: now,
+        isPremium: false,
+        premiumPlan: null,
+        premiumExpiresAt: null
+      }
+    },
+    matchHistory: [],
+    customQuestions: [],
+    premiumRequests: [],
+    settings: { ...DEFAULT_SETTINGS }
+  };
+}
+var SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS users (
+  id VARCHAR(64) PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100),
+  password_hash VARCHAR(255) NOT NULL,
+  avatar VARCHAR(20) DEFAULT '\u{1F9D9}\u200D\u2642\uFE0F',
+  role VARCHAR(20) DEFAULT 'user',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS profiles (
+  user_id VARCHAR(64) PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  username VARCHAR(50) NOT NULL,
+  email VARCHAR(100),
+  avatar VARCHAR(20) DEFAULT '\u{1F9D9}\u200D\u2642\uFE0F',
+  level INTEGER DEFAULT 1,
+  xp INTEGER DEFAULT 0,
+  total_games INTEGER DEFAULT 0,
+  wins INTEGER DEFAULT 0,
+  losses INTEGER DEFAULT 0,
+  win_rate NUMERIC(5,2) DEFAULT 0.00,
+  highest_score INTEGER DEFAULT 0,
+  all_time_highest_score INTEGER DEFAULT 0,
+  rank_title VARCHAR(50) DEFAULT 'T\u1EADp S\u1EF1 Ph\xE9p Thu\u1EADt',
+  equipped_runes JSONB DEFAULT '[]'::jsonb,
+  unlocked_skins JSONB DEFAULT '[]'::jsonb,
+  is_premium BOOLEAN DEFAULT FALSE,
+  premium_plan VARCHAR(20),
+  premium_expires_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS premium_requests (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
+  username VARCHAR(50) NOT NULL,
+  plan VARCHAR(20) NOT NULL,
+  price INTEGER NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TIMESTAMP WITH TIME ZONE
+);
+CREATE TABLE IF NOT EXISTS site_settings (
+  id INTEGER PRIMARY KEY DEFAULT 1,
+  guide_link TEXT DEFAULT '',
+  solution_package_price INTEGER DEFAULT 20000,
+  monthly_package_price INTEGER DEFAULT 15000,
+  bank_account_name VARCHAR(100) DEFAULT '',
+  bank_account_number VARCHAR(50) DEFAULT '',
+  bank_name VARCHAR(100) DEFAULT '',
+  last_leaderboard_reset TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS custom_questions (
+  id VARCHAR(64) PRIMARY KEY,
+  question TEXT NOT NULL,
+  formula TEXT,
+  options JSONB,
+  answer VARCHAR(255) NOT NULL,
+  explanation TEXT,
+  time_limit INTEGER DEFAULT 15,
+  difficulty INTEGER DEFAULT 2,
+  category VARCHAR(32) NOT NULL,
+  level VARCHAR(20) DEFAULT 'THCS',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS match_history (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
+  opponent_name VARCHAR(50) NOT NULL,
+  is_win BOOLEAN NOT NULL,
+  score INTEGER NOT NULL,
+  accuracy NUMERIC(5,2) DEFAULT 0.00,
+  correct_answers INTEGER DEFAULT 0,
+  total_questions INTEGER DEFAULT 0,
+  busts INTEGER DEFAULT 0,
+  max_combo INTEGER DEFAULT 0,
+  mode VARCHAR(10) DEFAULT 'pvp',
+  played_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_profiles_highest_score ON profiles(highest_score DESC);
+CREATE INDEX IF NOT EXISTS idx_profiles_all_time_highest_score ON profiles(all_time_highest_score DESC);
+CREATE INDEX IF NOT EXISTS idx_match_history_user ON match_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_premium_requests_status ON premium_requests(status);
+`;
+function rowToUser(r) {
+  return {
+    id: r.id,
+    username: r.username,
+    email: r.email || "",
+    passwordHash: r.password_hash,
+    avatar: r.avatar,
+    role: r.role,
+    createdAt: new Date(r.created_at).toISOString()
+  };
+}
+function rowToProfile(r) {
+  return {
+    id: r.user_id,
+    username: r.username,
+    email: r.email || void 0,
+    avatar: r.avatar,
+    level: r.level,
+    xp: r.xp,
+    totalGames: r.total_games,
+    wins: r.wins,
+    losses: r.losses,
+    winRate: Number(r.win_rate),
+    highestScore: r.highest_score,
+    allTimeHighestScore: r.all_time_highest_score,
+    rankTitle: r.rank_title,
+    equippedRunes: r.equipped_runes || [],
+    unlockedSkins: r.unlocked_skins || [],
+    createdAt: new Date(r.created_at).toISOString(),
+    isPremium: r.is_premium,
+    premiumPlan: r.premium_plan,
+    premiumExpiresAt: r.premium_expires_at ? new Date(r.premium_expires_at).toISOString() : null
+  };
+}
+function rowToMatch(r) {
+  return {
+    id: r.id,
+    userId: r.user_id,
+    opponentName: r.opponent_name,
+    isWin: r.is_win,
+    score: r.score,
+    accuracy: Number(r.accuracy),
+    correctAnswers: r.correct_answers,
+    totalQuestions: r.total_questions,
+    busts: r.busts,
+    maxCombo: r.max_combo,
+    mode: r.mode,
+    timestamp: new Date(r.played_at).getTime()
+  };
+}
+function rowToQuestion(r) {
+  return {
+    id: r.id,
+    question: r.question,
+    formula: r.formula || void 0,
+    options: r.options || void 0,
+    answer: r.answer,
+    explanation: r.explanation || void 0,
+    timeLimit: r.time_limit,
+    difficulty: r.difficulty,
+    category: r.category,
+    level: r.level
+  };
+}
+function rowToPremiumRequest(r) {
+  return {
+    id: r.id,
+    userId: r.user_id,
+    username: r.username,
+    plan: r.plan,
+    price: r.price,
+    status: r.status,
+    createdAt: new Date(r.created_at).toISOString(),
+    resolvedAt: r.resolved_at ? new Date(r.resolved_at).toISOString() : void 0
+  };
+}
+function rowToSettings(r) {
+  return {
+    guideLink: r.guide_link || "",
+    solutionPackagePrice: r.solution_package_price,
+    monthlyPackagePrice: r.monthly_package_price,
+    bankAccountName: r.bank_account_name || "",
+    bankAccountNumber: r.bank_account_number || "",
+    bankName: r.bank_name || "",
+    lastLeaderboardReset: new Date(r.last_leaderboard_reset).toISOString()
+  };
+}
 var DatabaseManager = class {
   constructor() {
-    this.data = this.load();
+    this.data = buildDefaultSeed();
+    this.ready = this.init();
   }
-  load() {
+  /** Server nên `await db.waitUntilReady()` trước khi bắt đầu nhận request. */
+  waitUntilReady() {
+    return this.ready;
+  }
+  async init() {
+    if (!pool) {
+      return;
+    }
     try {
-      if (import_fs.default.existsSync(DB_FILE)) {
-        const raw = import_fs.default.readFileSync(DB_FILE, "utf-8");
-        return JSON.parse(raw);
+      await pool.query(SCHEMA_SQL);
+      const { rows: userRows } = await pool.query("SELECT * FROM users");
+      if (userRows.length === 0) {
+        const seed = this.data;
+        for (const u of seed.users) {
+          await pool.query(
+            `INSERT INTO users (id, username, email, password_hash, avatar, role, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7)
+             ON CONFLICT (id) DO NOTHING`,
+            [u.id, u.username, u.email, u.passwordHash, u.avatar, u.role, u.createdAt]
+          );
+        }
+        for (const p of Object.values(seed.profiles)) {
+          await pool.query(
+            `INSERT INTO profiles (user_id, username, email, avatar, level, xp, total_games, wins, losses,
+               win_rate, highest_score, all_time_highest_score, rank_title, equipped_runes, unlocked_skins,
+               is_premium, premium_plan, premium_expires_at, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+             ON CONFLICT (user_id) DO NOTHING`,
+            [
+              p.id,
+              p.username,
+              p.email || null,
+              p.avatar,
+              p.level,
+              p.xp,
+              p.totalGames,
+              p.wins,
+              p.losses,
+              p.winRate,
+              p.highestScore,
+              p.allTimeHighestScore || 0,
+              p.rankTitle,
+              JSON.stringify(p.equippedRunes),
+              JSON.stringify(p.unlockedSkins || []),
+              p.isPremium || false,
+              p.premiumPlan || null,
+              p.premiumExpiresAt || null,
+              p.createdAt
+            ]
+          );
+        }
+        await pool.query(
+          `INSERT INTO site_settings (id, guide_link, solution_package_price, monthly_package_price,
+             bank_account_name, bank_account_number, bank_name, last_leaderboard_reset)
+           VALUES (1,$1,$2,$3,$4,$5,$6,$7)
+           ON CONFLICT (id) DO NOTHING`,
+          [
+            seed.settings.guideLink,
+            seed.settings.solutionPackagePrice,
+            seed.settings.monthlyPackagePrice,
+            seed.settings.bankAccountName,
+            seed.settings.bankAccountNumber,
+            seed.settings.bankName,
+            seed.settings.lastLeaderboardReset
+          ]
+        );
       }
+      await this.loadAllFromDb();
+      console.log("\u2705 \u0110\xE3 k\u1EBFt n\u1ED1i Neon Postgres v\xE0 t\u1EA3i d\u1EEF li\u1EC7u th\xE0nh c\xF4ng.");
     } catch (e) {
-      console.warn("Failed to load DB file, using default seed:", e);
+      console.error("\u274C Kh\xF4ng th\u1EC3 k\u1EBFt n\u1ED1i/t\u1EA3i d\u1EEF li\u1EC7u t\u1EEB Neon Postgres \u2014 t\u1EA1m d\xF9ng d\u1EEF li\u1EC7u m\u1EB7c \u0111\u1ECBnh trong RAM:", e.message);
     }
-    this.save(DEFAULT_DB);
-    return DEFAULT_DB;
   }
-  save(dataToSave) {
+  async loadAllFromDb() {
+    if (!pool) return;
+    const [userRes, profileRes, matchRes, questionRes, premiumRes, settingsRes] = await Promise.all([
+      pool.query("SELECT * FROM users"),
+      pool.query("SELECT * FROM profiles"),
+      pool.query("SELECT * FROM match_history ORDER BY played_at DESC LIMIT 3000"),
+      pool.query("SELECT * FROM custom_questions"),
+      pool.query("SELECT * FROM premium_requests ORDER BY created_at DESC"),
+      pool.query("SELECT * FROM site_settings WHERE id = 1")
+    ]);
+    this.data.users = userRes.rows.map(rowToUser);
+    const profiles = {};
+    for (const r of profileRes.rows) profiles[r.user_id] = rowToProfile(r);
+    this.data.profiles = profiles;
+    this.data.matchHistory = matchRes.rows.map(rowToMatch);
+    this.data.customQuestions = questionRes.rows.map(rowToQuestion);
+    this.data.premiumRequests = premiumRes.rows.map(rowToPremiumRequest);
+    if (settingsRes.rows.length > 0) {
+      this.data.settings = rowToSettings(settingsRes.rows[0]);
+    } else {
+      await pool.query(
+        `INSERT INTO site_settings (id, guide_link, solution_package_price, monthly_package_price,
+           bank_account_name, bank_account_number, bank_name, last_leaderboard_reset)
+         VALUES (1,$1,$2,$3,$4,$5,$6,$7) ON CONFLICT (id) DO NOTHING`,
+        [
+          DEFAULT_SETTINGS.guideLink,
+          DEFAULT_SETTINGS.solutionPackagePrice,
+          DEFAULT_SETTINGS.monthlyPackagePrice,
+          DEFAULT_SETTINGS.bankAccountName,
+          DEFAULT_SETTINGS.bankAccountNumber,
+          DEFAULT_SETTINGS.bankName,
+          DEFAULT_SETTINGS.lastLeaderboardReset
+        ]
+      );
+      this.data.settings = { ...DEFAULT_SETTINGS };
+    }
+  }
+  /** Chạy 1 câu lệnh ghi vào Neon, không làm crash app nếu Neon tạm thời lỗi. */
+  async persist(fn) {
+    if (!pool) return;
     try {
-      const payload = dataToSave || this.data;
-      import_fs.default.writeFileSync(DB_FILE, JSON.stringify(payload, null, 2), "utf-8");
+      await fn();
     } catch (e) {
-      console.error("Error persisting database:", e);
+      console.error("\u274C L\u1ED7i ghi d\u1EEF li\u1EC7u v\xE0o Neon Postgres:", e.message);
     }
   }
-  // User auth methods
+  // ==========================================
+  // USER AUTH
+  // ==========================================
   findUserByUsername(username) {
     return this.data.users.find((u) => u.username.toLowerCase() === username.toLowerCase());
   }
   findUserById(id) {
     return this.data.users.find((u) => u.id === id);
   }
-  createUser(username, email, password, avatar) {
+  async createUser(username, email, password, avatar) {
     const salt = import_bcryptjs.default.genSaltSync(10);
     const passwordHash = import_bcryptjs.default.hashSync(password, salt);
     const newUser = {
@@ -360,7 +672,7 @@ var DatabaseManager = class {
       createdAt: (/* @__PURE__ */ new Date()).toISOString()
     };
     this.data.users.push(newUser);
-    this.data.profiles[newUser.id] = {
+    const newProfile = {
       id: newUser.id,
       username: newUser.username,
       email: newUser.email,
@@ -372,25 +684,56 @@ var DatabaseManager = class {
       losses: 0,
       winRate: 0,
       highestScore: 0,
+      allTimeHighestScore: 0,
       rankTitle: "T\u1EADp S\u1EF1 Ph\xE9p Thu\u1EADt",
       equippedRunes: [...DEFAULT_RUNE_SELECTION],
-      createdAt: newUser.createdAt
+      createdAt: newUser.createdAt,
+      isPremium: false,
+      premiumPlan: null,
+      premiumExpiresAt: null
     };
-    this.save();
+    this.data.profiles[newUser.id] = newProfile;
+    await this.persist(async () => {
+      await pool.query(
+        `INSERT INTO users (id, username, email, password_hash, avatar, role, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+        [newUser.id, newUser.username, newUser.email, newUser.passwordHash, newUser.avatar, newUser.role, newUser.createdAt]
+      );
+      await pool.query(
+        `INSERT INTO profiles (user_id, username, email, avatar, level, xp, total_games, wins, losses,
+           win_rate, highest_score, all_time_highest_score, rank_title, equipped_runes, unlocked_skins,
+           is_premium, premium_plan, premium_expires_at, created_at)
+         VALUES ($1,$2,$3,$4,1,0,0,0,0,0,0,0,$5,$6,'[]',false,NULL,NULL,$7)`,
+        [
+          newProfile.id,
+          newProfile.username,
+          newProfile.email || null,
+          newProfile.avatar,
+          newProfile.rankTitle,
+          JSON.stringify(newProfile.equippedRunes),
+          newProfile.createdAt
+        ]
+      );
+    });
     return newUser;
   }
   getProfile(userId) {
     return this.data.profiles[userId];
   }
-  updateProfile(userId, updates) {
+  async updateProfile(userId, updates) {
     if (!this.data.profiles[userId]) return void 0;
-    this.data.profiles[userId] = {
-      ...this.data.profiles[userId],
-      ...updates
-    };
-    this.save();
-    return this.data.profiles[userId];
+    this.data.profiles[userId] = { ...this.data.profiles[userId], ...updates };
+    const p = this.data.profiles[userId];
+    await this.persist(
+      () => pool.query(
+        `UPDATE profiles SET equipped_runes = $2, updated_at = NOW() WHERE user_id = $1`,
+        [userId, JSON.stringify(p.equippedRunes)]
+      )
+    );
+    return p;
   }
+  // Được gọi từ vòng lặp game (đồng bộ, "bắn và quên") — cập nhật RAM ngay lập tức
+  // để không làm chậm trận đấu, rồi ghi xuống Neon ở nền.
   recordMatch(item) {
     this.data.matchHistory.unshift(item);
     const profile = this.data.profiles[item.userId];
@@ -404,9 +747,8 @@ var DatabaseManager = class {
         profile.xp += 40 + item.correctAnswers * 5;
       }
       profile.winRate = Math.round(profile.wins / profile.totalGames * 100);
-      if (item.score > profile.highestScore) {
-        profile.highestScore = item.score;
-      }
+      if (item.score > profile.highestScore) profile.highestScore = item.score;
+      if (item.score > (profile.allTimeHighestScore || 0)) profile.allTimeHighestScore = item.score;
       const calculatedLevel = Math.max(1, Math.floor(profile.xp / 300) + 1);
       profile.level = calculatedLevel;
       if (profile.level >= 10) profile.rankTitle = "\u0110\u1EA1i Ph\xE1p S\u01B0 To\xE1n H\u1ECDc";
@@ -414,42 +756,231 @@ var DatabaseManager = class {
       else if (profile.level >= 4) profile.rankTitle = "H\u1ECDc Gi\u1EA3 Ph\xE9p Thu\u1EADt";
       else profile.rankTitle = "T\u1EADp S\u1EF1 Ph\xE9p Thu\u1EADt";
     }
-    this.save();
+    this.persist(async () => {
+      await pool.query(
+        `INSERT INTO match_history (id, user_id, opponent_name, is_win, score, accuracy, correct_answers,
+           total_questions, busts, max_combo, mode, played_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,to_timestamp($12::double precision / 1000.0))`,
+        [
+          item.id,
+          item.userId,
+          item.opponentName,
+          item.isWin,
+          item.score,
+          item.accuracy,
+          item.correctAnswers,
+          item.totalQuestions,
+          item.busts,
+          item.maxCombo,
+          item.mode,
+          item.timestamp
+        ]
+      );
+      if (profile) {
+        await pool.query(
+          `UPDATE profiles SET total_games=$2, wins=$3, losses=$4, xp=$5, win_rate=$6, highest_score=$7,
+             all_time_highest_score=$8, level=$9, rank_title=$10, updated_at=NOW() WHERE user_id=$1`,
+          [
+            item.userId,
+            profile.totalGames,
+            profile.wins,
+            profile.losses,
+            profile.xp,
+            profile.winRate,
+            profile.highestScore,
+            profile.allTimeHighestScore || 0,
+            profile.level,
+            profile.rankTitle
+          ]
+        );
+      }
+    }).catch((err) => console.error("\u274C L\u1ED7i l\u01B0u l\u1ECBch s\u1EED tr\u1EADn \u0111\u1EA5u v\xE0o Neon:", err));
   }
   getUserMatchHistory(userId, limit = 15) {
     return this.data.matchHistory.filter((m) => m.userId === userId).slice(0, limit);
   }
   getLeaderboard(filter = "all") {
-    const list = Object.values(this.data.profiles).filter((p) => p.id !== "bot-ai").sort((a, b) => {
-      if (b.highestScore !== a.highestScore) {
-        return b.highestScore - a.highestScore;
-      }
-      return b.xp - a.xp;
-    }).slice(0, 50).map((p, idx) => ({
+    const useWeekly = filter === "weekly" || filter === "daily";
+    return Object.values(this.data.profiles).filter((p) => p.id !== "bot-ai").map((p) => ({ ...p, _score: useWeekly ? p.highestScore : p.allTimeHighestScore ?? p.highestScore })).sort((a, b) => b._score !== a._score ? b._score - a._score : b.xp - a.xp).slice(0, 50).map((p, idx) => ({
       rank: idx + 1,
       userId: p.id,
       username: p.username,
       avatar: p.avatar,
       level: p.level,
-      score: p.highestScore,
+      score: p._score,
       wins: p.wins,
       winRate: p.winRate
     }));
-    return list;
+  }
+  // Xoá bảng xếp hạng tuần (điểm kỷ lục trong tuần) về 0đ cho toàn bộ người dùng.
+  // Điểm kỷ lục mọi thời đại (allTimeHighestScore) không bị ảnh hưởng.
+  async resetWeeklyLeaderboard() {
+    for (const p of Object.values(this.data.profiles)) p.highestScore = 0;
+    this.data.settings.lastLeaderboardReset = (/* @__PURE__ */ new Date()).toISOString();
+    await this.persist(async () => {
+      await pool.query(`UPDATE profiles SET highest_score = 0, updated_at = NOW()`);
+      await pool.query(`UPDATE site_settings SET last_leaderboard_reset = NOW() WHERE id = 1`);
+    });
   }
   getAllUsers() {
     return this.data.users.map(({ passwordHash, ...safe }) => safe);
   }
-  addCustomQuestion(q) {
+  async addCustomQuestion(q) {
     this.data.customQuestions.push(q);
-    this.save();
+    await this.persist(
+      () => pool.query(
+        `INSERT INTO custom_questions (id, question, formula, options, answer, explanation, time_limit, difficulty, category, level)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          q.id,
+          q.question,
+          q.formula || null,
+          JSON.stringify(q.options || null),
+          q.answer,
+          q.explanation || null,
+          q.timeLimit || 15,
+          q.difficulty || 2,
+          q.category,
+          q.level
+        ]
+      )
+    );
   }
   getCustomQuestions() {
     return this.data.customQuestions;
   }
-  deleteCustomQuestion(id) {
+  async deleteCustomQuestion(id) {
     this.data.customQuestions = this.data.customQuestions.filter((q) => q.id !== id);
-    this.save();
+    await this.persist(() => pool.query("DELETE FROM custom_questions WHERE id = $1", [id]));
+  }
+  // ==========================================
+  // ACCOUNT MANAGEMENT (chỉ 1 tài khoản Admin)
+  // ==========================================
+  async deleteUser(userId) {
+    const target = this.data.users.find((u) => u.id === userId);
+    if (!target) return { success: false, error: "Kh\xF4ng t\xECm th\u1EA5y t\xE0i kho\u1EA3n." };
+    if (target.role === "admin") {
+      return { success: false, error: "Kh\xF4ng th\u1EC3 x\xF3a t\xE0i kho\u1EA3n Qu\u1EA3n Tr\u1ECB Vi\xEAn duy nh\u1EA5t c\u1EE7a h\u1EC7 th\u1ED1ng." };
+    }
+    this.data.users = this.data.users.filter((u) => u.id !== userId);
+    delete this.data.profiles[userId];
+    this.data.matchHistory = this.data.matchHistory.filter((m) => m.userId !== userId);
+    this.data.premiumRequests = this.data.premiumRequests.filter((r) => r.userId !== userId);
+    await this.persist(() => pool.query("DELETE FROM users WHERE id = $1", [userId]));
+    return { success: true };
+  }
+  // ==========================================
+  // AVATAR (miễn phí + VIP dành cho gói Premium)
+  // ==========================================
+  async updateAvatar(userId, avatar) {
+    const user = this.data.users.find((u) => u.id === userId);
+    const profile = this.data.profiles[userId];
+    if (!user || !profile) return { success: false, error: "Kh\xF4ng t\xECm th\u1EA5y t\xE0i kho\u1EA3n." };
+    if (isVipAvatar(avatar) && !this.isPremiumActive(userId)) {
+      return { success: false, error: "Ph\xE1p th\xE2n n\xE0y ch\u1EC9 d\xE0nh cho th\xE0nh vi\xEAn Premium. H\xE3y n\xE2ng c\u1EA5p g\xF3i \u0111\u1EC3 m\u1EDF kh\xF3a!" };
+    }
+    user.avatar = avatar;
+    profile.avatar = avatar;
+    await this.persist(async () => {
+      await pool.query("UPDATE users SET avatar = $2 WHERE id = $1", [userId, avatar]);
+      await pool.query("UPDATE profiles SET avatar = $2, updated_at = NOW() WHERE user_id = $1", [userId, avatar]);
+    });
+    return { success: true, profile };
+  }
+  // ==========================================
+  // SITE SETTINGS (link hướng dẫn, giá gói, thông tin chuyển khoản)
+  // ==========================================
+  getSettings() {
+    return this.data.settings;
+  }
+  async updateSettings(updates) {
+    this.data.settings = { ...this.data.settings, ...updates };
+    const s = this.data.settings;
+    await this.persist(
+      () => pool.query(
+        `UPDATE site_settings SET guide_link=$1, solution_package_price=$2, monthly_package_price=$3,
+           bank_account_name=$4, bank_account_number=$5, bank_name=$6 WHERE id = 1`,
+        [s.guideLink, s.solutionPackagePrice, s.monthlyPackagePrice, s.bankAccountName, s.bankAccountNumber, s.bankName]
+      )
+    );
+    return s;
+  }
+  // ==========================================
+  // PREMIUM SUBSCRIPTION (Gói Xem Lời Giải / Gói Tháng)
+  // ==========================================
+  isPremiumActive(userId) {
+    const profile = this.data.profiles[userId];
+    if (!profile || !profile.isPremium) return false;
+    if (!profile.premiumExpiresAt) return true;
+    return new Date(profile.premiumExpiresAt).getTime() > Date.now();
+  }
+  async grantPremium(userId, plan, days = 30) {
+    const profile = this.data.profiles[userId];
+    if (!profile) return void 0;
+    const now = Date.now();
+    const base = profile.premiumExpiresAt && new Date(profile.premiumExpiresAt).getTime() > now ? new Date(profile.premiumExpiresAt).getTime() : now;
+    profile.isPremium = true;
+    profile.premiumPlan = plan;
+    profile.premiumExpiresAt = new Date(base + days * 24 * 60 * 60 * 1e3).toISOString();
+    await this.persist(
+      () => pool.query(
+        `UPDATE profiles SET is_premium=true, premium_plan=$2, premium_expires_at=$3, updated_at=NOW() WHERE user_id=$1`,
+        [userId, profile.premiumPlan, profile.premiumExpiresAt]
+      )
+    );
+    return profile;
+  }
+  async revokePremium(userId) {
+    const profile = this.data.profiles[userId];
+    if (!profile) return void 0;
+    profile.isPremium = false;
+    profile.premiumPlan = null;
+    profile.premiumExpiresAt = null;
+    await this.persist(
+      () => pool.query(
+        `UPDATE profiles SET is_premium=false, premium_plan=NULL, premium_expires_at=NULL, updated_at=NOW() WHERE user_id=$1`,
+        [userId]
+      )
+    );
+    return profile;
+  }
+  async createPremiumRequest(userId, username, plan, price) {
+    const req = {
+      id: `PRQ_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+      userId,
+      username,
+      plan,
+      price,
+      status: "pending",
+      createdAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    this.data.premiumRequests.unshift(req);
+    await this.persist(
+      () => pool.query(
+        `INSERT INTO premium_requests (id, user_id, username, plan, price, status, created_at)
+         VALUES ($1,$2,$3,$4,$5,'pending',$6)`,
+        [req.id, req.userId, req.username, req.plan, req.price, req.createdAt]
+      )
+    );
+    return req;
+  }
+  getPremiumRequests() {
+    return this.data.premiumRequests;
+  }
+  async resolvePremiumRequest(requestId, approve) {
+    const req = this.data.premiumRequests.find((r) => r.id === requestId);
+    if (!req) return { success: false, error: "Kh\xF4ng t\xECm th\u1EA5y y\xEAu c\u1EA7u." };
+    if (req.status !== "pending") return { success: false, error: "Y\xEAu c\u1EA7u n\xE0y \u0111\xE3 \u0111\u01B0\u1EE3c x\u1EED l\xFD." };
+    req.status = approve ? "approved" : "rejected";
+    req.resolvedAt = (/* @__PURE__ */ new Date()).toISOString();
+    let profile;
+    if (approve) {
+      profile = await this.grantPremium(req.userId, req.plan, 30);
+    }
+    await this.persist(
+      () => pool.query("UPDATE premium_requests SET status=$2, resolved_at=$3 WHERE id=$1", [req.id, req.status, req.resolvedAt])
+    );
+    return { success: true, profile };
   }
 };
 var db = new DatabaseManager();
@@ -2703,11 +3234,14 @@ var GameEngine = class {
         player.stats.categoryAccuracy[cat] = { correct: 0, total: 0 };
       }
       player.stats.categoryAccuracy[cat].total += 1;
+      const humanPlayerIds = Object.values(state.players).filter((p) => !p.isAi).map((p) => p.id);
+      const canSeeSolution = humanPlayerIds.some((id) => db.isPremiumActive(id));
+      const revealedExplanation = canSeeSolution ? currentFullQuestion.explanation : "\u{1F512} N\xE2ng c\u1EA5p g\xF3i Premium (H\u1ED3 S\u01A1 Ph\xE1p S\u01B0) \u0111\u1EC3 xem l\u1EDDi gi\u1EA3i chi ti\u1EBFt t\u1EEBng b\u01B0\u1EDBc cho c\xE2u h\u1ECFi n\xE0y!";
       state.lastAnswerResult = {
         correct: false,
         earnedPoints: 0,
         revealedAnswer: currentFullQuestion.answer,
-        explanation: currentFullQuestion.explanation
+        explanation: revealedExplanation
       };
       state.historyLog.push({
         id: `log_${Date.now()}`,
@@ -2728,7 +3262,7 @@ var GameEngine = class {
         correct: false,
         earnedPoints: 0,
         state,
-        explanation: currentFullQuestion.explanation
+        explanation: revealedExplanation
       };
     }
   }
@@ -3375,11 +3909,37 @@ var WebSocketHandler = class {
 // server.ts
 async function startServer() {
   const app = (0, import_express.default)();
-  const PORT = 3e3;
+  const PORT = Number(process.env.PORT) || 3e3;
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  if (!ADMIN_PASSWORD) {
+    console.warn("\u26A0\uFE0F  ADMIN_PASSWORD ch\u01B0a \u0111\u01B0\u1EE3c thi\u1EBFt l\u1EADp. Trang Qu\u1EA3n Tr\u1ECB s\u1EBD b\u1ECB kh\xF3a cho t\u1EDBi khi b\u1EA1n \u0111\u1EB7t bi\u1EBFn m\xF4i tr\u01B0\u1EDDng n\xE0y.");
+  }
+  function requireAdmin(req, res, next) {
+    if (!ADMIN_PASSWORD) {
+      return res.status(503).json({ error: "M\xE1y ch\u1EE7 ch\u01B0a c\u1EA5u h\xECnh m\u1EADt kh\u1EA9u Admin (ADMIN_PASSWORD)." });
+    }
+    const key = req.headers["x-admin-key"];
+    if (key !== ADMIN_PASSWORD) {
+      return res.status(401).json({ error: "Sai m\u1EADt kh\u1EA9u qu\u1EA3n tr\u1ECB." });
+    }
+    next();
+  }
   app.use(import_express.default.json());
+  await db.waitUntilReady();
   const server = import_http.default.createServer(app);
   new WebSocketHandler(server);
-  app.post("/api/auth/register", (req, res) => {
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1e3;
+  const checkWeeklyLeaderboardReset = () => {
+    const last = new Date(db.getSettings().lastLeaderboardReset || 0).getTime();
+    if (Date.now() - last >= WEEK_MS) {
+      db.resetWeeklyLeaderboard().then(() => {
+        console.log("\u{1F3C6} \u0110\xE3 t\u1EF1 \u0111\u1ED9ng reset B\u1EA3ng X\u1EBFp H\u1EA1ng Tu\u1EA7n v\u1EC1 0\u0111.");
+      });
+    }
+  };
+  checkWeeklyLeaderboardReset();
+  setInterval(checkWeeklyLeaderboardReset, 60 * 60 * 1e3);
+  app.post("/api/auth/register", async (req, res) => {
     try {
       const { username, email, password, avatar } = req.body;
       if (!username || !password) {
@@ -3389,7 +3949,7 @@ async function startServer() {
       if (existing) {
         return res.status(400).json({ error: "T\xEAn ng\u01B0\u1EDDi d\xF9ng \u0111\xE3 \u0111\u01B0\u1EE3c s\u1EED d\u1EE5ng." });
       }
-      const newUser = db.createUser(username, email || "", password, avatar || "\u{1F9D9}\u200D\u2642\uFE0F");
+      const newUser = await db.createUser(username, email || "", password, avatar || "\u{1F9D9}\u200D\u2642\uFE0F");
       const profile = db.getProfile(newUser.id);
       return res.json({
         user: { id: newUser.id, username: newUser.username, avatar: newUser.avatar, role: newUser.role },
@@ -3422,12 +3982,12 @@ async function startServer() {
       return res.status(500).json({ error: e.message });
     }
   });
-  app.post("/api/auth/guest", (req, res) => {
+  app.post("/api/auth/guest", async (req, res) => {
     try {
       const randomGuestName = `Ph\xE1p S\u01B0 #${Math.floor(1e3 + Math.random() * 9e3)}`;
       const avatars = ["\u{1F9D9}\u200D\u2642\uFE0F", "\u{1F52E}", "\u26A1", "\u{1F409}", "\u2728", "\u{1F98A}", "\u{1F985}", "\u{1F989}"];
       const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
-      const guestUser = db.createUser(randomGuestName, "", Math.random().toString(), randomAvatar);
+      const guestUser = await db.createUser(randomGuestName, "", Math.random().toString(), randomAvatar);
       const profile = db.getProfile(guestUser.id);
       return res.json({
         user: { id: guestUser.id, username: guestUser.username, avatar: guestUser.avatar, role: guestUser.role },
@@ -3437,22 +3997,48 @@ async function startServer() {
       return res.status(500).json({ error: e.message });
     }
   });
+  app.get("/api/settings", (_req, res) => {
+    return res.json(db.getSettings());
+  });
   app.get("/api/profile/:id", (req, res) => {
     const profile = db.getProfile(req.params.id);
     if (!profile) return res.status(404).json({ error: "Kh\xF4ng t\xECm th\u1EA5y h\u1ED3 s\u01A1." });
     return res.json(profile);
   });
-  app.put("/api/profile/:id/runes", (req, res) => {
+  app.put("/api/profile/:id/runes", async (req, res) => {
     const { runes } = req.body;
     if (!Array.isArray(runes) || runes.length === 0) {
       return res.status(400).json({ error: "C\u1EA7n ch\u1ECDn \xEDt nh\u1EA5t 1 Rune \u0111\u1EC3 trang b\u1ECB!" });
     }
-    const updated = db.updateProfile(req.params.id, { equippedRunes: runes });
+    const updated = await db.updateProfile(req.params.id, { equippedRunes: runes });
     return res.json(updated);
   });
   app.get("/api/profile/:id/history", (req, res) => {
     const history = db.getUserMatchHistory(req.params.id);
     return res.json(history);
+  });
+  app.put("/api/profile/:id/avatar", async (req, res) => {
+    const { avatar } = req.body;
+    if (!avatar) {
+      return res.status(400).json({ error: "Vui l\xF2ng ch\u1ECDn ph\xE1p th\xE2n (avatar)." });
+    }
+    const result = await db.updateAvatar(req.params.id, avatar);
+    if (!result.success) {
+      return res.status(403).json({ error: result.error });
+    }
+    return res.json(result.profile);
+  });
+  app.post("/api/premium/request", async (req, res) => {
+    const { userId, plan } = req.body;
+    if (!userId || plan !== "solution" && plan !== "monthly") {
+      return res.status(400).json({ error: "Th\xF4ng tin g\xF3i \u0111\u0103ng k\xFD kh\xF4ng h\u1EE3p l\u1EC7." });
+    }
+    const user = db.findUserById(userId);
+    if (!user) return res.status(404).json({ error: "Kh\xF4ng t\xECm th\u1EA5y t\xE0i kho\u1EA3n." });
+    const settings = db.getSettings();
+    const price = plan === "monthly" ? settings.monthlyPackagePrice : settings.solutionPackagePrice;
+    const request = await db.createPremiumRequest(userId, user.username, plan, price);
+    return res.json({ success: true, request });
   });
   app.get("/api/leaderboard", (req, res) => {
     const filter = req.query.filter || "all";
@@ -3469,22 +4055,36 @@ async function startServer() {
     const custom = db.getCustomQuestions();
     return res.json([...CURATED_QUESTIONS, ...custom]);
   });
-  app.get("/api/admin/stats", (_req, res) => {
+  app.post("/api/admin/verify", (req, res) => {
+    if (!ADMIN_PASSWORD) {
+      return res.status(503).json({ error: "M\xE1y ch\u1EE7 ch\u01B0a c\u1EA5u h\xECnh m\u1EADt kh\u1EA9u Admin (ADMIN_PASSWORD)." });
+    }
+    const { password } = req.body;
+    if (password !== ADMIN_PASSWORD) {
+      return res.status(401).json({ error: "Sai m\u1EADt kh\u1EA9u qu\u1EA3n tr\u1ECB." });
+    }
+    return res.json({ success: true });
+  });
+  app.get("/api/admin/stats", requireAdmin, (_req, res) => {
     const allUsers = db.getAllUsers();
+    const premiumCount = allUsers.filter((u) => db.isPremiumActive(u.id)).length;
+    const pendingPremiumRequests = db.getPremiumRequests().filter((r) => r.status === "pending").length;
     return res.json({
       totalUsers: allUsers.length,
       totalQuestions: CURATED_QUESTIONS.length + db.getCustomQuestions().length,
       totalCards: DECK_60_CARDS.length,
       totalRunes: ALL_RUNES.length,
+      totalPremiumUsers: premiumCount,
+      pendingPremiumRequests,
       systemStatus: "Operational",
       activeMemoryUsage: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`
     });
   });
-  app.get("/api/admin/users", (_req, res) => {
+  app.get("/api/admin/users", requireAdmin, (_req, res) => {
     const users = db.getAllUsers();
     return res.json(users);
   });
-  app.post("/api/admin/questions", (req, res) => {
+  app.post("/api/admin/questions", requireAdmin, async (req, res) => {
     const { question, formula, options, answer, explanation, timeLimit, difficulty, category, level } = req.body;
     if (!question || !answer || !category) {
       return res.status(400).json({ error: "Thi\u1EBFu th\xF4ng tin c\xE2u h\u1ECFi b\u1EAFt bu\u1ED9c." });
@@ -3501,12 +4101,63 @@ async function startServer() {
       category,
       level: level || "THCS"
     };
-    db.addCustomQuestion(newQ);
+    await db.addCustomQuestion(newQ);
     return res.json({ success: true, question: newQ });
   });
-  app.delete("/api/admin/questions/:id", (req, res) => {
-    db.deleteCustomQuestion(req.params.id);
+  app.delete("/api/admin/questions/:id", requireAdmin, async (req, res) => {
+    await db.deleteCustomQuestion(req.params.id);
     return res.json({ success: true });
+  });
+  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    const result = await db.deleteUser(req.params.id);
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
+    return res.json({ success: true });
+  });
+  app.put("/api/admin/settings", requireAdmin, async (req, res) => {
+    const { guideLink, solutionPackagePrice, monthlyPackagePrice, bankAccountName, bankAccountNumber, bankName } = req.body;
+    const updated = await db.updateSettings({
+      ...guideLink !== void 0 && { guideLink },
+      ...solutionPackagePrice !== void 0 && { solutionPackagePrice: Number(solutionPackagePrice) },
+      ...monthlyPackagePrice !== void 0 && { monthlyPackagePrice: Number(monthlyPackagePrice) },
+      ...bankAccountName !== void 0 && { bankAccountName },
+      ...bankAccountNumber !== void 0 && { bankAccountNumber },
+      ...bankName !== void 0 && { bankName }
+    });
+    return res.json(updated);
+  });
+  app.get("/api/admin/premium/requests", requireAdmin, (_req, res) => {
+    return res.json(db.getPremiumRequests());
+  });
+  app.post("/api/admin/premium/requests/:id/approve", requireAdmin, async (req, res) => {
+    const result = await db.resolvePremiumRequest(req.params.id, true);
+    if (!result.success) return res.status(400).json({ error: result.error });
+    return res.json({ success: true, profile: result.profile });
+  });
+  app.post("/api/admin/premium/requests/:id/reject", requireAdmin, async (req, res) => {
+    const result = await db.resolvePremiumRequest(req.params.id, false);
+    if (!result.success) return res.status(400).json({ error: result.error });
+    return res.json({ success: true });
+  });
+  app.post("/api/admin/premium/grant", requireAdmin, async (req, res) => {
+    const { userId, plan, days } = req.body;
+    if (!userId || plan !== "solution" && plan !== "monthly") {
+      return res.status(400).json({ error: "Th\xF4ng tin kh\xF4ng h\u1EE3p l\u1EC7." });
+    }
+    const profile = await db.grantPremium(userId, plan, days ? Number(days) : 30);
+    if (!profile) return res.status(404).json({ error: "Kh\xF4ng t\xECm th\u1EA5y t\xE0i kho\u1EA3n." });
+    return res.json(profile);
+  });
+  app.post("/api/admin/premium/revoke", requireAdmin, async (req, res) => {
+    const { userId } = req.body;
+    const profile = await db.revokePremium(userId);
+    if (!profile) return res.status(404).json({ error: "Kh\xF4ng t\xECm th\u1EA5y t\xE0i kho\u1EA3n." });
+    return res.json(profile);
+  });
+  app.post("/api/admin/leaderboard/reset", requireAdmin, async (_req, res) => {
+    await db.resetWeeklyLeaderboard();
+    return res.json({ success: true, settings: db.getSettings() });
   });
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
@@ -3519,10 +4170,10 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = import_path2.default.join(process.cwd(), "dist");
+    const distPath = import_path.default.join(process.cwd(), "dist");
     app.use(import_express.default.static(distPath));
     app.get("*", (_req, res) => {
-      res.sendFile(import_path2.default.join(distPath, "index.html"));
+      res.sendFile(import_path.default.join(distPath, "index.html"));
     });
   }
   server.listen(PORT, "0.0.0.0", () => {
@@ -3532,4 +4183,3 @@ async function startServer() {
 startServer().catch((err) => {
   console.error("Failed to start server:", err);
 });
-//# sourceMappingURL=server.cjs.map

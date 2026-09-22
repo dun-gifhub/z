@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Trophy, Award, Target, Flame, History, BookOpen, User, CheckCircle, XCircle } from 'lucide-react';
-import { UserProfile } from '../../shared/types.ts';
+import { ArrowLeft, Trophy, Award, Target, Flame, History, BookOpen, User, CheckCircle, XCircle, Crown, Sparkles, Lock, Landmark, Copy, Check } from 'lucide-react';
+import { UserProfile, SiteSettings, PremiumPlan } from '../../shared/types.ts';
+import { BASIC_AVATARS, VIP_AVATARS } from '../../shared/avatars.ts';
 
 interface ProfileViewProps {
   profile: UserProfile | null;
   onBack: () => void;
+  onUpdateAvatar?: (avatar: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => {
+function formatVnd(n: number) {
+  return n.toLocaleString('vi-VN') + 'đ';
+}
+
+export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpdateAvatar }) => {
   const [matchHistory, setMatchHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+
+  // ------- Avatar changer -------
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const [avatarMsg, setAvatarMsg] = useState<string | null>(null);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+
+  // ------- Premium purchase -------
+  const [selectedPlan, setSelectedPlan] = useState<PremiumPlan | null>(null);
+  const [requestSent, setRequestSent] = useState(false);
+  const [requestMsg, setRequestMsg] = useState<string | null>(null);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!profile?.id) return;
@@ -22,6 +41,61 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => 
       .catch(e => console.warn('Failed to load history:', e))
       .finally(() => setLoadingHistory(false));
   }, [profile?.id]);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => setSettings(data))
+      .catch(e => console.warn('Failed to load settings:', e));
+  }, []);
+
+  const isPremiumActive = !!profile?.isPremium && (!profile.premiumExpiresAt || new Date(profile.premiumExpiresAt).getTime() > Date.now());
+
+  const handlePickAvatar = async (av: string) => {
+    if (!onUpdateAvatar || avatarSaving) return;
+    setAvatarSaving(true);
+    setAvatarMsg(null);
+    const result = await onUpdateAvatar(av);
+    if (result.success) {
+      setAvatarMsg('✓ Đã đổi Pháp Thân!');
+      setAvatarPickerOpen(false);
+    } else {
+      setAvatarMsg(result.error || 'Không thể đổi Pháp Thân.');
+    }
+    setAvatarSaving(false);
+    setTimeout(() => setAvatarMsg(null), 3000);
+  };
+
+  const handleCopyBank = () => {
+    if (!settings?.bankAccountNumber) return;
+    navigator.clipboard?.writeText(settings.bankAccountNumber).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  };
+
+  const handleSendPremiumRequest = async () => {
+    if (!profile?.id || !selectedPlan) return;
+    setRequestLoading(true);
+    setRequestMsg(null);
+    try {
+      const res = await fetch('/api/premium/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: profile.id, plan: selectedPlan }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRequestSent(true);
+      } else {
+        setRequestMsg(data.error || 'Có lỗi xảy ra.');
+      }
+    } catch (e: any) {
+      setRequestMsg('Lỗi kết nối máy chủ.');
+    } finally {
+      setRequestLoading(false);
+    }
+  };
 
   if (!profile) {
     return (
@@ -58,8 +132,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => 
       {/* Profile Overview Card */}
       <div className="p-6 bg-slate-900 border-2 border-indigo-700/60 rounded-3xl space-y-5 shadow-2xl">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
-          <div className="w-20 h-20 rounded-2xl bg-indigo-950 border-2 border-amber-400 flex items-center justify-center text-4xl shadow-lg">
-            {profile.avatar}
+          <div className="relative">
+            <div className="w-20 h-20 rounded-2xl bg-indigo-950 border-2 border-amber-400 flex items-center justify-center text-4xl shadow-lg">
+              {profile.avatar}
+            </div>
+            {onUpdateAvatar && (
+              <button
+                onClick={() => setAvatarPickerOpen(v => !v)}
+                title="Đổi Pháp Thân (Avatar)"
+                className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-slate-900 border border-amber-500 text-amber-300 text-xs flex items-center justify-center shadow-md hover:bg-slate-800 transition-colors"
+              >
+                ✎
+              </button>
+            )}
           </div>
 
           <div className="flex-1 space-y-1">
@@ -70,6 +155,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => 
               <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold self-center sm:self-auto">
                 {profile.rankTitle}
               </span>
+              {isPremiumActive && (
+                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-400/50 text-yellow-300 text-xs font-bold self-center sm:self-auto">
+                  <Crown className="w-3 h-3" />
+                  PREMIUM
+                </span>
+              )}
             </div>
 
             <p className="text-xs text-slate-400">
@@ -91,6 +182,62 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => 
             </div>
           </div>
         </div>
+
+        {/* Avatar Picker (toggle) */}
+        {avatarPickerOpen && (
+          <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
+            {avatarMsg && (
+              <div className="text-xs text-amber-300 font-semibold">{avatarMsg}</div>
+            )}
+            <div>
+              <div className="text-[11px] font-bold text-slate-400 mb-1.5">PHÁP THÂN CƠ BẢN (MIỄN PHÍ)</div>
+              <div className="flex flex-wrap gap-2">
+                {BASIC_AVATARS.map(av => (
+                  <button
+                    key={av}
+                    disabled={avatarSaving}
+                    onClick={() => handlePickAvatar(av)}
+                    className={`text-xl p-2 rounded-lg transition-all disabled:opacity-50 ${
+                      profile.avatar === av
+                        ? 'bg-amber-500/20 border border-amber-400 scale-110'
+                        : 'bg-slate-900 border border-slate-800 hover:bg-slate-800'
+                    }`}
+                  >
+                    {av}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-[11px] font-bold text-yellow-400/90 mb-1.5 flex items-center gap-1">
+                <Crown className="w-3 h-3" /> PHÁP THÂN VIP (DÀNH CHO THÀNH VIÊN PREMIUM)
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {VIP_AVATARS.map(av => {
+                  const locked = !isPremiumActive;
+                  return (
+                    <button
+                      key={av}
+                      disabled={avatarSaving || locked}
+                      onClick={() => handlePickAvatar(av)}
+                      title={locked ? 'Nâng cấp gói Premium để mở khóa' : undefined}
+                      className={`relative text-xl p-2 rounded-lg transition-all disabled:cursor-not-allowed ${
+                        profile.avatar === av
+                          ? 'bg-yellow-500/20 border border-yellow-400 scale-110'
+                          : locked
+                          ? 'bg-slate-900/60 border border-slate-800 opacity-40'
+                          : 'bg-slate-900 border border-slate-800 hover:bg-slate-800'
+                      }`}
+                    >
+                      {av}
+                      {locked && <Lock className="w-3 h-3 absolute -top-1 -right-1 text-slate-500" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 4 Stat Badges */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-800 font-mono">
@@ -118,6 +265,116 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => 
             <div className="text-[10px] text-purple-500">Ấn chú bảo mệnh</div>
           </div>
         </div>
+      </div>
+
+      {/* Premium Subscription Section */}
+      <div className="p-5 bg-slate-900 border-2 border-yellow-700/50 rounded-3xl space-y-4 shadow-xl">
+        <h3 className="font-cinzel text-base font-bold text-yellow-300 flex items-center gap-2">
+          <Crown className="w-4 h-4" />
+          <span>GÓI PREMIUM</span>
+        </h3>
+
+        {isPremiumActive ? (
+          <div className="p-4 bg-yellow-950/30 border border-yellow-700/50 rounded-2xl text-xs text-yellow-200 space-y-1">
+            <div className="font-bold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Bạn đang là thành viên Premium!</span>
+            </div>
+            <div className="text-slate-300">
+              Gói hiện tại: <strong className="text-yellow-300">{profile.premiumPlan === 'monthly' ? 'Gói Tháng' : 'Gói Xem Lời Giải'}</strong>
+            </div>
+            {profile.premiumExpiresAt && (
+              <div className="text-slate-400">
+                Hết hạn: {new Date(profile.premiumExpiresAt).toLocaleDateString('vi-VN')}
+              </div>
+            )}
+            <div className="text-[11px] text-slate-500 pt-1">
+              ✓ Xem lời giải chi tiết mọi câu hỏi &nbsp;•&nbsp; ✓ Mở khóa Pháp Thân VIP
+            </div>
+          </div>
+        ) : requestSent ? (
+          <div className="p-4 bg-indigo-950/40 border border-indigo-700/50 rounded-2xl text-xs text-indigo-200 space-y-1">
+            <div className="font-bold">⏳ Yêu cầu của bạn đang chờ Admin xác nhận chuyển khoản.</div>
+            <div className="text-slate-400">Sau khi được duyệt, gói Premium sẽ tự động kích hoạt cho tài khoản này.</div>
+          </div>
+        ) : (
+          <>
+            <p className="text-xs text-slate-400">
+              Mở khóa <strong className="text-yellow-300">xem lời giải chi tiết từng bước</strong> cho mọi câu hỏi và <strong className="text-yellow-300">Pháp Thân VIP</strong> độc quyền.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => setSelectedPlan('solution')}
+                className={`p-4 rounded-2xl border text-left transition-all ${
+                  selectedPlan === 'solution'
+                    ? 'bg-amber-500/10 border-amber-400 shadow-md'
+                    : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                }`}
+              >
+                <div className="text-xs font-bold text-slate-200">Gói Xem Lời Giải</div>
+                <div className="text-lg font-black text-amber-300 mt-1">
+                  {formatVnd(settings?.solutionPackagePrice ?? 20000)}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1">Hiệu lực 30 ngày</div>
+              </button>
+
+              <button
+                onClick={() => setSelectedPlan('monthly')}
+                className={`relative p-4 rounded-2xl border text-left transition-all ${
+                  selectedPlan === 'monthly'
+                    ? 'bg-emerald-500/10 border-emerald-400 shadow-md'
+                    : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                }`}
+              >
+                <div className="absolute -top-2 right-3 px-2 py-0.5 bg-emerald-500 text-slate-950 text-[9px] font-black rounded-full">
+                  TIẾT KIỆM HƠN
+                </div>
+                <div className="text-xs font-bold text-slate-200">Gói Tháng</div>
+                <div className="text-lg font-black text-emerald-400 mt-1">
+                  {formatVnd(settings?.monthlyPackagePrice ?? 15000)}
+                  <span className="text-[10px] text-slate-500 font-normal">/tháng</span>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1">Tự động gia hạn 30 ngày mỗi lần đăng ký</div>
+              </button>
+            </div>
+
+            {selectedPlan && (
+              <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-2.5 text-xs">
+                <div className="font-bold text-slate-200 flex items-center gap-1.5">
+                  <Landmark className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Chuyển khoản để kích hoạt gói</span>
+                </div>
+                {settings?.bankAccountNumber ? (
+                  <div className="space-y-1 font-mono text-slate-300">
+                    <div>Ngân hàng: <span className="text-slate-100">{settings.bankName || '—'}</span></div>
+                    <div>Chủ TK: <span className="text-slate-100">{settings.bankAccountName || '—'}</span></div>
+                    <div className="flex items-center gap-2">
+                      <span>Số TK: <span className="text-slate-100">{settings.bankAccountNumber}</span></span>
+                      <button onClick={handleCopyBank} className="text-amber-400 hover:text-amber-300">
+                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <div>Số tiền: <span className="text-amber-300">{formatVnd(selectedPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
+                    <div>Nội dung CK: <span className="text-emerald-400">PREMIUM {profile.username}</span></div>
+                  </div>
+                ) : (
+                  <div className="text-slate-500">Admin chưa cập nhật thông tin chuyển khoản. Vui lòng liên hệ trực tiếp Quản Trị Viên.</div>
+                )}
+
+                {requestMsg && <div className="text-rose-400">{requestMsg}</div>}
+
+                <button
+                  onClick={handleSendPremiumRequest}
+                  disabled={requestLoading}
+                  className="w-full py-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {requestLoading ? 'Đang gửi...' : 'Tôi Đã Chuyển Khoản - Xác Nhận'}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Match History Table */}

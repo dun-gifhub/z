@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Plus, Trash2, Database, Users, BookOpen, CheckCircle, RefreshCw, Lock, KeyRound } from 'lucide-react';
-import { MathLevel, MathCategory, Question } from '../../shared/types.ts';
+import { ArrowLeft, Shield, Plus, Trash2, Database, Users, BookOpen, CheckCircle, RefreshCw, Lock, KeyRound, Settings, Crown, UserX, XCircle, Link2, Landmark, RotateCcw } from 'lucide-react';
+import { MathLevel, MathCategory, Question, SiteSettings, PremiumRequest, PremiumPlan } from '../../shared/types.ts';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
+
+function formatVnd(n: number) {
+  return (n || 0).toLocaleString('vi-VN') + 'đ';
+}
 
 interface AdminPanelProps {
   onBack: () => void;
@@ -63,7 +67,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [stats, setStats] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'stats' | 'questions' | 'users'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'questions' | 'users' | 'premium' | 'settings'>('stats');
+
+  // Premium requests state
+  const [premiumRequests, setPremiumRequests] = useState<PremiumRequest[]>([]);
+  const [premiumActionMsg, setPremiumActionMsg] = useState<string | null>(null);
+
+  // Settings state
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [settingsForm, setSettingsForm] = useState<Partial<SiteSettings>>({});
+  const [settingsMsg, setSettingsMsg] = useState<string | null>(null);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   // New question form state
   const [qText, setQText] = useState('');
@@ -97,11 +112,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       .catch(e => console.warn(e));
   };
 
+  const fetchPremiumRequests = () => {
+    fetch('/api/admin/premium/requests', { headers: adminHeaders })
+      .then(res => res.json())
+      .then(data => setPremiumRequests(Array.isArray(data) ? data : []))
+      .catch(e => console.warn(e));
+  };
+
+  const fetchSettings = () => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        setSettings(data);
+        setSettingsForm(data);
+      })
+      .catch(e => console.warn(e));
+  };
+
   useEffect(() => {
     if (!authed) return;
     fetchStats();
     fetchQuestions();
     fetchUsers();
+    fetchPremiumRequests();
+    fetchSettings();
   }, [authed]);
 
   const handleAddQuestion = async (e: React.FormEvent) => {
@@ -158,6 +192,117 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       fetchStats();
     } catch (e) {
       console.warn(e);
+    }
+  };
+
+  // ------- Xóa tài khoản người dùng (chỉ 1 tài khoản Admin duy nhất, không thể xóa) -------
+  const handleDeleteUser = async (u: any) => {
+    if (!confirm(`Bạn có chắc chắn muốn XÓA VĨNH VIỄN tài khoản "${u.username}"? Toàn bộ hồ sơ, lịch sử trận đấu sẽ bị mất và không thể hoàn tác!`)) return;
+    try {
+      const res = await fetch(`/api/admin/users/${u.id}`, { method: 'DELETE', headers: adminHeaders });
+      const d = await res.json();
+      if (res.ok) {
+        fetchUsers();
+        fetchStats();
+      } else {
+        alert(d.error || 'Không thể xóa tài khoản.');
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  // ------- Cấp / Thu hồi Premium thủ công (VD: nhận chuyển khoản tiền mặt trực tiếp) -------
+  const handleGrantPremium = async (userId: string, plan: PremiumPlan) => {
+    try {
+      await fetch('/api/admin/premium/grant', {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify({ userId, plan, days: 30 }),
+      });
+      fetchUsers();
+      fetchStats();
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const handleRevokePremium = async (userId: string) => {
+    if (!confirm('Thu hồi gói Premium của tài khoản này?')) return;
+    try {
+      await fetch('/api/admin/premium/revoke', {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify({ userId }),
+      });
+      fetchUsers();
+      fetchStats();
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  // ------- Duyệt / Từ chối yêu cầu mua gói Premium -------
+  const handleResolvePremiumRequest = async (id: string, approve: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/premium/requests/${id}/${approve ? 'approve' : 'reject'}`, {
+        method: 'POST',
+        headers: adminHeaders,
+      });
+      if (res.ok) {
+        setPremiumActionMsg(approve ? '✓ Đã duyệt và kích hoạt Premium cho người dùng!' : 'Đã từ chối yêu cầu.');
+        fetchPremiumRequests();
+        fetchUsers();
+        fetchStats();
+        setTimeout(() => setPremiumActionMsg(null), 3000);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  // ------- Cài đặt hệ thống: link hướng dẫn, giá gói, thông tin chuyển khoản -------
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSettingsSaving(true);
+    setSettingsMsg(null);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: adminHeaders,
+        body: JSON.stringify(settingsForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSettings(data);
+        setSettingsMsg('✓ Đã lưu cài đặt!');
+      } else {
+        setSettingsMsg(`Lỗi: ${data.error}`);
+      }
+    } catch (err: any) {
+      setSettingsMsg(`Lỗi kết nối: ${err.message}`);
+    } finally {
+      setSettingsSaving(false);
+      setTimeout(() => setSettingsMsg(null), 3000);
+    }
+  };
+
+  // ------- Reset Bảng Xếp Hạng tuần (điểm về 0đ) -------
+  const handleResetLeaderboard = async () => {
+    if (!confirm('Xóa Bảng Xếp Hạng Tuần và đưa điểm của TẤT CẢ người chơi về 0đ? (Điểm kỷ lục mọi thời đại vẫn được giữ nguyên)')) return;
+    setResetLoading(true);
+    try {
+      const res = await fetch('/api/admin/leaderboard/reset', { method: 'POST', headers: adminHeaders });
+      const d = await res.json();
+      if (res.ok) {
+        setSettings(prev => prev ? { ...prev, lastLeaderboardReset: d.settings.lastLeaderboardReset } : prev);
+        setSettingsMsg('✓ Đã reset Bảng Xếp Hạng Tuần về 0đ!');
+        setTimeout(() => setSettingsMsg(null), 3000);
+      }
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -243,11 +388,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-center gap-2">
+      <div className="flex flex-wrap justify-center gap-2">
         {[
           { id: 'stats', label: '📊 Tổng Quan Máy Chủ' },
           { id: 'questions', label: '🧮 Ngân Hàng Câu Hỏi' },
           { id: 'users', label: '👥 Người Dùng' },
+          { id: 'premium', label: '💎 Gói Premium' },
+          { id: 'settings', label: '⚙️ Cài Đặt' },
         ].map(t => (
           <button
             key={t.id}
@@ -292,6 +439,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               <div className="text-xs text-slate-400">Bộ Ấn Chú</div>
               <div className="text-2xl font-black text-purple-300 font-mono mt-1">
                 {stats?.totalRunes ?? 16} Rune
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-900 border border-yellow-800/50 rounded-2xl text-center">
+              <div className="text-xs text-slate-400">Thành Viên Premium</div>
+              <div className="text-2xl font-black text-yellow-300 font-mono mt-1">
+                {stats?.totalPremiumUsers ?? 0}
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-900 border border-indigo-800/50 rounded-2xl text-center">
+              <div className="text-xs text-slate-400">Yêu Cầu Premium Chờ Duyệt</div>
+              <div className="text-2xl font-black text-indigo-300 font-mono mt-1">
+                {stats?.pendingPremiumRequests ?? 0}
               </div>
             </div>
           </div>
@@ -478,27 +639,247 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       {activeTab === 'users' && (
         <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
           <h3 className="font-cinzel text-sm font-bold text-slate-200">
-            DANH SÁCH NGƯỜI DÙNG ({users.length} PHÁP SƯ)
+            DANH SÁCH NGƯỜI DÙNG ({users.length} PHÁP SƯ) — CHỈ 1 TÀI KHOẢN ADMIN DUY NHẤT
           </h3>
           <div className="space-y-2">
-            {users.map(u => (
-              <div
-                key={u.id}
-                className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-2xl">{u.avatar}</span>
-                  <div>
-                    <div className="font-bold text-slate-200">{u.username}</div>
-                    <div className="text-[10px] font-mono text-slate-500">ID: {u.id} • Vai trò: {u.role}</div>
+            {users.map(u => {
+              const isPremiumActive = !!u.isPremium && (!u.premiumExpiresAt || new Date(u.premiumExpiresAt).getTime() > Date.now());
+              return (
+                <div
+                  key={u.id}
+                  className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-2xl">{u.avatar}</span>
+                    <div>
+                      <div className="font-bold text-slate-200 flex items-center gap-1.5">
+                        <span>{u.username}</span>
+                        {u.role === 'admin' && (
+                          <span className="px-1.5 py-0.5 bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[9px] font-black rounded-md">ADMIN</span>
+                        )}
+                        {isPremiumActive && (
+                          <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 text-[9px] font-black rounded-md">
+                            <Crown className="w-2.5 h-2.5" /> PREMIUM
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-500">
+                        ID: {u.id} • {new Date(u.createdAt).toLocaleDateString('vi-VN')}
+                        {isPremiumActive && u.premiumExpiresAt && (
+                          <> • Hết hạn: {new Date(u.premiumExpiresAt).toLocaleDateString('vi-VN')}</>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="text-[10px] font-mono text-slate-500">
-                  {new Date(u.createdAt).toLocaleDateString('vi-VN')}
+                  {u.role !== 'admin' && (
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {isPremiumActive ? (
+                        <button
+                          onClick={() => handleRevokePremium(u.id)}
+                          className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 hover:border-rose-700 text-slate-400 hover:text-rose-300 rounded-lg transition-colors"
+                        >
+                          Thu Hồi Premium
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleGrantPremium(u.id, 'solution')}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-950/40 border border-yellow-800/50 hover:border-yellow-500 text-yellow-300 rounded-lg transition-colors"
+                        >
+                          <Crown className="w-3 h-3" />
+                          Cấp Premium 30 Ngày
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteUser(u)}
+                        title="Xóa tài khoản"
+                        className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800"
+                      >
+                        <UserX className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: PREMIUM REQUESTS */}
+      {activeTab === 'premium' && (
+        <div className="space-y-4">
+          {premiumActionMsg && (
+            <div className="p-2.5 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
+              {premiumActionMsg}
+            </div>
+          )}
+          <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
+            <h3 className="font-cinzel text-sm font-bold text-slate-200 flex items-center gap-1.5">
+              <Crown className="w-4 h-4 text-yellow-400" />
+              <span>YÊU CẦU MUA GÓI PREMIUM ({premiumRequests.filter(r => r.status === 'pending').length} ĐANG CHỜ)</span>
+            </h3>
+
+            {premiumRequests.length === 0 ? (
+              <div className="p-6 text-center text-xs text-slate-500">Chưa có yêu cầu nào.</div>
+            ) : (
+              <div className="space-y-2">
+                {premiumRequests.map(r => (
+                  <div
+                    key={r.id}
+                    className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-200">
+                        {r.username} — <span className="text-amber-300">{r.plan === 'monthly' ? 'Gói Tháng' : 'Gói Xem Lời Giải'}</span>
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-500">
+                        {formatVnd(r.price)} • {new Date(r.createdAt).toLocaleString('vi-VN')} •{' '}
+                        <span className={
+                          r.status === 'pending' ? 'text-amber-400' : r.status === 'approved' ? 'text-emerald-400' : 'text-rose-400'
+                        }>
+                          {r.status === 'pending' ? 'ĐANG CHỜ' : r.status === 'approved' ? 'ĐÃ DUYỆT' : 'ĐÃ TỪ CHỐI'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {r.status === 'pending' && (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleResolvePremiumRequest(r.id, true)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-950/40 border border-emerald-800/50 hover:border-emerald-500 text-emerald-300 rounded-lg transition-colors"
+                        >
+                          <CheckCircle className="w-3 h-3" /> Duyệt
+                        </button>
+                        <button
+                          onClick={() => handleResolvePremiumRequest(r.id, false)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-950/40 border border-rose-800/50 hover:border-rose-500 text-rose-300 rounded-lg transition-colors"
+                        >
+                          <XCircle className="w-3 h-3" /> Từ Chối
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: SITE SETTINGS */}
+      {activeTab === 'settings' && (
+        <div className="space-y-6">
+          <form onSubmit={handleSaveSettings} className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5">
+              <Link2 className="w-4 h-4" />
+              <span>ĐƯỜNG LINK HƯỚNG DẪN Ở TRANG CHỦ</span>
+            </h3>
+            <p className="text-[11px] text-slate-500">
+              Link này sẽ hiện ở nút "Hướng Dẫn Chi Tiết" trên Trang Chủ (VD: link nhóm Zalo, Facebook, video Youtube hướng dẫn...).
+            </p>
+            <input
+              type="url"
+              value={settingsForm.guideLink || ''}
+              onChange={e => setSettingsForm(f => ({ ...f, guideLink: e.target.value }))}
+              placeholder="https://..."
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400"
+            />
+
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5 pt-2">
+              <Crown className="w-4 h-4" />
+              <span>GIÁ GÓI PREMIUM</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-slate-300 mb-1 text-xs">Gói Xem Lời Giải (một lần, 30 ngày):</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={settingsForm.solutionPackagePrice ?? 0}
+                  onChange={e => setSettingsForm(f => ({ ...f, solutionPackagePrice: Number(e.target.value) }))}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 mb-1 text-xs">Gói Tháng (rẻ hơn, tự động 30 ngày):</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={settingsForm.monthlyPackagePrice ?? 0}
+                  onChange={e => setSettingsForm(f => ({ ...f, monthlyPackagePrice: Number(e.target.value) }))}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+            </div>
+
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5 pt-2">
+              <Landmark className="w-4 h-4" />
+              <span>THÔNG TIN CHUYỂN KHOẢN (HIỂN THỊ CHO NGƯỜI MUA GÓI)</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-slate-300 mb-1 text-xs">Ngân Hàng:</label>
+                <input
+                  type="text"
+                  value={settingsForm.bankName || ''}
+                  onChange={e => setSettingsForm(f => ({ ...f, bankName: e.target.value }))}
+                  placeholder="VD: Vietcombank"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 mb-1 text-xs">Chủ Tài Khoản:</label>
+                <input
+                  type="text"
+                  value={settingsForm.bankAccountName || ''}
+                  onChange={e => setSettingsForm(f => ({ ...f, bankAccountName: e.target.value }))}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 mb-1 text-xs">Số Tài Khoản:</label>
+                <input
+                  type="text"
+                  value={settingsForm.bankAccountNumber || ''}
+                  onChange={e => setSettingsForm(f => ({ ...f, bankAccountNumber: e.target.value }))}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+            </div>
+
+            {settingsMsg && (
+              <div className="p-2.5 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
+                {settingsMsg}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={settingsSaving}
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
+            >
+              {settingsSaving ? 'Đang lưu...' : 'Lưu Cài Đặt'}
+            </button>
+          </form>
+
+          <div className="p-5 bg-slate-900 border border-rose-900/50 rounded-2xl space-y-3">
+            <h3 className="font-cinzel text-sm font-bold text-rose-300 flex items-center gap-1.5">
+              <RotateCcw className="w-4 h-4" />
+              <span>RESET BẢNG XẾP HẠNG TUẦN</span>
+            </h3>
+            <p className="text-[11px] text-slate-500">
+              Hệ thống tự động reset điểm Bảng Xếp Hạng về 0đ mỗi 7 ngày. Bạn cũng có thể bấm nút dưới đây để reset thủ công ngay bây giờ.
+              Lần reset gần nhất: {settings?.lastLeaderboardReset ? new Date(settings.lastLeaderboardReset).toLocaleString('vi-VN') : '—'}.
+              (Điểm kỷ lục mọi thời đại ở mục "Tất Cả Thời Gian" không bị ảnh hưởng.)
+            </p>
+            <button
+              onClick={handleResetLeaderboard}
+              disabled={resetLoading}
+              className="px-5 py-2.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
+            >
+              {resetLoading ? 'Đang reset...' : 'Reset Ngay (Về 0đ)'}
+            </button>
           </div>
         </div>
       )}

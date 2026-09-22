@@ -1,65 +1,78 @@
 -- ==========================================================
--- MATH RUNE: DRAW & SOLVE - RELATIONAL DATABASE SCHEMA
--- Compatible with PostgreSQL / Supabase / Neon / Turso
+-- MATH RUNE: DRAW & SOLVE - DATABASE SCHEMA (Neon / PostgreSQL)
 -- ==========================================================
+-- File này chỉ để THAM KHẢO — server tự động chạy các câu lệnh
+-- CREATE TABLE IF NOT EXISTS này khi khởi động (xem server/database/db.ts),
+-- bạn KHÔNG cần tự chạy file này thủ công.
+--
+-- Các bảng tĩnh (60 lá bài, 16 Rune, ngân hàng câu hỏi mặc định) không lưu
+-- ở đây vì chúng nằm sẵn trong code (shared/cards.ts, shared/runes.ts,
+-- server/questions/questionBank.ts). Chỉ dữ liệu ĐỘNG (do người dùng tạo ra
+-- khi chơi) mới cần lưu vào Neon để không bị mất khi server restart/redeploy.
 
--- 1. USERS TABLE
+-- 1. USERS TABLE (chỉ 1 tài khoản role = 'admin' duy nhất trong hệ thống)
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(64) PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE,
+    email VARCHAR(100),
     password_hash VARCHAR(255) NOT NULL,
     avatar VARCHAR(20) DEFAULT '🧙‍♂️',
     role VARCHAR(20) DEFAULT 'user',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. PROFILES & PROGRESSION
+-- 2. PROFILES & PROGRESSION (tự chứa toàn bộ, không cần JOIN với users)
 CREATE TABLE IF NOT EXISTS profiles (
     user_id VARCHAR(64) PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100),
+    avatar VARCHAR(20) DEFAULT '🧙‍♂️',
     level INTEGER DEFAULT 1,
     xp INTEGER DEFAULT 0,
     total_games INTEGER DEFAULT 0,
     wins INTEGER DEFAULT 0,
     losses INTEGER DEFAULT 0,
     win_rate NUMERIC(5,2) DEFAULT 0.00,
-    highest_score INTEGER DEFAULT 0,
+    highest_score INTEGER DEFAULT 0, -- điểm kỷ lục TUẦN NÀY, bị reset về 0 mỗi tuần
+    all_time_highest_score INTEGER DEFAULT 0, -- điểm kỷ lục MỌI THỜI ĐẠI, không bao giờ reset
     rank_title VARCHAR(50) DEFAULT 'Tập Sự Phép Thuật',
     equipped_runes JSONB DEFAULT '["rune_revive", "rune_shield", "rune_freeze"]'::jsonb,
     unlocked_skins JSONB DEFAULT '[]'::jsonb,
+    -- Gói Premium (Gói Xem Lời Giải / Gói Tháng)
+    is_premium BOOLEAN DEFAULT FALSE,
+    premium_plan VARCHAR(20), -- 'solution' | 'monthly'
+    premium_expires_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. CARDS REPOSITORY (60 CARDS)
-CREATE TABLE IF NOT EXISTS cards (
-    id VARCHAR(32) PRIMARY KEY,
-    domain_id VARCHAR(32) NOT NULL,
-    domain_name VARCHAR(50) NOT NULL,
-    domain_name_vi VARCHAR(50) NOT NULL,
-    point_value INTEGER NOT NULL,
-    rarity VARCHAR(20) NOT NULL,
-    skill_name VARCHAR(100) NOT NULL,
-    skill_desc TEXT NOT NULL,
-    element_color VARCHAR(20),
-    accent_glow VARCHAR(50),
-    icon_name VARCHAR(50)
+-- 3. PREMIUM PURCHASE REQUESTS (chuyển khoản thủ công, Admin duyệt)
+CREATE TABLE IF NOT EXISTS premium_requests (
+    id VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
+    username VARCHAR(50) NOT NULL,
+    plan VARCHAR(20) NOT NULL, -- 'solution' | 'monthly'
+    price INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending', -- 'pending' | 'approved' | 'rejected'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP WITH TIME ZONE
 );
 
--- 4. 16 RUNES DEFINITION
-CREATE TABLE IF NOT EXISTS runes (
-    id VARCHAR(32) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    category VARCHAR(20) NOT NULL,
-    category_name_vi VARCHAR(50) NOT NULL,
-    icon VARCHAR(50) NOT NULL,
-    color VARCHAR(20) NOT NULL,
-    description TEXT NOT NULL,
-    max_uses INTEGER DEFAULT 2,
-    unlocked_level INTEGER DEFAULT 1
+-- 4. SITE SETTINGS (link hướng dẫn trang chủ, giá gói Premium, thông tin chuyển khoản)
+--    Chỉ có đúng 1 dòng duy nhất (id = 1).
+CREATE TABLE IF NOT EXISTS site_settings (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    guide_link TEXT DEFAULT '',
+    solution_package_price INTEGER DEFAULT 20000,
+    monthly_package_price INTEGER DEFAULT 15000,
+    bank_account_name VARCHAR(100) DEFAULT '',
+    bank_account_number VARCHAR(50) DEFAULT '',
+    bank_name VARCHAR(100) DEFAULT '',
+    last_leaderboard_reset TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. QUESTIONS BANK
-CREATE TABLE IF NOT EXISTS questions (
+-- 5. CÂU HỎI DO ADMIN TỰ THÊM (câu hỏi mặc định nằm trong code, không lưu ở đây)
+CREATE TABLE IF NOT EXISTS custom_questions (
     id VARCHAR(64) PRIMARY KEY,
     question TEXT NOT NULL,
     formula TEXT,
@@ -73,18 +86,7 @@ CREATE TABLE IF NOT EXISTS questions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 6. ROOMS & LOBBY
-CREATE TABLE IF NOT EXISTS rooms (
-    room_code VARCHAR(12) PRIMARY KEY,
-    host_user_id VARCHAR(64) REFERENCES users(id),
-    status VARCHAR(20) DEFAULT 'waiting', -- 'waiting', 'playing', 'closed'
-    mode VARCHAR(10) DEFAULT 'pvp',
-    math_level VARCHAR(20) DEFAULT 'THCS',
-    target_score INTEGER DEFAULT 150,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- 7. MATCH HISTORY
+-- 6. LỊCH SỬ TRẬN ĐẤU
 CREATE TABLE IF NOT EXISTS match_history (
     id VARCHAR(64) PRIMARY KEY,
     user_id VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
@@ -97,11 +99,12 @@ CREATE TABLE IF NOT EXISTS match_history (
     busts INTEGER DEFAULT 0,
     max_combo INTEGER DEFAULT 0,
     mode VARCHAR(10) DEFAULT 'pvp',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    played_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 8. INDEXES FOR HIGH-PERFORMANCE LEADERBOARD & QUERIES
+-- 7. INDEXES CHO BẢNG XẾP HẠNG & TRUY VẤN NHANH
 CREATE INDEX IF NOT EXISTS idx_profiles_highest_score ON profiles(highest_score DESC);
+CREATE INDEX IF NOT EXISTS idx_profiles_all_time_highest_score ON profiles(all_time_highest_score DESC);
 CREATE INDEX IF NOT EXISTS idx_profiles_xp ON profiles(xp DESC);
 CREATE INDEX IF NOT EXISTS idx_match_history_user ON match_history(user_id);
-CREATE INDEX IF NOT EXISTS idx_questions_category_level ON questions(category, level);
+CREATE INDEX IF NOT EXISTS idx_premium_requests_status ON premium_requests(status);

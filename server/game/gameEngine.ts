@@ -689,11 +689,20 @@ export class GameEngine {
       }
       player.stats.categoryAccuracy[cat].total += 1;
 
+      // Lời giải chi tiết chỉ hiển thị đầy đủ cho thành viên đã đăng ký gói Premium.
+      // Người chơi thường vẫn thấy đáp án đúng để trận đấu công bằng, nhưng phần giải thích từng bước bị khóa.
+      // Xét theo (các) người chơi thật đang xem trận đấu này (bỏ qua AI, vì AI không có tài khoản Premium).
+      const humanPlayerIds = Object.values(state.players).filter(p => !p.isAi).map(p => p.id);
+      const canSeeSolution = humanPlayerIds.some(id => db.isPremiumActive(id));
+      const revealedExplanation = canSeeSolution
+        ? currentFullQuestion.explanation
+        : '🔒 Nâng cấp gói Premium (Hồ Sơ Pháp Sư) để xem lời giải chi tiết từng bước cho câu hỏi này!';
+
       state.lastAnswerResult = {
         correct: false,
         earnedPoints: 0,
         revealedAnswer: currentFullQuestion.answer,
-        explanation: currentFullQuestion.explanation,
+        explanation: revealedExplanation,
       };
 
       state.historyLog.push({
@@ -718,7 +727,7 @@ export class GameEngine {
         correct: false,
         earnedPoints: 0,
         state,
-        explanation: currentFullQuestion.explanation,
+        explanation: revealedExplanation,
       };
     }
   }

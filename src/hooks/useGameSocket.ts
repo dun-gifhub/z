@@ -357,6 +357,28 @@ export function useGameSocket() {
     if (user?.id) fetchProfile(user.id);
   };
 
+  const updateAvatar = async (avatar: string): Promise<{ success: boolean; error?: string }> => {
+    if (!user?.id) return { success: false, error: 'Chưa đăng nhập.' };
+    try {
+      const res = await fetch(`/api/profile/${user.id}/avatar`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Không thể đổi Pháp Thân.' };
+      }
+      setProfile(data);
+      const updatedUser = { ...user, avatar };
+      setUser(updatedUser);
+      localStorage.setItem('mathrune_user', JSON.stringify(updatedUser));
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e.message || 'Lỗi kết nối máy chủ.' };
+    }
+  };
+
   const updateEquippedRunes = async (runes: string[]) => {
     if (!user?.id) return;
     const res = await fetch(`/api/profile/${user.id}/runes`, {
@@ -395,6 +417,7 @@ export function useGameSocket() {
     surrender,
     exitGame,
     updateEquippedRunes,
+    updateAvatar,
     refreshProfile: () => user?.id && fetchProfile(user.id),
   };
 }
