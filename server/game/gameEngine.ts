@@ -1025,15 +1025,15 @@ export class GameEngine {
 
     this.notifyState(gameId, isSolvingQuestion ? 'ai_solving' : 'ai_thinking');
 
-    let thinkDelay = 5500;
+    let thinkDelay = 1200;
     if (isSolvingQuestion) {
-      if (diff === 'easy') thinkDelay = 5000 + Math.random() * 2000;
-      else if (diff === 'medium') thinkDelay = 6500 + Math.random() * 2500;
-      else thinkDelay = 7500 + Math.random() * 2500;
+      if (diff === 'easy') thinkDelay = 1000 + Math.random() * 500;
+      else if (diff === 'medium') thinkDelay = 1200 + Math.random() * 600;
+      else thinkDelay = 1500 + Math.random() * 800;
     } else {
-      if (diff === 'easy') thinkDelay = 3800 + Math.random() * 1500;
-      else if (diff === 'medium') thinkDelay = 4500 + Math.random() * 2000;
-      else thinkDelay = 5500 + Math.random() * 2000;
+      if (diff === 'easy') thinkDelay = 700 + Math.random() * 400;
+      else if (diff === 'medium') thinkDelay = 900 + Math.random() * 500;
+      else thinkDelay = 1100 + Math.random() * 600;
     }
 
     session.aiTimer = setTimeout(() => {
@@ -1072,7 +1072,7 @@ export class GameEngine {
         explanation: res.explanation,
       });
 
-      setTimeout(() => this.checkAiTurn(gameId), 4000);
+      setTimeout(() => this.checkAiTurn(gameId), 1200);
       return;
     }
 
@@ -1107,7 +1107,7 @@ export class GameEngine {
       const res = this.drawCard(gameId, ai.id);
       this.notifyState(gameId, res.isBust ? 'bust' : 'card_drawn');
       if (!res.isBust) {
-        setTimeout(() => this.checkAiTurn(gameId), 3500);
+        setTimeout(() => this.checkAiTurn(gameId), 1000);
       }
     }
   }

@@ -80,6 +80,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
+  // User management state: filtering, search, and Pro package controls
+  const [userFilter, setUserFilter] = useState<'all' | 'registered' | 'guest' | 'pro'>('all');
+  const [userSearch, setUserSearch] = useState('');
+  const [customGrantUsername, setCustomGrantUsername] = useState('');
+  const [customGrantDays, setCustomGrantDays] = useState<number>(30);
+  const [customGrantPlan, setCustomGrantPlan] = useState<'monthly' | 'solution'>('monthly');
+  const [grantActionMsg, setGrantActionMsg] = useState<string | null>(null);
+  const [grantActionLoading, setGrantActionLoading] = useState(false);
+
   // New question form state
   const [qText, setQText] = useState('');
   const [qFormula, setQFormula] = useState('');
@@ -212,33 +221,77 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     }
   };
 
-  // ------- Cấp / Thu hồi Premium thủ công (VD: nhận chuyển khoản tiền mặt trực tiếp) -------
-  const handleGrantPremium = async (userId: string, plan: PremiumPlan) => {
+  // ------- Cấp / Thu hồi / Gia hạn Gói PRO thủ công (bằng ID hoặc Tên tài khoản) -------
+  const handleGrantPremium = async (userId: string, plan: PremiumPlan = 'monthly', days: number = 30) => {
     try {
-      await fetch('/api/admin/premium/grant', {
+      const res = await fetch('/api/admin/premium/grant', {
         method: 'POST',
         headers: adminHeaders,
-        body: JSON.stringify({ userId, plan, days: 30 }),
+        body: JSON.stringify({ userId, plan, days }),
       });
-      fetchUsers();
-      fetchStats();
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || `Đã gia hạn thành công gói PRO thêm ${days} ngày!`);
+        fetchUsers();
+        fetchStats();
+      } else {
+        alert(data.error || 'Lỗi cấp gói PRO.');
+      }
     } catch (e) {
       console.warn(e);
     }
   };
 
   const handleRevokePremium = async (userId: string) => {
-    if (!confirm('Thu hồi gói Premium của tài khoản này?')) return;
+    if (!confirm('Bạn có chắc chắn muốn gỡ bỏ gói PRO của tài khoản này không?')) return;
     try {
-      await fetch('/api/admin/premium/revoke', {
+      const res = await fetch('/api/admin/premium/revoke', {
         method: 'POST',
         headers: adminHeaders,
         body: JSON.stringify({ userId }),
       });
-      fetchUsers();
-      fetchStats();
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || 'Đã gỡ gói PRO thành công!');
+        fetchUsers();
+        fetchStats();
+      } else {
+        alert(data.error || 'Lỗi gỡ gói PRO.');
+      }
     } catch (e) {
       console.warn(e);
+    }
+  };
+
+  const handleCustomGrantByUsername = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customGrantUsername.trim()) return;
+    setGrantActionLoading(true);
+    setGrantActionMsg(null);
+    try {
+      const res = await fetch('/api/admin/premium/grant', {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify({
+          username: customGrantUsername.trim(),
+          plan: customGrantPlan,
+          days: customGrantDays,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setGrantActionMsg(`✓ ${data.message || 'Đã gia hạn gói PRO thành công!'}`);
+        setCustomGrantUsername('');
+        fetchUsers();
+        fetchStats();
+      } else {
+        setGrantActionMsg(data.error || 'Lỗi gia hạn gói PRO.');
+      }
+    } catch {
+      setGrantActionMsg('Lỗi kết nối máy chủ.');
+    } finally {
+      setGrantActionLoading(false);
+      setTimeout(() => setGrantActionMsg(null), 5000);
     }
   };
 
@@ -509,29 +562,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             )}
 
             <form onSubmit={handleAddQuestion} className="space-y-3 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 mb-1">Nội dung câu hỏi (*):</label>
-                  <input
-                    type="text"
-                    required
-                    value={qText}
-                    onChange={e => setQText(e.target.value)}
-                    placeholder="VD: Số 29 có phải là số nguyên tố không?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-300 mb-1">Công thức LaTeX / Ký hiệu:</label>
-                  <input
-                    type="text"
-                    value={qFormula}
-                    onChange={e => setQFormula(e.target.value)}
-                    placeholder="VD: 29 \in \mathbb{P}"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400 font-mono"
-                  />
-                </div>
+              <div>
+                <label className="block text-slate-300 mb-1">Nội dung câu hỏi (*):</label>
+                <input
+                  type="text"
+                  required
+                  value={qText}
+                  onChange={e => setQText(e.target.value)}
+                  placeholder="VD: Số 29 có phải là số nguyên tố không?"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -653,76 +693,275 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         </div>
       )}
 
-      {/* TAB 3: USERS LIST */}
-      {activeTab === 'users' && (
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
-          <h3 className="font-cinzel text-sm font-bold text-slate-200">
-            DANH SÁCH NGƯỜI DÙNG ({users.length} PHÁP SƯ) — CHỈ 1 TÀI KHOẢN ADMIN DUY NHẤT
-          </h3>
-          <div className="space-y-2">
-            {users.map(u => {
-              const isPremiumActive = !!u.isPremium && (!u.premiumExpiresAt || new Date(u.premiumExpiresAt).getTime() > Date.now());
-              return (
-                <div
-                  key={u.id}
-                  className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-2xl">{u.avatar}</span>
-                    <div>
-                      <div className="font-bold text-slate-200 flex items-center gap-1.5">
-                        <span>{u.username}</span>
-                        {u.role === 'admin' && (
-                          <span className="px-1.5 py-0.5 bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[9px] font-black rounded-md">ADMIN</span>
-                        )}
-                        {isPremiumActive && (
-                          <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 text-[9px] font-black rounded-md">
-                            <Crown className="w-2.5 h-2.5" /> PREMIUM
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[10px] font-mono text-slate-500">
-                        ID: {u.id} • {new Date(u.createdAt).toLocaleDateString('vi-VN')}
-                        {isPremiumActive && u.premiumExpiresAt && (
-                          <> • Hết hạn: {new Date(u.premiumExpiresAt).toLocaleDateString('vi-VN')}</>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+      {/* TAB 3: USERS LIST (PHÂN LOẠI TÀI KHOẢN ĐĂNG KÝ / CHƠI NHANH & QUẢN LÝ GÓI PRO) */}
+      {activeTab === 'users' && (() => {
+        const isUserGuest = (u: any) => u.isGuest || u.role === 'guest' || u.accountType === 'guest';
+        const isUserPro = (u: any) => !!u.isPremium && (!u.premiumExpiresAt || new Date(u.premiumExpiresAt).getTime() > Date.now());
 
-                  {u.role !== 'admin' && (
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {isPremiumActive ? (
-                        <button
-                          onClick={() => handleRevokePremium(u.id)}
-                          className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 hover:border-rose-700 text-slate-400 hover:text-rose-300 rounded-lg transition-colors"
-                        >
-                          Thu Hồi Premium
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleGrantPremium(u.id, 'solution')}
-                          className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-950/40 border border-yellow-800/50 hover:border-yellow-500 text-yellow-300 rounded-lg transition-colors"
-                        >
-                          <Crown className="w-3 h-3" />
-                          Cấp Premium 30 Ngày
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteUser(u)}
-                        title="Xóa tài khoản"
-                        className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800"
-                      >
-                        <UserX className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
+        const registeredUsers = users.filter(u => !isUserGuest(u) && u.role !== 'admin');
+        const guestUsers = users.filter(u => isUserGuest(u));
+        const proUsers = users.filter(u => isUserPro(u));
+
+        const filteredUsers = users.filter(u => {
+          if (userFilter === 'registered') {
+            if (isUserGuest(u) || u.role === 'admin') return false;
+          } else if (userFilter === 'guest') {
+            if (!isUserGuest(u)) return false;
+          } else if (userFilter === 'pro') {
+            if (!isUserPro(u)) return false;
+          }
+
+          if (userSearch.trim()) {
+            const query = userSearch.toLowerCase();
+            const matchName = (u.username || '').toLowerCase().includes(query);
+            const matchId = (u.id || '').toLowerCase().includes(query);
+            return matchName || matchId;
+          }
+          return true;
+        });
+
+        return (
+          <div className="space-y-4">
+            {/* TOOL: GIA HẠN GÓI PRO CHO NGƯỜI MÌNH MUỐN */}
+            <div className="p-4 bg-slate-900 border-2 border-yellow-600/50 rounded-2xl space-y-3 shadow-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="font-cinzel text-sm font-bold text-yellow-300 flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-yellow-400" />
+                  <span>GIA HẠN / CẤP GÓI PRO CHO NGƯỜI BẠN MUỐN</span>
+                </h3>
+                <span className="text-[11px] text-slate-400">Công cụ độc quyền Admin</span>
+              </div>
+
+              {grantActionMsg && (
+                <div className="p-2.5 bg-emerald-950 border border-emerald-700 text-emerald-200 text-xs rounded-xl flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 shrink-0" />
+                  <span>{grantActionMsg}</span>
                 </div>
-              );
-            })}
+              )}
+
+              <form onSubmit={handleCustomGrantByUsername} className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+                <div className="sm:col-span-2">
+                  <input
+                    type="text"
+                    value={customGrantUsername}
+                    onChange={e => setCustomGrantUsername(e.target.value)}
+                    placeholder="Nhập Tên đăng nhập hoặc ID người muốn gia hạn..."
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-yellow-400 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <select
+                    value={customGrantDays}
+                    onChange={e => setCustomGrantDays(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-yellow-400 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none"
+                  >
+                    <option value={7}>7 Ngày (1 Tuần)</option>
+                    <option value={30}>30 Ngày (1 Tháng)</option>
+                    <option value={60}>60 Ngày (2 Tháng)</option>
+                    <option value={90}>90 Ngày (3 Tháng)</option>
+                    <option value={180}>180 Ngày (6 Tháng)</option>
+                    <option value={365}>365 Ngày (1 Năm)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={grantActionLoading || !customGrantUsername.trim()}
+                    className="w-full py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    {grantActionLoading ? 'Đang cấp...' : 'Gia Hạn PRO Ngay'}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* USERS OVERVIEW & FILTERS */}
+            <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <h3 className="font-cinzel text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-amber-400" />
+                  <span>DANH SÁCH NGƯỜI DÙNG ({users.length} PHÁP SƯ)</span>
+                </h3>
+
+                {/* Filter Tabs */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setUserFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      userFilter === 'all'
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
+                        : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
+                    }`}
+                  >
+                    Tất Cả ({users.length})
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setUserFilter('registered')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      userFilter === 'registered'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'bg-slate-950 text-emerald-400/80 hover:text-emerald-300 border border-slate-800'
+                    }`}
+                  >
+                    🟢 Đã Đăng Ký ({registeredUsers.length})
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setUserFilter('guest')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      userFilter === 'guest'
+                        ? 'bg-amber-600 text-white shadow-sm'
+                        : 'bg-slate-950 text-amber-400/80 hover:text-amber-300 border border-slate-800'
+                    }`}
+                  >
+                    ⚡ Chơi Nhanh ({guestUsers.length})
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setUserFilter('pro')}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      userFilter === 'pro'
+                        ? 'bg-yellow-500 text-slate-950 shadow-sm'
+                        : 'bg-slate-950 text-yellow-400/80 hover:text-yellow-300 border border-slate-800'
+                    }`}
+                  >
+                    <Crown className="w-3 h-3" />
+                    <span>PRO ({proUsers.length})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Search Box */}
+              <div>
+                <input
+                  type="text"
+                  value={userSearch}
+                  onChange={e => setUserSearch(e.target.value)}
+                  placeholder="Tìm kiếm theo Tên tài khoản hoặc ID người dùng..."
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none"
+                />
+              </div>
+
+              {/* User rows */}
+              <div className="space-y-2.5 pt-1">
+                {filteredUsers.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
+                    Không tìm thấy người dùng nào phù hợp với bộ lọc.
+                  </div>
+                ) : (
+                  filteredUsers.map(u => {
+                    const activePro = isUserPro(u);
+                    const isGuest = isUserGuest(u);
+                    const isAdmin = u.role === 'admin';
+
+                    return (
+                      <div
+                        key={u.id}
+                        className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl shrink-0">{u.avatar}</span>
+                          <div className="space-y-1">
+                            <div className="font-bold text-slate-200 flex items-center gap-2 flex-wrap">
+                              <span className="text-sm">{u.username}</span>
+
+                              {/* Account Type Classification Badges */}
+                              {isAdmin ? (
+                                <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-black rounded-md">
+                                  🛡️ ADMIN
+                                </span>
+                              ) : isGuest ? (
+                                <span className="px-2 py-0.5 bg-amber-500/10 border border-amber-400/40 text-amber-300 text-[10px] font-bold rounded-md flex items-center gap-1">
+                                  ⚡ CHƠI NHANH (KHÁCH)
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold rounded-md flex items-center gap-1">
+                                  🟢 ĐÃ ĐĂNG KÝ
+                                </span>
+                              )}
+
+                              {/* Pro VIP Badge */}
+                              {activePro && (
+                                <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-500/20 border border-yellow-400/50 text-yellow-300 text-[10px] font-black rounded-md">
+                                  <Crown className="w-3 h-3" />
+                                  <span>PRO VIP ({u.premiumPlan === 'monthly' ? 'Tháng' : 'Lời Giải'})</span>
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="text-[11px] font-mono text-slate-400 flex items-center gap-2.5 flex-wrap">
+                              <span>ID: <span className="text-slate-300">{u.id}</span></span>
+                              <span>•</span>
+                              <span>Tạo: {new Date(u.createdAt).toLocaleDateString('vi-VN')}</span>
+                              {activePro && u.premiumExpiresAt && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-yellow-300 font-semibold">
+                                    Hạn PRO: {new Date(u.premiumExpiresAt).toLocaleDateString('vi-VN')}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions: Gia hạn gói PRO & Gỡ gói PRO */}
+                        {!isAdmin && (
+                          <div className="flex items-center gap-1.5 flex-wrap self-end md:self-auto">
+                            {activePro ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRevokePremium(u.id)}
+                                  className="px-2.5 py-1.5 bg-rose-950/60 border border-rose-700/60 hover:border-rose-500 text-rose-300 rounded-lg transition-colors font-medium text-[11px]"
+                                >
+                                  ❌ Gỡ Gói PRO
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleGrantPremium(u.id, 'monthly', 30)}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/40 hover:border-yellow-400 text-yellow-300 rounded-lg transition-colors font-medium text-[11px]"
+                                >
+                                  🔄 +30 Ngày
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleGrantPremium(u.id, 'monthly', 30)}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-950/50 border border-yellow-700/60 hover:border-yellow-400 text-yellow-300 rounded-lg transition-colors font-medium text-[11px]"
+                              >
+                                <Crown className="w-3 h-3" />
+                                <span>Cấp PRO 30 Ngày</span>
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteUser(u)}
+                              title="Xóa tài khoản này"
+                              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800"
+                            >
+                              <UserX className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* TAB 4: PREMIUM REQUESTS */}
       {activeTab === 'premium' && (

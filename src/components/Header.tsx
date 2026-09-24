@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Music, Wifi, WifiOff, Sparkles, User, LogOut, Shield, Palette } from 'lucide-react';
+import { Volume2, VolumeX, Music, Wifi, WifiOff, Sparkles, User, LogOut, Shield, Palette, Sun, Moon } from 'lucide-react';
 import { sound } from '../utils/soundEffects.ts';
 import { UserProfile } from '../../shared/types.ts';
 import { ThemeDef } from '../utils/themeManager.ts';
@@ -14,6 +14,7 @@ interface HeaderProps {
   currentView: string;
   currentTheme: ThemeDef;
   onOpenThemeModal: () => void;
+  onToggleLightMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentView,
   currentTheme,
   onOpenThemeModal,
+  onToggleLightMode,
 }) => {
   const [isMuted, setIsMuted] = useState(sound.getIsMuted());
   const [isBgmOn, setIsBgmOn] = useState(sound.getIsBgmPlaying());
@@ -101,6 +103,31 @@ export const Header: React.FC<HeaderProps> = ({
               <Music className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Quick Toggle Light / Dark Mode */}
+          {onToggleLightMode && (
+            <button
+              onClick={onToggleLightMode}
+              title={currentTheme.isLight ? 'Chuyển sang Giao Diện Tối' : 'Chuyển sang Giao Diện Trắng (Sáng)'}
+              className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 border ${
+                currentTheme.isLight
+                  ? 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200'
+                  : 'bg-slate-900 border-slate-700 text-amber-300 hover:bg-slate-800'
+              }`}
+            >
+              {currentTheme.isLight ? (
+                <>
+                  <Moon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline font-bold">Giao Diện Tối</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline font-black text-amber-300">Giao Diện Trắng</span>
+                </>
+              )}
+            </button>
+          )}
 
           {/* Theme Background Changer */}
           <button

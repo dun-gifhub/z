@@ -59,10 +59,19 @@ export const ThemeModal: React.FC<ThemeModalProps> = ({
                 <div className="flex items-center gap-2.5">
                   <span className="text-xl">{theme.icon}</span>
                   <div>
-                    <div className="text-xs font-bold text-slate-100 flex items-center gap-1">
+                    <div className={`text-xs font-bold flex items-center gap-1 ${
+                      theme.isLight ? 'text-slate-900' : 'text-slate-100'
+                    }`}>
                       {theme.name}
+                      {theme.isLight && (
+                        <span className="ml-1 px-1.5 py-0.2 bg-amber-500/20 border border-amber-500 text-[9px] font-black text-amber-700 rounded">
+                          MỚI
+                        </span>
+                      )}
                     </div>
-                    <div className="text-[10px] text-slate-400 line-clamp-1">
+                    <div className={`text-[10px] line-clamp-1 ${
+                      theme.isLight ? 'text-slate-600 font-medium' : 'text-slate-400'
+                    }`}>
                       {theme.description}
                     </div>
                   </div>

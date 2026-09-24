@@ -8,9 +8,34 @@ export interface ThemeDef {
   gradientOverlay: string;
   accentBorder: string;
   description: string;
+  isLight?: boolean;
 }
 
 export const GAME_THEMES: ThemeDef[] = [
+  {
+    id: 'light_pure',
+    name: 'Bạch Ngân Thánh Điện (Giao Diện Trắng)',
+    icon: '☀️',
+    previewColor: '#f8fafc',
+    bgHex: '#f8fafc',
+    bgClass: 'bg-slate-50',
+    gradientOverlay: 'from-slate-50 via-amber-50/40 to-slate-100',
+    accentBorder: 'border-slate-300',
+    description: 'Giao diện nền trắng sáng sủa, tinh khiết, chữ đen sắc nét êm dịu cho mắt.',
+    isLight: true,
+  },
+  {
+    id: 'light_ivory',
+    name: 'Bạch Kim Hoàng Gia (Trắng Ngà)',
+    icon: '✨',
+    previewColor: '#fdfbf7',
+    bgHex: '#fdfbf7',
+    bgClass: 'bg-[#fdfbf7]',
+    gradientOverlay: 'from-[#fdfbf7] via-amber-50/60 to-[#f5f0e6]',
+    accentBorder: 'border-amber-300',
+    description: 'Màu trắng ngà ánh kim sang trọng, ấm cúng và dịu nhẹ cho mọi lứa tuổi.',
+    isLight: true,
+  },
   {
     id: 'void',
     name: 'Hư Không Dạ Khúc',
@@ -83,14 +108,31 @@ export const getSavedTheme = (): ThemeDef => {
   if (typeof window === 'undefined') return GAME_THEMES[0];
   const savedId = localStorage.getItem('mathrune_theme_id');
   const found = GAME_THEMES.find(t => t.id === savedId);
-  return found || GAME_THEMES[0];
+  const theme = found || GAME_THEMES[0];
+  applyThemeToDom(theme);
+  return theme;
+};
+
+export const applyThemeToDom = (theme: ThemeDef) => {
+  if (typeof window === 'undefined') return;
+  document.documentElement.style.setProperty('--bg-game', theme.bgHex);
+  if (theme.isLight) {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light-theme');
+    document.body.style.backgroundColor = theme.bgHex;
+  } else {
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light-theme');
+    document.body.style.backgroundColor = theme.bgHex;
+  }
 };
 
 export const saveTheme = (themeId: string): ThemeDef => {
   const theme = GAME_THEMES.find(t => t.id === themeId) || GAME_THEMES[0];
   if (typeof window !== 'undefined') {
     localStorage.setItem('mathrune_theme_id', theme.id);
-    document.documentElement.style.setProperty('--bg-game', theme.bgHex);
+    applyThemeToDom(theme);
   }
   return theme;
 };
+

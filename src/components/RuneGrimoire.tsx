@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Sparkles, Check, Shield, Zap, AlertCircle, Info, Flame, Clock, HeartHandshake } from 'lucide-react';
+import { ArrowLeft, Sparkles, Check, Zap, Info } from 'lucide-react';
 import { ALL_RUNES } from '../../shared/runes.ts';
 import { RuneCategory, RuneDef } from '../../shared/types.ts';
+import { RuneIcon } from './RuneIcon.tsx';
 
 interface RuneGrimoireProps {
   equippedRunes: string[];
@@ -122,13 +123,14 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
           <div className="p-3.5 bg-slate-950/80 border border-indigo-500/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border-2 shrink-0 shadow-lg"
+                className="w-14 h-14 rounded-2xl flex items-center justify-center border-2 shrink-0 shadow-lg"
                 style={{
                   backgroundColor: `${activeRuneDef.color}22`,
                   borderColor: activeRuneDef.color,
+                  color: activeRuneDef.color,
                 }}
               >
-                {activeRuneDef.icon}
+                <RuneIcon icon={activeRuneDef.icon} className="w-7 h-7" />
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
@@ -203,13 +205,14 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
               <div className="space-y-2.5">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border shrink-0"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center border shrink-0"
                     style={{
                       backgroundColor: `${rune.color}22`,
                       borderColor: rune.color,
+                      color: rune.color,
                     }}
                   >
-                    {rune.icon}
+                    <RuneIcon icon={rune.icon} className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-cinzel text-sm font-bold text-slate-100" style={{ color: rune.color }}>

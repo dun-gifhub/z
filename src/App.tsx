@@ -12,7 +12,7 @@ import { AdminPanel } from './components/AdminPanel.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
 import { HowToPlayModal } from './components/HowToPlayModal.tsx';
 import { ThemeModal } from './components/ThemeModal.tsx';
-import { getSavedTheme, saveTheme, ThemeDef } from './utils/themeManager.ts';
+import { getSavedTheme, saveTheme, ThemeDef, GAME_THEMES } from './utils/themeManager.ts';
 import { MathLevel, AiDifficulty } from '../shared/types.ts';
 
 type AppView = 'main' | 'online' | 'deck' | 'runes' | 'profile' | 'leaderboard' | 'admin';
@@ -44,6 +44,7 @@ export function App() {
     exitGame,
     updateEquippedRunes,
     updateAvatar,
+    refreshProfile,
   } = useGameSocket();
 
   const [currentView, setCurrentView] = useState<AppView>('main');
@@ -58,6 +59,16 @@ export function App() {
     setCurrentTheme(saved);
   };
 
+  const handleToggleLightMode = () => {
+    if (currentTheme.isLight) {
+      const darkTheme = GAME_THEMES.find(t => t.id === 'void') || GAME_THEMES[2];
+      handleSelectTheme(darkTheme);
+    } else {
+      const lightTheme = GAME_THEMES.find(t => t.id === 'light_pure') || GAME_THEMES[0];
+      handleSelectTheme(lightTheme);
+    }
+  };
+
   // Auto initialize guest account on first load if no user
   useEffect(() => {
     if (!user) {
@@ -68,7 +79,7 @@ export function App() {
   return (
     <div
       style={{ backgroundColor: currentTheme.bgHex }}
-      className={`min-h-screen text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300`}
+      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300`}
     >
       {/* Top Navbar */}
       <Header
@@ -83,6 +94,7 @@ export function App() {
         currentView={currentView}
         currentTheme={currentTheme}
         onOpenThemeModal={() => setThemeModalOpen(true)}
+        onToggleLightMode={handleToggleLightMode}
       />
 
       {/* Main Container */}
@@ -149,6 +161,7 @@ export function App() {
                 profile={profile}
                 onBack={() => setCurrentView('main')}
                 onUpdateAvatar={updateAvatar}
+                onRefreshProfile={refreshProfile}
               />
             )}
 

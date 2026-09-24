@@ -9,6 +9,7 @@ import {
 import { ALL_RUNES } from '../../shared/runes.ts';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
 import { HowToPlayModal } from './HowToPlayModal.tsx';
+import { RuneIcon } from './RuneIcon.tsx';
 import {
   Shield,
   Coins,
@@ -180,7 +181,9 @@ export const GameArena: React.FC<GameArenaProps> = ({
                     >
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-3xl p-2 rounded-xl bg-slate-900 border border-slate-800">{rDef.icon}</span>
+                          <span className="p-2 rounded-xl bg-slate-900 border border-slate-800" style={{ color: rDef.color }}>
+                            <RuneIcon icon={rDef.icon} className="w-8 h-8" />
+                          </span>
                           <div>
                             <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="font-cinzel text-base font-bold text-amber-200 group-hover:text-amber-100">
@@ -353,7 +356,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
 
                 return (
                   <div className="text-[10px] text-indigo-300 flex items-center gap-1.5 mt-0.5 flex-wrap" title={rDef?.persistentEffectDesc || rDef?.description}>
-                    <span>{rDef?.icon}</span>
+                    <RuneIcon icon={rDef?.icon || ''} className="w-3.5 h-3.5 inline-block" />
                     <span className="font-bold">Nội tại: {rDef?.name}</span>
                     {isOncePerMatch && (
                       <span className={`px-1.5 py-0.2 text-[9px] font-mono rounded ${
@@ -672,7 +675,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
                         : 'bg-slate-950/80 text-slate-300'
                     }`}
                   >
-                    <span className="text-base">{def.icon}</span>
+                    <span className="shrink-0"><RuneIcon icon={def.icon} className="w-4 h-4" /></span>
                     <span className="font-bold">{def.name}</span>
 
                     {/* Status Badge */}
@@ -795,7 +798,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
                   const rDef = ALL_RUNES.find(r => r.id === you.chosenRuneId);
                   return (
                     <div className="text-[11px] text-amber-300 flex items-center gap-1.5 mt-1" title={rDef?.persistentEffectDesc || rDef?.description}>
-                      <span>{rDef?.icon}</span>
+                      <RuneIcon icon={rDef?.icon || ''} className="w-3.5 h-3.5 inline-block" />
                       <span className="font-bold text-amber-400">Nội tại toàn trận: {rDef?.name}</span>
                       <span className="text-slate-300 font-light hidden sm:inline">— {rDef?.persistentEffectDesc}</span>
                     </div>

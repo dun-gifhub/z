@@ -187,20 +187,39 @@ async function startServer() {
   });
 
   // ==========================================
-  // PREMIUM SUBSCRIPTION APIS (Gói Xem Lời Giải / Gói Tháng)
+  // PREMIUM SUBSCRIPTION APIS (Gói PRO / Xem Lời Giải / Gói Tháng)
   // ==========================================
   app.post('/api/premium/request', async (req, res) => {
-    const { userId, plan } = req.body;
+    const { userId, plan, targetUsername } = req.body;
     if (!userId || (plan !== 'solution' && plan !== 'monthly')) {
       return res.status(400).json({ error: 'Thông tin gói đăng ký không hợp lệ.' });
     }
-    const user = db.findUserById(userId);
-    if (!user) return res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
+    const sender = db.findUserById(userId);
+    if (!sender) return res.status(404).json({ error: 'Không tìm thấy tài khoản người gửi.' });
+
+    let recipientId = userId;
+    let recipientName = sender.username;
+
+    if (targetUsername && targetUsername.trim()) {
+      const targetUser = db.findUserByUsername(targetUsername.trim());
+      if (!targetUser) {
+        return res.status(404).json({ error: `Không tìm thấy tài khoản người nhận "${targetUsername}". Vui lòng kiểm tra lại chính xác tên đăng nhập!` });
+      }
+      recipientId = targetUser.id;
+      recipientName = `${targetUser.username} (Gia hạn bởi: ${sender.username})`;
+    }
 
     const settings = db.getSettings();
     const price = plan === 'monthly' ? settings.monthlyPackagePrice : settings.solutionPackagePrice;
-    const request = await db.createPremiumRequest(userId, user.username, plan, price);
-    return res.json({ success: true, request });
+    const request = await db.createPremiumRequest(recipientId, recipientName, plan, price);
+    return res.json({ success: true, request, recipientName });
+  });
+
+  app.post('/api/premium/cancel-my-pro', async (req, res) => {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'Thiếu thông tin tài khoản.' });
+    const profile = await db.revokePremium(userId);
+    return res.json({ success: true, profile, message: 'Đã gỡ bỏ gói PRO khỏi tài khoản của bạn.' });
   });
 
   app.get('/api/leaderboard', (req, res) => {
@@ -257,7 +276,25 @@ async function startServer() {
 
   app.get('/api/admin/users', requireAdmin, (_req, res) => {
     const users = db.getAllUsers();
-    return res.json(users);
+    const enriched = users.map(u => {
+      const profile = db.getProfile(u.id);
+      const isPremium = db.isPremiumActive(u.id);
+      return {
+        ...u,
+        accountType: u.role === 'guest' ? 'guest' : 'registered',
+        isGuest: u.role === 'guest',
+        isPremium,
+        premiumPlan: profile?.premiumPlan || null,
+        premiumExpiresAt: profile?.premiumExpiresAt || null,
+        level: profile?.level || 1,
+        xp: profile?.xp || 0,
+        totalGames: profile?.totalGames || 0,
+        wins: profile?.wins || 0,
+        losses: profile?.losses || 0,
+        winRate: profile?.winRate || 0,
+      };
+    });
+    return res.json(enriched);
   });
 
   app.post('/api/admin/questions', requireAdmin, async (req, res) => {
@@ -327,20 +364,33 @@ async function startServer() {
   });
 
   app.post('/api/admin/premium/grant', requireAdmin, async (req, res) => {
-    const { userId, plan, days } = req.body;
-    if (!userId || (plan !== 'solution' && plan !== 'monthly')) {
-      return res.status(400).json({ error: 'Thông tin không hợp lệ.' });
+    const { userId, username, plan = 'monthly', days = 30 } = req.body;
+    let targetId = userId;
+    if (!targetId && username) {
+      const user = db.findUserByUsername(username.trim()) || db.findUserById(username.trim());
+      if (user) targetId = user.id;
     }
-    const profile = await db.grantPremium(userId, plan, days ? Number(days) : 30);
-    if (!profile) return res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
-    return res.json(profile);
+    if (!targetId) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp ID hoặc Tên đăng nhập của tài khoản cần gia hạn gói PRO.' });
+    }
+    const profile = await db.grantPremium(targetId, (plan === 'solution' ? 'solution' : 'monthly'), Number(days) || 30);
+    if (!profile) return res.status(404).json({ error: 'Không tìm thấy tài khoản để kích hoạt gói PRO.' });
+    return res.json({ success: true, profile, message: `Đã gia hạn thành công gói PRO thêm ${days} ngày cho tài khoản ${profile.username}!` });
   });
 
   app.post('/api/admin/premium/revoke', requireAdmin, async (req, res) => {
-    const { userId } = req.body;
-    const profile = await db.revokePremium(userId);
-    if (!profile) return res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
-    return res.json(profile);
+    const { userId, username } = req.body;
+    let targetId = userId;
+    if (!targetId && username) {
+      const user = db.findUserByUsername(username.trim()) || db.findUserById(username.trim());
+      if (user) targetId = user.id;
+    }
+    if (!targetId) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp ID hoặc Tên đăng nhập của tài khoản cần gỡ gói PRO.' });
+    }
+    const profile = await db.revokePremium(targetId);
+    if (!profile) return res.status(404).json({ error: 'Không tìm thấy tài khoản để gỡ gói PRO.' });
+    return res.json({ success: true, profile, message: `Đã gỡ bỏ thành công gói PRO của tài khoản ${profile.username}.` });
   });
 
   // ------- Reset Bảng Xếp Hạng tuần (thủ công - ngoài lịch tự động mỗi tuần) -------

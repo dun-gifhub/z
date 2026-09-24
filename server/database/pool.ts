@@ -17,6 +17,7 @@ export const pool = hasDatabase
       ssl: { rejectUnauthorized: false },
       max: 5,
       idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
     })
   : null;
 

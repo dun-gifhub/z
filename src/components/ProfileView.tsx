@@ -7,13 +7,14 @@ interface ProfileViewProps {
   profile: UserProfile | null;
   onBack: () => void;
   onUpdateAvatar?: (avatar: string) => Promise<{ success: boolean; error?: string }>;
+  onRefreshProfile?: () => void;
 }
 
 function formatVnd(n: number) {
   return n.toLocaleString('vi-VN') + 'đ';
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpdateAvatar }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpdateAvatar, onRefreshProfile }) => {
   const [matchHistory, setMatchHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -23,12 +24,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
   const [avatarMsg, setAvatarMsg] = useState<string | null>(null);
   const [avatarSaving, setAvatarSaving] = useState(false);
 
-  // ------- Premium purchase -------
+  // ------- Premium purchase & gift/renew for others -------
   const [selectedPlan, setSelectedPlan] = useState<PremiumPlan | null>(null);
+  const [showSelfRenew, setShowSelfRenew] = useState(false);
+  const [targetGiftUsername, setTargetGiftUsername] = useState('');
+  const [giftPlan, setGiftPlan] = useState<PremiumPlan>('monthly');
+  const [giftMode, setGiftMode] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
+  const [requestRecipient, setRequestRecipient] = useState('');
   const [requestMsg, setRequestMsg] = useState<string | null>(null);
   const [requestLoading, setRequestLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // ------- Cancel / Revoke Pro -------
+  const [cancellingPro, setCancellingPro] = useState(false);
+  const [cancelMsg, setCancelMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!profile?.id) return;
@@ -74,19 +84,32 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
     }).catch(() => {});
   };
 
-  const handleSendPremiumRequest = async () => {
-    if (!profile?.id || !selectedPlan) return;
+  const handleSendPremiumRequest = async (isGift: boolean = false) => {
+    if (!profile?.id) return;
+    const planToUse = isGift ? giftPlan : selectedPlan;
+    if (!planToUse) return;
+
+    if (isGift && !targetGiftUsername.trim()) {
+      setRequestMsg('Vui lòng nhập chính xác Tên đăng nhập người nhận!');
+      return;
+    }
+
     setRequestLoading(true);
     setRequestMsg(null);
     try {
       const res = await fetch('/api/premium/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: profile.id, plan: selectedPlan }),
+        body: JSON.stringify({
+          userId: profile.id,
+          plan: planToUse,
+          targetUsername: isGift ? targetGiftUsername.trim() : undefined,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
         setRequestSent(true);
+        setRequestRecipient(data.recipientName || (isGift ? targetGiftUsername.trim() : profile.username));
       } else {
         setRequestMsg(data.error || 'Có lỗi xảy ra.');
       }
@@ -94,6 +117,37 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
       setRequestMsg('Lỗi kết nối máy chủ.');
     } finally {
       setRequestLoading(false);
+    }
+  };
+
+  const handleCancelMyPro = async () => {
+    if (!profile?.id) return;
+    if (!confirm('Bạn có chắc chắn muốn gỡ bỏ gói PRO khỏi tài khoản của mình không? Sau khi gỡ, các đặc quyền VIP sẽ tạm dừng.')) {
+      return;
+    }
+
+    setCancellingPro(true);
+    setCancelMsg(null);
+    try {
+      const res = await fetch('/api/premium/cancel-my-pro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: profile.id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCancelMsg('✓ Đã gỡ bỏ gói PRO thành công khỏi tài khoản của bạn!');
+        if (onRefreshProfile) {
+          onRefreshProfile();
+        }
+      } else {
+        setCancelMsg(data.error || 'Không thể gỡ gói PRO.');
+      }
+    } catch {
+      setCancelMsg('Lỗi kết nối máy chủ.');
+    } finally {
+      setCancellingPro(false);
+      setTimeout(() => setCancelMsg(null), 4000);
     }
   };
 
@@ -268,110 +322,296 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
       </div>
 
       {/* Premium Subscription Section */}
-      <div className="p-5 bg-slate-900 border-2 border-yellow-700/50 rounded-3xl space-y-4 shadow-xl">
-        <h3 className="font-cinzel text-base font-bold text-yellow-300 flex items-center gap-2">
-          <Crown className="w-4 h-4" />
-          <span>GÓI PREMIUM</span>
-        </h3>
+      <div className="p-5 bg-slate-900 border-2 border-yellow-700/50 rounded-3xl space-y-5 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <h3 className="font-cinzel text-base font-bold text-yellow-300 flex items-center gap-2">
+            <Crown className="w-5 h-5 text-yellow-400" />
+            <span>GÓI PRO & ĐẶC QUYỀN VIP</span>
+          </h3>
 
-        {isPremiumActive ? (
-          <div className="p-4 bg-yellow-950/30 border border-yellow-700/50 rounded-2xl text-xs text-yellow-200 space-y-1">
-            <div className="font-bold flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setGiftMode(false);
+                setSelectedPlan(null);
+                setRequestSent(false);
+              }}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                !giftMode ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Gói Của Tôi
+            </button>
+            <button
+              onClick={() => {
+                setGiftMode(true);
+                setRequestSent(false);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                giftMode ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Bạn đang là thành viên Premium!</span>
-            </div>
-            <div className="text-slate-300">
-              Gói hiện tại: <strong className="text-yellow-300">{profile.premiumPlan === 'monthly' ? 'Gói Tháng' : 'Gói Xem Lời Giải'}</strong>
-            </div>
-            {profile.premiumExpiresAt && (
-              <div className="text-slate-400">
-                Hết hạn: {new Date(profile.premiumExpiresAt).toLocaleDateString('vi-VN')}
+              <span>Gia Hạn Cho Người Khác</span>
+            </button>
+          </div>
+        </div>
+
+        {cancelMsg && (
+          <div className="p-3 bg-emerald-950 border border-emerald-700 text-emerald-200 text-xs rounded-xl flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 shrink-0" />
+            <span>{cancelMsg}</span>
+          </div>
+        )}
+
+        {/* MODE 1: FOR ANOTHER USER (GIFT/RENEW FOR ANYONE) */}
+        {giftMode ? (
+          <div className="space-y-4">
+            <div className="p-3.5 bg-indigo-950/40 border border-indigo-700/50 rounded-2xl text-xs space-y-1">
+              <div className="font-bold text-indigo-200 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-indigo-300" />
+                <span>GIA HẠN HOẶC TẶNG GÓI PRO CHO NGƯỜI BẠN MUỐN</span>
               </div>
-            )}
-            <div className="text-[11px] text-slate-500 pt-1">
-              ✓ Xem lời giải chi tiết mọi câu hỏi &nbsp;•&nbsp; ✓ Mở khóa Pháp Thân VIP
+              <p className="text-slate-300">
+                Nhập tên đăng nhập của bạn bè hoặc người chơi bạn muốn gia hạn gói PRO. Sau khi xác nhận thanh toán, hệ thống sẽ kích hoạt trực tiếp cho tài khoản đó!
+              </p>
             </div>
-          </div>
-        ) : requestSent ? (
-          <div className="p-4 bg-indigo-950/40 border border-indigo-700/50 rounded-2xl text-xs text-indigo-200 space-y-1">
-            <div className="font-bold">⏳ Yêu cầu của bạn đang chờ Admin xác nhận chuyển khoản.</div>
-            <div className="text-slate-400">Sau khi được duyệt, gói Premium sẽ tự động kích hoạt cho tài khoản này.</div>
-          </div>
-        ) : (
-          <>
-            <p className="text-xs text-slate-400">
-              Mở khóa <strong className="text-yellow-300">xem lời giải chi tiết từng bước</strong> cho mọi câu hỏi và <strong className="text-yellow-300">Pháp Thân VIP</strong> độc quyền.
-            </p>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-200">
+                Tên đăng nhập người nhận gói PRO (*):
+              </label>
+              <input
+                type="text"
+                value={targetGiftUsername}
+                onChange={e => setTargetGiftUsername(e.target.value)}
+                placeholder="VD: dungdaumoi2222, phap_su_toan..."
+                className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none"
+              />
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
-                onClick={() => setSelectedPlan('solution')}
-                className={`p-4 rounded-2xl border text-left transition-all ${
-                  selectedPlan === 'solution'
-                    ? 'bg-amber-500/10 border-amber-400 shadow-md'
+                type="button"
+                onClick={() => setGiftPlan('monthly')}
+                className={`p-3.5 rounded-2xl border text-left transition-all ${
+                  giftPlan === 'monthly'
+                    ? 'bg-indigo-500/10 border-indigo-400 shadow-md ring-1 ring-indigo-400/40'
                     : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
                 }`}
               >
-                <div className="text-xs font-bold text-slate-200">Gói Xem Lời Giải</div>
-                <div className="text-lg font-black text-amber-300 mt-1">
-                  {formatVnd(settings?.solutionPackagePrice ?? 20000)}
+                <div className="text-xs font-bold text-slate-200">Gói Tháng (30 ngày)</div>
+                <div className="text-base font-black text-indigo-300 mt-1">
+                  {formatVnd(settings?.monthlyPackagePrice ?? 15000)}
                 </div>
-                <div className="text-[10px] text-slate-500 mt-1">Hiệu lực 30 ngày</div>
+                <div className="text-[10px] text-slate-400 mt-0.5">Tiết kiệm & đầy đủ quyền lợi</div>
               </button>
 
               <button
-                onClick={() => setSelectedPlan('monthly')}
-                className={`relative p-4 rounded-2xl border text-left transition-all ${
-                  selectedPlan === 'monthly'
-                    ? 'bg-emerald-500/10 border-emerald-400 shadow-md'
+                type="button"
+                onClick={() => setGiftPlan('solution')}
+                className={`p-3.5 rounded-2xl border text-left transition-all ${
+                  giftPlan === 'solution'
+                    ? 'bg-indigo-500/10 border-indigo-400 shadow-md ring-1 ring-indigo-400/40'
                     : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
                 }`}
               >
-                <div className="absolute -top-2 right-3 px-2 py-0.5 bg-emerald-500 text-slate-950 text-[9px] font-black rounded-full">
-                  TIẾT KIỆM HƠN
+                <div className="text-xs font-bold text-slate-200">Gói Xem Lời Giải (30 ngày)</div>
+                <div className="text-base font-black text-amber-300 mt-1">
+                  {formatVnd(settings?.solutionPackagePrice ?? 20000)}
                 </div>
-                <div className="text-xs font-bold text-slate-200">Gói Tháng</div>
-                <div className="text-lg font-black text-emerald-400 mt-1">
-                  {formatVnd(settings?.monthlyPackagePrice ?? 15000)}
-                  <span className="text-[10px] text-slate-500 font-normal">/tháng</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-1">Tự động gia hạn 30 ngày mỗi lần đăng ký</div>
+                <div className="text-[10px] text-slate-400 mt-0.5">Mở khóa toàn bộ lời giải chi tiết</div>
               </button>
             </div>
 
-            {selectedPlan && (
+            {requestSent ? (
+              <div className="p-4 bg-emerald-950/40 border border-emerald-700/60 rounded-2xl text-xs text-emerald-200 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span>Đã gửi yêu cầu gia hạn gói PRO cho: {requestRecipient}!</span>
+                </div>
+                <p className="text-slate-300">
+                  Quản Trị Viên sẽ xác nhận giao dịch chuyển khoản và kích hoạt gói PRO ngay sau ít phút.
+                </p>
+              </div>
+            ) : (
               <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-2.5 text-xs">
                 <div className="font-bold text-slate-200 flex items-center gap-1.5">
-                  <Landmark className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Chuyển khoản để kích hoạt gói</span>
+                  <Landmark className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Thông tin chuyển khoản gia hạn cho bạn bè:</span>
                 </div>
                 {settings?.bankAccountNumber ? (
                   <div className="space-y-1 font-mono text-slate-300">
                     <div>Ngân hàng: <span className="text-slate-100">{settings.bankName || '—'}</span></div>
                     <div>Chủ TK: <span className="text-slate-100">{settings.bankAccountName || '—'}</span></div>
                     <div className="flex items-center gap-2">
-                      <span>Số TK: <span className="text-slate-100">{settings.bankAccountNumber}</span></span>
+                      <span>Số TK: <span className="text-slate-100 font-bold">{settings.bankAccountNumber}</span></span>
                       <button onClick={handleCopyBank} className="text-amber-400 hover:text-amber-300">
                         {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
-                    <div>Số tiền: <span className="text-amber-300">{formatVnd(selectedPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
-                    <div>Nội dung CK: <span className="text-emerald-400">PREMIUM {profile.username}</span></div>
+                    <div>Số tiền: <span className="text-amber-300 font-bold">{formatVnd(giftPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
+                    <div>
+                      Nội dung CK: <span className="text-emerald-400 font-bold">PREMIUM {targetGiftUsername.trim() || '[TÊN_BẠN_BÈ]'}</span>
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-slate-500">Admin chưa cập nhật thông tin chuyển khoản. Vui lòng liên hệ trực tiếp Quản Trị Viên.</div>
+                  <div className="text-slate-500">Admin chưa cấu hình tài khoản ngân hàng.</div>
                 )}
 
-                {requestMsg && <div className="text-rose-400">{requestMsg}</div>}
+                {requestMsg && <div className="text-rose-400 font-medium">{requestMsg}</div>}
 
                 <button
-                  onClick={handleSendPremiumRequest}
-                  disabled={requestLoading}
-                  className="w-full py-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-50"
+                  type="button"
+                  onClick={() => handleSendPremiumRequest(true)}
+                  disabled={requestLoading || !targetGiftUsername.trim()}
+                  className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-50"
                 >
-                  {requestLoading ? 'Đang gửi...' : 'Tôi Đã Chuyển Khoản - Xác Nhận'}
+                  {requestLoading ? 'Đang gửi yêu cầu...' : `Xác Nhận Đã Chuyển Khoản Gia Hạn Cho ${targetGiftUsername.trim() || 'Người Dùng'}`}
                 </button>
               </div>
+            )}
+          </div>
+        ) : (
+          /* MODE 2: FOR SELF */
+          <>
+            {isPremiumActive ? (
+              <div className="p-4 bg-yellow-950/30 border border-yellow-700/50 rounded-2xl text-xs text-yellow-200 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <div className="font-bold flex items-center gap-1.5 text-sm text-yellow-300">
+                      <Sparkles className="w-4 h-4 text-yellow-400" />
+                      <span>Bạn đang là thành viên PRO VIP!</span>
+                    </div>
+                    <div className="text-slate-300">
+                      Gói hiện tại: <strong className="text-yellow-300">{profile.premiumPlan === 'monthly' ? 'Gói Tháng' : 'Gói Xem Lời Giải'}</strong>
+                    </div>
+                    {profile.premiumExpiresAt && (
+                      <div className="text-slate-400 font-mono">
+                        Hết hạn ngày: <strong className="text-slate-200">{new Date(profile.premiumExpiresAt).toLocaleDateString('vi-VN')}</strong>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions for active Pro user: Extend or Revoke */}
+                  <div className="flex items-center gap-2 flex-wrap pt-2 sm:pt-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowSelfRenew(v => !v)}
+                      className="px-3 py-1.5 bg-yellow-500/20 border border-yellow-400/60 hover:bg-yellow-500/30 text-yellow-300 font-bold rounded-xl transition-all shadow-sm"
+                    >
+                      {showSelfRenew ? 'Đóng Gia Hạn' : '🔄 Gia Hạn Thêm Gói PRO'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelMyPro}
+                      disabled={cancellingPro}
+                      className="px-3 py-1.5 bg-rose-950/60 border border-rose-700/60 hover:bg-rose-900/60 text-rose-300 font-bold rounded-xl transition-all shadow-sm disabled:opacity-50"
+                    >
+                      {cancellingPro ? 'Đang gỡ...' : '❌ Gỡ Gói PRO'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-slate-400 border-t border-yellow-800/40 pt-2 flex items-center gap-3 flex-wrap">
+                  <span>✓ Xem lời giải chi tiết mọi câu hỏi</span>
+                  <span>•</span>
+                  <span>✓ Mở khóa Pháp Thân VIP</span>
+                  <span>•</span>
+                  <span>✓ Tùy chỉnh danh hiệu độc quyền</span>
+                </div>
+              </div>
+            ) : null}
+
+            {(!isPremiumActive || showSelfRenew) && (
+              <>
+                {requestSent ? (
+                  <div className="p-4 bg-indigo-950/40 border border-indigo-700/50 rounded-2xl text-xs text-indigo-200 space-y-1">
+                    <div className="font-bold flex items-center gap-1.5">
+                      <CheckCircle className="w-4 h-4 text-indigo-300" />
+                      <span>⏳ Yêu cầu kích hoạt/gia hạn của bạn đang chờ Admin duyệt.</span>
+                    </div>
+                    <div className="text-slate-400">Sau khi nhận chuyển khoản, gói PRO sẽ tự động kích hoạt ngay cho tài khoản {profile.username}.</div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-xs text-slate-400">
+                      Mở khóa <strong className="text-yellow-300">xem lời giải chi tiết từng bước</strong> cho mọi câu hỏi và <strong className="text-yellow-300">Pháp Thân VIP</strong> độc quyền.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setSelectedPlan('solution')}
+                        className={`p-4 rounded-2xl border text-left transition-all ${
+                          selectedPlan === 'solution'
+                            ? 'bg-amber-500/10 border-amber-400 shadow-md ring-1 ring-amber-400/40'
+                            : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                        }`}
+                      >
+                        <div className="text-xs font-bold text-slate-200">Gói Xem Lời Giải</div>
+                        <div className="text-lg font-black text-amber-300 mt-1">
+                          {formatVnd(settings?.solutionPackagePrice ?? 20000)}
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-1">Hiệu lực 30 ngày</div>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedPlan('monthly')}
+                        className={`relative p-4 rounded-2xl border text-left transition-all ${
+                          selectedPlan === 'monthly'
+                            ? 'bg-emerald-500/10 border-emerald-400 shadow-md ring-1 ring-emerald-400/40'
+                            : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                        }`}
+                      >
+                        <div className="absolute -top-2 right-3 px-2 py-0.5 bg-emerald-500 text-slate-950 text-[9px] font-black rounded-full">
+                          TIẾT KIỆM HƠN
+                        </div>
+                        <div className="text-xs font-bold text-slate-200">Gói Tháng</div>
+                        <div className="text-lg font-black text-emerald-400 mt-1">
+                          {formatVnd(settings?.monthlyPackagePrice ?? 15000)}
+                          <span className="text-[10px] text-slate-500 font-normal">/tháng</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-1">Tự động gia hạn 30 ngày mỗi lần đăng ký</div>
+                      </button>
+                    </div>
+
+                    {selectedPlan && (
+                      <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-2.5 text-xs">
+                        <div className="font-bold text-slate-200 flex items-center gap-1.5">
+                          <Landmark className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Chuyển khoản để kích hoạt gói PRO</span>
+                        </div>
+                        {settings?.bankAccountNumber ? (
+                          <div className="space-y-1 font-mono text-slate-300">
+                            <div>Ngân hàng: <span className="text-slate-100">{settings.bankName || '—'}</span></div>
+                            <div>Chủ TK: <span className="text-slate-100">{settings.bankAccountName || '—'}</span></div>
+                            <div className="flex items-center gap-2">
+                              <span>Số TK: <span className="text-slate-100 font-bold">{settings.bankAccountNumber}</span></span>
+                              <button onClick={handleCopyBank} className="text-amber-400 hover:text-amber-300">
+                                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                            <div>Số tiền: <span className="text-amber-300 font-bold">{formatVnd(selectedPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
+                            <div>Nội dung CK: <span className="text-emerald-400 font-bold">PREMIUM {profile.username}</span></div>
+                          </div>
+                        ) : (
+                          <div className="text-slate-500">Admin chưa cập nhật thông tin chuyển khoản. Vui lòng liên hệ trực tiếp Quản Trị Viên.</div>
+                        )}
+
+                        {requestMsg && <div className="text-rose-400">{requestMsg}</div>}
+
+                        <button
+                          onClick={() => handleSendPremiumRequest(false)}
+                          disabled={requestLoading}
+                          className="w-full py-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-50"
+                        >
+                          {requestLoading ? 'Đang gửi...' : 'Tôi Đã Chuyển Khoản - Xác Nhận'}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
             )}
           </>
         )}
