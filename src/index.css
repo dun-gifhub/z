@@ -70,7 +70,7 @@
 }
 
 /* ==========================================================================
-   LIGHT THEME (GIAO DIỆN TRẮNG BẠCH KIM) OVERRIDES
+   LIGHT THEME (GIAO DIỆN TRẮNG BẠCH KIM) OVERRIDES & BUTTON GRAPHICS
    ========================================================================== */
 html.light-theme {
   color-scheme: light;
@@ -81,18 +81,20 @@ html.light-theme body {
   color: #0f172a !important;
 }
 
-/* Base slate-900 boxes become clean white cards with shadow */
+/* Base slate-900 boxes become clean white cards with crisp borders and soft elevation */
 html.light-theme .bg-slate-900 {
   background-color: #ffffff !important;
   color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.07);
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
 }
 
 /* Slate 950 inner nested containers become light slate soft surfaces */
 html.light-theme .bg-slate-950,
 html.light-theme .bg-slate-950\/80,
+html.light-theme .bg-slate-950\/85,
 html.light-theme .bg-slate-950\/90,
+html.light-theme .bg-slate-950\/95,
 html.light-theme .bg-slate-950\/60 {
   background-color: #f1f5f9 !important;
   color: #1e293b !important;
@@ -101,10 +103,11 @@ html.light-theme .bg-slate-950\/60 {
 
 /* Semi-transparent popups / headers */
 html.light-theme .bg-slate-900\/80,
-html.light-theme .bg-slate-900\/90 {
+html.light-theme .bg-slate-900\/90,
+html.light-theme .bg-slate-900\/95 {
   background-color: rgba(255, 255, 255, 0.96) !important;
   color: #0f172a !important;
-  border-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
 }
 
 /* High contrast text overrides */
@@ -124,7 +127,7 @@ html.light-theme .text-slate-500 {
 
 html.light-theme .border-slate-800,
 html.light-theme .border-slate-700 {
-  border-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
 }
 
 /* Gold/Amber text contrast in light mode */
@@ -137,7 +140,7 @@ html.light-theme .text-amber-300 {
 }
 
 html.light-theme .text-amber-400 {
-  color: #d97706 !important;
+  color: #c2410c !important;
 }
 
 /* Accent badges in light mode */
@@ -152,7 +155,9 @@ html.light-theme .bg-amber-950 {
 
 html.light-theme .bg-indigo-950,
 html.light-theme .bg-indigo-950\/40,
-html.light-theme .bg-indigo-950\/50 {
+html.light-theme .bg-indigo-950\/50,
+html.light-theme .bg-indigo-950\/80,
+html.light-theme .bg-indigo-950\/90 {
   background-color: #e0e7ff !important;
   color: #3730a3 !important;
   border-color: #c7d2fe !important;
@@ -161,6 +166,7 @@ html.light-theme .bg-indigo-950\/50 {
 html.light-theme .bg-rose-950,
 html.light-theme .bg-rose-950\/40,
 html.light-theme .bg-rose-950\/50,
+html.light-theme .bg-rose-950\/60,
 html.light-theme .bg-rose-950\/80 {
   background-color: #ffe4e6 !important;
   color: #9f1239 !important;
@@ -169,10 +175,242 @@ html.light-theme .bg-rose-950\/80 {
 
 html.light-theme .bg-emerald-950,
 html.light-theme .bg-emerald-950\/40,
-html.light-theme .bg-emerald-950\/50 {
+html.light-theme .bg-emerald-950\/50,
+html.light-theme .bg-emerald-950\/70 {
   background-color: #d1fae5 !important;
   color: #065f46 !important;
   border-color: #a7f3d0 !important;
+}
+
+html.light-theme .bg-cyan-950 {
+  background-color: #cffafe !important;
+  color: #155e75 !important;
+  border-color: #a5f3fc !important;
+}
+
+/* ==========================================================================
+   BUTTON & INTERACTIVE GRAPHICS STYLING ADAPTED FOR WHITE / LIGHT BACKGROUND
+   ========================================================================== */
+
+/* 1. Base transition & click feedback on all buttons in Light Mode */
+html.light-theme button {
+  transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.light-theme button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+html.light-theme button:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(25%);
+}
+
+/* 2. Secondary & Neutral Buttons (Cards, Grids, Actions) */
+html.light-theme button.bg-slate-900,
+html.light-theme button.bg-slate-950,
+html.light-theme button.bg-slate-800,
+html.light-theme button.bg-slate-900\/80,
+html.light-theme button.bg-slate-950\/80 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+}
+
+html.light-theme button.bg-slate-900:hover,
+html.light-theme button.bg-slate-950:hover,
+html.light-theme button.bg-slate-800:hover,
+html.light-theme button.bg-slate-900\/80:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.09) !important;
+  transform: translateY(-1px);
+}
+
+/* 3. Primary Action Buttons (Draw Card, Gold/Amber buttons) */
+html.light-theme .bg-gradient-to-r.from-amber-600,
+html.light-theme .bg-gradient-to-r.from-amber-500,
+html.light-theme button:has(.animate-glow) {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #b45309 !important;
+  box-shadow: 0 6px 18px -2px rgba(217, 119, 6, 0.38), 0 2px 6px rgba(217, 119, 6, 0.2) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+html.light-theme .bg-gradient-to-r.from-amber-600:hover,
+html.light-theme .bg-gradient-to-r.from-amber-500:hover,
+html.light-theme button:has(.animate-glow):hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%) !important;
+  box-shadow: 0 8px 24px -2px rgba(217, 119, 6, 0.5) !important;
+  filter: brightness(1.03);
+}
+
+/* 4. Bank Points & Success Buttons (Emerald / Teal) */
+html.light-theme .bg-gradient-to-r.from-emerald-600,
+html.light-theme .bg-gradient-to-r.from-emerald-500,
+html.light-theme button:has(.lucide-coins) {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #047857 !important;
+  box-shadow: 0 6px 18px -2px rgba(5, 150, 105, 0.38), 0 2px 6px rgba(5, 150, 105, 0.2) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+html.light-theme .bg-gradient-to-r.from-emerald-600:hover,
+html.light-theme .bg-gradient-to-r.from-emerald-500:hover,
+html.light-theme button:has(.lucide-coins):hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%) !important;
+  box-shadow: 0 8px 24px -2px rgba(5, 150, 105, 0.5) !important;
+}
+
+/* 5. Question Multiple Choice Options (A, B, C, D) in Game Arena */
+html.light-theme .grid.grid-cols-2 button,
+html.light-theme .grid.grid-cols-4 button {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 2px solid #cbd5e1 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light-theme .grid.grid-cols-2 button:hover,
+html.light-theme .grid.grid-cols-4 button:hover {
+  background-color: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25) !important;
+  transform: translateY(-2px);
+}
+
+/* 6. Question Chamber Card */
+html.light-theme .max-w-xl.bg-gradient-to-b.from-slate-900 {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 2px solid #f59e0b !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1) !important;
+}
+
+/* 7. Main Menu Hero Mode Cards (Chơi với máy, Chơi online) */
+html.light-theme .group.relative.w-full[class*="from-slate-900"] {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 2px solid #cbd5e1 !important;
+  box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.07) !important;
+}
+
+html.light-theme .group.relative.w-full[class*="from-slate-900"]:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 10px 28px -4px rgba(217, 119, 6, 0.18) !important;
+  transform: translateY(-2px);
+}
+
+html.light-theme .group.relative.w-full[class*="from-slate-900"] .font-cinzel {
+  color: #78350f !important;
+}
+
+/* 8. Quick 2x2 Submenu Cards (Bộ bài 60 Lá, Rune, Hồ sơ, BXH, Quản trị) */
+html.light-theme .grid.grid-cols-2 button.bg-slate-900\/80 {
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light-theme .grid.grid-cols-2 button.bg-slate-900\/80:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.09) !important;
+  transform: translateY(-1.5px);
+}
+
+/* 9. Header Buttons, Sound controls & Navigation */
+html.light-theme header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.light-theme header .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light-theme header .bg-slate-800\/80 {
+  background-color: #ffffff !important;
+  color: #d97706 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 10. Form Inputs, Keypad, Search Bars in Light Mode */
+html.light-theme input,
+html.light-theme select,
+html.light-theme textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light-theme input:focus,
+html.light-theme select:focus,
+html.light-theme textarea:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18), inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light-theme input::placeholder,
+html.light-theme textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* 11. Modal Dialog Cards in Light Mode */
+html.light-theme .fixed.inset-0:not(.pointer-events-none) {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html.light-theme .fixed .bg-slate-900,
+html.light-theme .fixed .bg-slate-950 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+}
+
+/* 12. Danger, Surrender & Pro Revocation Buttons */
+html.light-theme .bg-rose-950\/60,
+html.light-theme button:has(.lucide-flag) {
+  background-color: #fff1f2 !important;
+  border: 1.5px solid #fda4af !important;
+  color: #be123c !important;
+}
+
+html.light-theme .bg-rose-950\/60:hover,
+html.light-theme button:has(.lucide-flag):hover {
+  background-color: #ffe4e6 !important;
+  border-color: #f43f5e !important;
+  color: #9f1239 !important;
+}
+
+/* 13. Active Tab Buttons vs Inactive Tab Buttons */
+html.light-theme button.bg-slate-950.text-slate-400 {
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+html.light-theme button.bg-slate-950.text-slate-400:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* 14. DeckViewer Cards in Light Theme */
+html.light-theme .group.relative.rounded-2xl.border-2 {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light-theme .group.relative.rounded-2xl.border-2:hover {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12) !important;
 }
 
 html.light-theme .hover\:bg-slate-800:hover {
@@ -189,5 +427,174 @@ html.light-theme ::-webkit-scrollbar-track {
 
 html.light-theme ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
+}
+
+/* ==========================================================================
+   15. RUNE GRIMOIRE & DEFENSE / REVIVE RUNES IN LIGHT THEME
+   ========================================================================== */
+
+/* Grimoire Top Equipped Showcase Banner */
+html.light-theme .bg-gradient-to-r.from-slate-900.via-indigo-950\/60 {
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 50%, #f0fdf4 100%) !important;
+  border: 2px solid #f59e0b !important;
+  box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.15), 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light-theme .bg-gradient-to-r.from-slate-900.via-indigo-950\/60 h3 {
+  color: #1e1b4b !important;
+}
+
+/* Grimoire Inner Boxes & Panels */
+html.light-theme .bg-slate-950\/80,
+html.light-theme .bg-slate-950\/90 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+/* Rune Grid Cards in Grimoire */
+html.light-theme .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > div.bg-slate-900,
+html.light-theme .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div.bg-slate-900 {
+  background-color: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light-theme .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > div.bg-slate-900:hover,
+html.light-theme .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div.bg-slate-900:hover {
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 24px -2px rgba(15, 23, 42, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+/* Rune Card Title & Descriptions */
+html.light-theme .grid > div h4.font-cinzel,
+html.light-theme .grid > div h3.font-cinzel {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html.light-theme .grid > div p.text-slate-300,
+html.light-theme .grid > div p.text-slate-400 {
+  color: #334155 !important;
+}
+
+/* Category Filter Pills in Grimoire */
+html.light-theme .flex.flex-wrap.gap-2 button.bg-slate-950 {
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #334155 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.light-theme .flex.flex-wrap.gap-2 button.bg-slate-950:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+html.light-theme .flex.flex-wrap.gap-2 button.bg-gradient-to-r.from-purple-600 {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #5b21b6 !important;
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35) !important;
+}
+
+/* In-game Rune Bar */
+html.light-theme .p-2\.5.bg-slate-950\/85.border-indigo-900\/60 {
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light-theme .p-2\.5.bg-slate-950\/85.border-indigo-900\/60 .text-purple-300 {
+  color: #6b21a8 !important;
+}
+
+/* Rune Buttons in Rune Bar */
+html.light-theme .p-2\.5.bg-slate-950\/85 button {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light-theme .p-2\.5.bg-slate-950\/85 button:hover:not(:disabled) {
+  background-color: #fefce8 !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Defense & Revive Status Badges in Light Mode */
+html.light-theme .bg-rose-950,
+html.light-theme .bg-rose-950\/80,
+html.light-theme .bg-rose-950\/90,
+html.light-theme .bg-rose-900\/90 {
+  background-color: #fff1f2 !important;
+  border-color: #f43f5e !important;
+  color: #be123c !important;
+}
+
+html.light-theme .bg-red-950,
+html.light-theme .bg-red-950\/90 {
+  background-color: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+html.light-theme .bg-amber-950,
+html.light-theme .bg-amber-950\/80,
+html.light-theme .bg-amber-950\/90 {
+  background-color: #fffbeb !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+html.light-theme .bg-pink-950,
+html.light-theme .bg-pink-950\/90 {
+  background-color: #fdf2f8 !important;
+  border-color: #ec4899 !important;
+  color: #9d174d !important;
+}
+
+html.light-theme .bg-cyan-950,
+html.light-theme .bg-cyan-950\/80 {
+  background-color: #ecfeff !important;
+  border-color: #06b6d4 !important;
+  color: #0e7490 !important;
+}
+
+html.light-theme .bg-purple-950,
+html.light-theme .bg-purple-950\/80,
+html.light-theme .bg-purple-950\/90 {
+  background-color: #faf5ff !important;
+  border-color: #a855f7 !important;
+  color: #6b21a8 !important;
+}
+
+/* Drafting Modal in Light Theme */
+html.light-theme .fixed .w-full.max-w-2xl.bg-slate-900.border-amber-500\/80 {
+  background-color: #ffffff !important;
+  border: 2px solid #f59e0b !important;
+  box-shadow: 0 25px 60px -15px rgba(217, 119, 6, 0.25), 0 10px 30px rgba(15, 23, 42, 0.15) !important;
+}
+
+html.light-theme .fixed .w-full.max-w-2xl h2 {
+  color: #78350f !important;
+}
+
+html.light-theme .fixed .w-full.max-w-2xl .bg-slate-950\/90 {
+  background-color: #ffffff !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light-theme .fixed .w-full.max-w-2xl .bg-slate-950\/90:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.22) !important;
+}
+
+html.light-theme .fixed .w-full.max-w-2xl .bg-amber-950\/40 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #78350f !important;
 }
 

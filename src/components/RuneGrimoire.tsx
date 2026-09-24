@@ -22,11 +22,11 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const categories: { id: string; name: string }[] = [
-    { id: 'all', name: 'Tất Cả (16 Ấn)' },
-    { id: 'defense', name: '🛡️ Phòng Thủ & Hồi Sinh' },
-    { id: 'time', name: '⏳ Kéo Dài Thời Gian' },
-    { id: 'score', name: '💎 Nhân Điểm & Combo' },
-    { id: 'magic', name: '✨ Phù Phép Đặc Biệt' },
+    { id: 'all', name: 'Tất Cả (16 Ấn Chú)' },
+    { id: 'DEFENSE', name: '🛡️ Phòng Thủ & Hồi Sinh (4 Ấn)' },
+    { id: 'TIME', name: '⏳ Kéo Dài Thời Gian (4 Ấn)' },
+    { id: 'POINTS', name: '💎 Nhân Điểm & Combo (4 Ấn)' },
+    { id: 'MAGIC', name: '✨ Ma Thuật Huyền Bí (4 Ấn)' },
   ];
 
   const handleSelectRune = (runeId: string) => {
@@ -41,35 +41,48 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
     setTimeout(() => setSaveSuccess(false), 2500);
   };
 
-  const filteredRunes = ALL_RUNES.filter(
-    r => activeCategory === 'all' || r.category === activeCategory
-  );
+  const filteredRunes = ALL_RUNES.filter(r => {
+    if (activeCategory === 'all') return true;
+    return r.category === activeCategory || r.category.toLowerCase() === activeCategory.toLowerCase();
+  });
 
   const activeRuneDef = ALL_RUNES.find(r => r.id === selectedRuneId);
 
   // Helper to describe activation mechanism
   const getActivationGuide = (rune: RuneDef) => {
     switch (rune.id) {
-      case 'rune_shield':
-        return 'Tự động kích hoạt: Bảo vệ bạn 1 lần khi rút trùng hệ với lá trên bàn.';
       case 'rune_revive':
-        return 'Tự động kích hoạt khi BUST: Giữ nguyên điểm an toàn và kết thúc lượt không mất gì.';
+        return 'Tự động kích hoạt khi BUST: Cứu lại 50% điểm an toàn của lượt đó vào kho. Duy nhất 1 lần trong cả trận đấu!';
+      case 'rune_shield':
+        return 'Tự động kích hoạt khi rút trùng hệ: Vô hiệu hóa cú nổ BUST đầu tiên trong mỗi lượt thi đấu!';
+      case 'rune_insurance':
+        return 'Tự động kích hoạt: Khóa lá bài điểm cao nhất trên bàn vào kho an toàn khi gom từ 2 lá trở lên (1 lần/lượt).';
       case 'rune_retry':
-        return 'Tự động kích hoạt khi trả lời sai: Cho bạn làm lại câu hỏi với thêm 10 giây.';
-      case 'rune_timestop':
-        return 'Chủ động bấm: Thêm +15 giây vào đồng hồ đếm ngược câu hỏi hiện tại.';
-      case 'rune_slow':
-        return 'Chủ động bấm: Làm chậm thời gian, hỗ trợ suy nghĩ câu hỏi toán phức tạp.';
-      case 'rune_multiplier':
-        return 'Chủ động bấm: Nhân đôi điểm số đạt được của câu hỏi tiếp theo.';
-      case 'rune_combo':
-        return 'Chủ động bấm: Tăng chỉ số Combo lên mức tối đa ngay lập tức.';
-      case 'rune_clairvoyance':
-        return 'Chủ động bấm trước khi rút bài: Dự báo hệ bài sắp xuất hiện để né BUST.';
+        return 'Tự động kích hoạt khi trả lời sai: Cho phép làm lại câu hỏi toán với thêm 15 giây hồi phục (1 lần/lượt).';
+      case 'rune_freeze':
+        return 'Nội tại liên tục: Tự động cộng thêm +20 giây suy nghĩ cho mọi câu hỏi toán trong suốt cả trận.';
+      case 'rune_haste':
+        return 'Nội tại áp chế: Giảm 8 giây thời gian suy nghĩ của đối thủ trong mọi lượt thi đấu của họ.';
+      case 'rune_time_plus':
+        return 'Nội tại liên tục: Luôn có 60 giây thời gian tư duy và nhận thưởng +3 điểm khi trả lời nhanh dưới 12 giây.';
+      case 'rune_swap_question':
+        return 'Chủ động bấm (1 lần/lượt): Đổi ngay câu hỏi toán khó sang một câu hỏi khác cùng hệ.';
+      case 'rune_double':
+        return 'Chủ động bấm (1 lần/lượt): Nhân x1.5 điểm cho 1 lá bài giải đúng trong lượt thi đấu.';
+      case 'rune_bank_bonus':
+        return 'Tự động khi bấm BANK: Thưởng thêm +15 điểm trực tiếp vào kho an toàn (1 lần/lượt).';
+      case 'rune_harvest':
+        return 'Tự động khi gom từ 3 lá trên bàn: Thưởng thêm +15 điểm kinh nghiệm vào lượt (1 lần/lượt).';
+      case 'rune_siphon':
+        return 'Tự động khi trả lời đúng: Hút 3 điểm an toàn từ đối thủ sang kho của bạn (1 lần/lượt).';
+      case 'rune_foresight':
+        return 'Nội tại thấu thị: Luôn nhìn thấy trước hệ và điểm số của lá bài trên đỉnh bộ bài để né BUST.';
       case 'rune_purify':
-        return 'Chủ động bấm: Xóa sạch các lá bài trên bàn, loại bỏ 100% nguy cơ BUST.';
-      case 'rune_swap':
-        return 'Chủ động bấm: Đổi câu hỏi khó sang một câu hỏi khác cùng hệ toán.';
+        return 'Chủ động bấm (1 lần/lượt): Thanh tẩy toàn bộ lá bài trên bàn, đưa nguy cơ BUST về 0%.';
+      case 'rune_curse':
+        return 'Chủ động bấm: Ám bùa nguyền rủa lên đối thủ, làm giảm điểm cất giữ của họ.';
+      case 'rune_immortal':
+        return 'Tự động kích hoạt khi HP về 0: Hồi sinh lập tức với 20 HP bảo mệnh (Duy nhất 1 lần/trận).';
       default:
         return 'Kích hoạt trong lượt của bạn để xoay chuyển cục diện trận đấu.';
     }

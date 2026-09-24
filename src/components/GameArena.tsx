@@ -12,6 +12,9 @@ import { HowToPlayModal } from './HowToPlayModal.tsx';
 import { RuneIcon } from './RuneIcon.tsx';
 import {
   Shield,
+  ShieldAlert,
+  Lock,
+  Crown,
   Coins,
   Layers,
   Clock,
@@ -170,7 +173,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
 
             {!you?.chosenRuneId ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                {(you?.draftRunes || []).map((rId) => {
+                {((you?.draftRunes && you.draftRunes.length > 0) ? you.draftRunes : ['rune_shield', 'rune_revive']).map((rId) => {
                   const rDef = ALL_RUNES.find(r => r.id === rId);
                   if (!rDef) return null;
                   return (
@@ -348,28 +351,44 @@ export const GameArena: React.FC<GameArenaProps> = ({
                 <span>❤️ HP: {opponent?.hp || 100}</span>
                 <span className="text-amber-400">⭐ Kho An Toàn: {opponent?.safeScore || 0}đ</span>
               </div>
-              {opponent?.chosenRuneId && (() => {
-                const rDef = ALL_RUNES.find(r => r.id === opponent.chosenRuneId);
+              {(() => {
+                const oppRuneId = opponent?.chosenRuneId || opponent?.runes?.[0]?.runeId;
+                if (!oppRuneId) return null;
+                const rDef = ALL_RUNES.find(r => r.id === oppRuneId);
                 const isOncePerMatch = rDef?.limitType === 'once_per_match';
                 const isOncePerTurn = rDef?.limitType === 'once_per_turn';
                 const oppUsed = isOncePerMatch ? opponent.runeUsedInMatch : isOncePerTurn ? opponent.runeUsedThisTurn : false;
 
+                // Defense specific flags
+                const isShield = oppRuneId === 'rune_shield';
+                const isRevive = oppRuneId === 'rune_revive';
+
                 return (
-                  <div className="text-[10px] text-indigo-300 flex items-center gap-1.5 mt-0.5 flex-wrap" title={rDef?.persistentEffectDesc || rDef?.description}>
+                  <div className="text-[10px] text-indigo-300 flex items-center gap-1.5 mt-1 flex-wrap" title={rDef?.persistentEffectDesc || rDef?.description}>
                     <RuneIcon icon={rDef?.icon || ''} className="w-3.5 h-3.5 inline-block" />
                     <span className="font-bold">Nội tại: {rDef?.name}</span>
                     {isOncePerMatch && (
-                      <span className={`px-1.5 py-0.2 text-[9px] font-mono rounded ${
-                        oppUsed ? 'bg-slate-800 text-slate-500' : 'bg-rose-950 text-rose-300 border border-rose-800'
+                      <span className={`px-1.5 py-0.5 text-[9px] font-mono rounded ${
+                        oppUsed ? 'bg-slate-800 text-slate-500' : 'bg-rose-950 text-rose-300 border border-rose-800 animate-pulse'
                       }`}>
                         {oppUsed ? 'Đã dùng (Hết trận)' : '1 Lần/Trận'}
                       </span>
                     )}
                     {isOncePerTurn && (
-                      <span className={`px-1.5 py-0.2 text-[9px] font-mono rounded ${
+                      <span className={`px-1.5 py-0.5 text-[9px] font-mono rounded ${
                         oppUsed ? 'bg-slate-800 text-slate-500' : 'bg-amber-950 text-amber-300 border border-amber-800'
                       }`}>
                         {oppUsed ? 'Đã dùng lượt này' : '1 Lần/Lượt'}
+                      </span>
+                    )}
+                    {isShield && !oppUsed && (
+                      <span className="px-1.5 py-0.5 text-[9px] bg-rose-950/90 border border-rose-500 text-rose-300 rounded font-bold flex items-center gap-0.5">
+                        <Shield className="w-2.5 h-2.5" /> Có Khiên Chống BUST
+                      </span>
+                    )}
+                    {isRevive && !oppUsed && (
+                      <span className="px-1.5 py-0.5 text-[9px] bg-red-950/90 border border-red-500 text-red-300 rounded font-bold flex items-center gap-0.5 animate-pulse">
+                        <ShieldAlert className="w-2.5 h-2.5" /> Có Ấn Hồi Sinh 50%
                       </span>
                     )}
                     <span className="text-slate-400 hidden sm:inline">— {rDef?.persistentEffectDesc}</span>
@@ -645,79 +664,99 @@ export const GameArena: React.FC<GameArenaProps> = ({
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            {you?.runes.map((slot) => {
-              const def = ALL_RUNES.find(r => r.id === slot.runeId);
-              if (!def) return null;
-              const isOncePerMatch = def.limitType === 'once_per_match';
-              const isOncePerTurn = def.limitType === 'once_per_turn';
+            {(() => {
+              const displaySlots = (you?.runes && you.runes.length > 0)
+                ? you.runes
+                : you?.chosenRuneId
+                ? [{
+                    runeId: you.chosenRuneId,
+                    usesLeft: 1,
+                    active: true,
+                    usedThisTurn: you.runeUsedThisTurn,
+                    usedInMatch: you.runeUsedInMatch,
+                  }]
+                : [{
+                    runeId: 'rune_shield',
+                    usesLeft: 1,
+                    active: true,
+                    usedThisTurn: false,
+                    usedInMatch: false,
+                  }];
 
-              const isExhausted = isOncePerMatch
-                ? (slot.usedInMatch || you?.runeUsedInMatch || slot.usesLeft <= 0)
-                : isOncePerTurn
-                ? (slot.usedThisTurn || you?.runeUsedThisTurn || slot.usesLeft <= 0)
-                : false;
+              return displaySlots.map((slot) => {
+                const def = ALL_RUNES.find(r => r.id === slot.runeId);
+                if (!def) return null;
+                const isOncePerMatch = def.limitType === 'once_per_match';
+                const isOncePerTurn = def.limitType === 'once_per_turn';
 
-              const isClickablePower = ['rune_swap_question', 'rune_purify', 'rune_shield', 'rune_double'].includes(def.id);
-              const canUse = isMyTurn && !isGameOver && !isExhausted && isClickablePower;
+                const isExhausted = isOncePerMatch
+                  ? (slot.usedInMatch || you?.runeUsedInMatch || slot.usesLeft <= 0)
+                  : isOncePerTurn
+                  ? (slot.usedThisTurn || you?.runeUsedThisTurn || slot.usesLeft <= 0)
+                  : false;
 
-              return (
-                <div key={slot.runeId} className="flex items-center gap-2.5 flex-wrap">
-                  <button
-                    disabled={!canUse}
-                    onClick={() => onUseRune(slot.runeId)}
-                    title={`${def.name}: ${def.description}`}
-                    style={{ borderColor: !isExhausted ? def.color : '#334155' }}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
-                      canUse
-                        ? 'bg-slate-900 hover:scale-105 active:scale-95 text-slate-100 shadow-md ring-1 ring-amber-400/40'
-                        : isExhausted
-                        ? 'bg-slate-950/60 text-slate-500 opacity-60 cursor-not-allowed border-dashed'
-                        : 'bg-slate-950/80 text-slate-300'
-                    }`}
-                  >
-                    <span className="shrink-0"><RuneIcon icon={def.icon} className="w-4 h-4" /></span>
-                    <span className="font-bold">{def.name}</span>
+                const isClickablePower = ['rune_swap_question', 'rune_purify', 'rune_shield', 'rune_double'].includes(def.id);
+                const canUse = isMyTurn && !isGameOver && !isExhausted && isClickablePower;
 
-                    {/* Status Badge */}
-                    {isOncePerMatch ? (
-                      isExhausted ? (
-                        <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-rose-950/60 border border-rose-900 text-rose-400">
-                          Đã dùng (Hết trận)
-                        </span>
+                return (
+                  <div key={slot.runeId} className="flex items-center gap-2.5 flex-wrap">
+                    <button
+                      disabled={!canUse}
+                      onClick={() => onUseRune(slot.runeId)}
+                      title={`${def.name}: ${def.description}`}
+                      style={{ borderColor: !isExhausted ? def.color : '#334155' }}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                        canUse
+                          ? 'bg-slate-900 hover:scale-105 active:scale-95 text-slate-100 shadow-md ring-1 ring-amber-400/40'
+                          : isExhausted
+                          ? 'bg-slate-950/60 text-slate-500 opacity-60 cursor-not-allowed border-dashed'
+                          : 'bg-slate-950/80 text-slate-300'
+                      }`}
+                    >
+                      <span className="shrink-0"><RuneIcon icon={def.icon} className="w-4 h-4" /></span>
+                      <span className="font-bold">{def.name}</span>
+
+                      {/* Status Badge */}
+                      {isOncePerMatch ? (
+                        isExhausted ? (
+                          <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-rose-950/60 border border-rose-900 text-rose-400">
+                            Đã dùng (Hết trận)
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-rose-950 border border-rose-500 text-rose-300 animate-pulse">
+                            1 lần / Trận
+                          </span>
+                        )
+                      ) : isOncePerTurn ? (
+                        isExhausted ? (
+                          <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-amber-950/60 border border-amber-900 text-amber-500/80">
+                            Đã dùng lượt này
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-amber-950 border border-amber-500 text-amber-300">
+                            1 lần / Lượt (Sẵn sàng)
+                          </span>
+                        )
                       ) : (
-                        <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-rose-950 border border-rose-500 text-rose-300 animate-pulse">
-                          1 lần / Trận
+                        <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-cyan-950 border border-cyan-500 text-cyan-300">
+                          Nội Tại Toàn Trận
                         </span>
-                      )
-                    ) : isOncePerTurn ? (
-                      isExhausted ? (
-                        <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-amber-950/60 border border-amber-900 text-amber-500/80">
-                          Đã dùng lượt này
-                        </span>
-                      ) : (
-                        <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-amber-950 border border-amber-500 text-amber-300">
-                          1 lần / Lượt (Sẵn sàng)
-                        </span>
-                      )
-                    ) : (
-                      <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-cyan-950 border border-cyan-500 text-cyan-300">
-                        Nội Tại Toàn Trận
-                      </span>
-                    )}
+                      )}
 
-                    {canUse && (
-                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 uppercase tracking-tight">
-                        Bấm Dùng
-                      </span>
-                    )}
-                  </button>
+                      {canUse && (
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 uppercase tracking-tight">
+                          Bấm Dùng
+                        </span>
+                      )}
+                    </button>
 
-                  <div className="text-[11px] text-slate-300 hidden md:block max-w-sm truncate" title={def.description}>
-                    <span className="text-amber-400 font-bold">Tác dụng:</span> {def.description}
+                    <div className="text-[11px] text-slate-300 hidden md:block max-w-sm truncate" title={def.description}>
+                      <span className="text-amber-400 font-bold">Tác dụng:</span> {def.description}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
         </div>
 
@@ -777,30 +816,86 @@ export const GameArena: React.FC<GameArenaProps> = ({
                 {you?.avatar || '🧙‍♂️'}
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-bold text-sm text-amber-200">{you?.name || 'Bạn'}</span>
                   {isMyTurn && (
                     <span className="px-2 py-0.5 bg-amber-400 text-slate-950 font-black text-[10px] rounded-full uppercase">
                       Lượt Của Bạn
                     </span>
                   )}
-                  {gameState.activeShield && (
-                    <span className="px-2 py-0.5 bg-rose-500 text-white font-bold text-[10px] rounded-full flex items-center gap-1">
-                      <Shield className="w-3 h-3" /> Khiên ON
-                    </span>
-                  )}
+                  {/* Defense & Revive Quick Badges */}
+                  {(() => {
+                    const myRuneId = you?.chosenRuneId || you?.runes?.[0]?.runeId || 'rune_shield';
+                    const hasShieldRune = myRuneId === 'rune_shield';
+                    const hasReviveRune = myRuneId === 'rune_revive';
+                    const hasInsuranceRune = myRuneId === 'rune_insurance';
+                    const hasRetryRune = myRuneId === 'rune_retry';
+                    const hasImmortalRune = myRuneId === 'rune_immortal';
+
+                    const shieldActive = gameState.activeShield || (hasShieldRune && !you?.runeUsedThisTurn);
+                    const reviveActive = hasReviveRune && !you?.runeUsedInMatch;
+                    const insuranceActive = hasInsuranceRune && !you?.runeUsedThisTurn;
+                    const retryActive = hasRetryRune && !you?.runeUsedThisTurn;
+                    const immortalActive = hasImmortalRune && !you?.runeUsedInMatch;
+
+                    return (
+                      <>
+                        {shieldActive && (
+                          <span className="px-2 py-0.5 bg-rose-900/90 border border-rose-500 text-rose-200 font-bold text-[10px] rounded-full flex items-center gap-1 shadow-sm" title="Khiên hộ mệnh sẵn sàng chống 1 lần BUST trùng hệ">
+                            <Shield className="w-3 h-3 text-rose-400" /> Khiên Chắn ON
+                          </span>
+                        )}
+                        {hasShieldRune && you?.runeUsedThisTurn && !gameState.activeShield && (
+                          <span className="px-1.5 py-0.5 bg-slate-800 text-slate-400 text-[9px] rounded-full flex items-center gap-1">
+                            <Shield className="w-2.5 h-2.5 text-slate-500" /> Khiên: Đã dùng
+                          </span>
+                        )}
+
+                        {reviveActive && (
+                          <span className="px-2 py-0.5 bg-red-950 border border-red-500 text-red-200 font-bold text-[10px] rounded-full flex items-center gap-1 shadow-sm animate-pulse" title="Ấn hồi sinh bảo mệnh sẵn sàng cứu 50% điểm an toàn (1 lần/trận)">
+                            <ShieldAlert className="w-3 h-3 text-red-400" /> Hồi Sinh ON (1/1)
+                          </span>
+                        )}
+                        {hasReviveRune && you?.runeUsedInMatch && (
+                          <span className="px-1.5 py-0.5 bg-slate-800 text-slate-400 text-[9px] rounded-full flex items-center gap-1">
+                            <ShieldAlert className="w-2.5 h-2.5 text-slate-500" /> Hồi Sinh: Đã dùng
+                          </span>
+                        )}
+
+                        {insuranceActive && (
+                          <span className="px-2 py-0.5 bg-amber-950 border border-amber-500 text-amber-200 font-bold text-[10px] rounded-full flex items-center gap-1 shadow-sm" title="Khóa bài cao nhất vào kho khi có >= 2 lá">
+                            <Lock className="w-3 h-3 text-amber-400" /> Bảo Hiểm ON
+                          </span>
+                        )}
+
+                        {retryActive && (
+                          <span className="px-2 py-0.5 bg-pink-950 border border-pink-500 text-pink-200 font-bold text-[10px] rounded-full flex items-center gap-1 shadow-sm" title="Cho phép làm lại câu hỏi toán khi giải sai">
+                            <RotateCcw className="w-3 h-3 text-pink-400" /> Sửa Sai ON
+                          </span>
+                        )}
+
+                        {immortalActive && (
+                          <span className="px-2 py-0.5 bg-purple-950 border border-purple-500 text-purple-200 font-bold text-[10px] rounded-full flex items-center gap-1 shadow-sm animate-pulse" title="Hồi sinh với 20 HP bảo mệnh khi tử trận">
+                            <Crown className="w-3 h-3 text-purple-400" /> Bất Tử ON
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
                 <div className="text-[11px] text-slate-400 flex items-center gap-3 mt-0.5 font-mono">
                   <span>❤️ HP: {you?.hp || 100}</span>
                   <span className="text-amber-400">⭐ Kho An Toàn: <strong className="text-amber-200 text-sm">{you?.safeScore || 0}đ</strong></span>
                 </div>
-                {you?.chosenRuneId && (() => {
-                  const rDef = ALL_RUNES.find(r => r.id === you.chosenRuneId);
+                {(() => {
+                  const activeRuneId = you?.chosenRuneId || you?.runes?.[0]?.runeId || 'rune_shield';
+                  const rDef = ALL_RUNES.find(r => r.id === activeRuneId);
+                  if (!rDef) return null;
                   return (
-                    <div className="text-[11px] text-amber-300 flex items-center gap-1.5 mt-1" title={rDef?.persistentEffectDesc || rDef?.description}>
-                      <RuneIcon icon={rDef?.icon || ''} className="w-3.5 h-3.5 inline-block" />
-                      <span className="font-bold text-amber-400">Nội tại toàn trận: {rDef?.name}</span>
-                      <span className="text-slate-300 font-light hidden sm:inline">— {rDef?.persistentEffectDesc}</span>
+                    <div className="text-[11px] text-amber-300 flex items-center gap-1.5 mt-1" title={rDef.persistentEffectDesc || rDef.description}>
+                      <RuneIcon icon={rDef.icon || ''} className="w-3.5 h-3.5 inline-block" />
+                      <span className="font-bold text-amber-400">Nội tại toàn trận: {rDef.name}</span>
+                      <span className="text-slate-300 font-light hidden sm:inline">— {rDef.persistentEffectDesc}</span>
                     </div>
                   );
                 })()}

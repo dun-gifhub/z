@@ -23,8 +23,12 @@ function shuffleDeck<T>(array: T[]): T[] {
   return arr;
 }
 
-// Function to deal 2 random distinct runes from ALL_RUNES
-function pick2RandomRunes(): string[] {
+// Function to deal 2 random distinct runes from ALL_RUNES, favoring preferred rune if provided
+function pick2RandomRunes(preferredRuneId?: string): string[] {
+  if (preferredRuneId && ALL_RUNES.some(r => r.id === preferredRuneId)) {
+    const others = ALL_RUNES.filter(r => r.id !== preferredRuneId).sort(() => Math.random() - 0.5);
+    return [preferredRuneId, others[0].id];
+  }
   const shuffled = [...ALL_RUNES].sort(() => Math.random() - 0.5);
   return [shuffled[0].id, shuffled[1].id];
 }
@@ -136,8 +140,9 @@ export class GameEngine {
     const mathLevel = options.mathLevel || 'CO_BAN';
     const deck = shuffleDeck(DECK_60_CARDS);
 
-    // Player 1 gets 2 random distinct runes to choose 1 from
-    const p1Draft = pick2RandomRunes();
+    // Player 1 gets 2 random distinct runes to choose 1 from (favors equipped rune if set)
+    const p1Pref = options.player1.runes?.[0];
+    const p1Draft = pick2RandomRunes(p1Pref);
 
     const p1State: PlayerState = {
       id: options.player1.id,
@@ -274,7 +279,8 @@ export class GameEngine {
       return null;
     }
 
-    const p2Draft = pick2RandomRunes();
+    const p2Pref = player.runes?.[0];
+    const p2Draft = pick2RandomRunes(p2Pref);
     const pState: PlayerState = {
       id: player.id,
       name: player.name,
