@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Trophy, Award, Target, Flame, History, BookOpen, User, CheckCircle, XCircle, Crown, Sparkles, Lock, Landmark, Copy, Check } from 'lucide-react';
 import { UserProfile, SiteSettings, PremiumPlan } from '../../shared/types.ts';
 import { BASIC_AVATARS, VIP_AVATARS } from '../../shared/avatars.ts';
+import { ALL_RUNES } from '../../shared/runes.ts';
+import { RuneStone } from './RuneStone.tsx';
 
 interface ProfileViewProps {
   profile: UserProfile | null;
@@ -313,10 +315,20 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
             <div className="text-[10px] text-amber-500">Trong một trận</div>
           </div>
 
-          <div className="p-3 bg-slate-950 rounded-xl text-center">
-            <div className="text-[10px] text-slate-400">Rune Đang Đeo</div>
-            <div className="text-lg font-black text-purple-300">{profile.equippedRunes?.length || 1}/1</div>
-            <div className="text-[10px] text-purple-500">Ấn chú bảo mệnh</div>
+          <div className="p-3 bg-slate-950 rounded-xl text-center flex flex-col items-center justify-center">
+            <div className="text-[10px] text-slate-400">Rune Bảo Mệnh</div>
+            {(() => {
+              const rId = profile.equippedRunes?.[0] || 'rune_shield';
+              const rDef = ALL_RUNES.find(r => r.id === rId);
+              if (!rDef) return <div className="text-lg font-black text-purple-300">1/1</div>;
+              return (
+                <div className="flex items-center gap-1.5 mt-0.5" title={rDef.description}>
+                  <RuneStone rune={rDef} size="sm" isActive={true} />
+                  <span className="text-xs font-bold text-amber-200 truncate max-w-[85px]">{rDef.name}</span>
+                </div>
+              );
+            })()}
+            <div className="text-[10px] text-purple-400 mt-0.5">Ấn chú bảo mệnh</div>
           </div>
         </div>
       </div>

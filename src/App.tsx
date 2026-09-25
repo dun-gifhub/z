@@ -12,6 +12,7 @@ import { AdminPanel } from './components/AdminPanel.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
 import { HowToPlayModal } from './components/HowToPlayModal.tsx';
 import { ThemeModal } from './components/ThemeModal.tsx';
+import { AtmosphericBackground } from './components/AtmosphericBackground.tsx';
 import { getSavedTheme, saveTheme, ThemeDef, GAME_THEMES } from './utils/themeManager.ts';
 import { MathLevel, AiDifficulty } from '../shared/types.ts';
 
@@ -79,8 +80,11 @@ export function App() {
   return (
     <div
       style={{ backgroundColor: currentTheme.bgHex }}
-      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300`}
+      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300 relative`}
     >
+      {/* Living 5-Layer Parallax Atmosphere Background */}
+      <AtmosphericBackground lowGraphics={false} />
+
       {/* Top Navbar */}
       <Header
         user={user}

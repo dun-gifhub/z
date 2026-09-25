@@ -7,9 +7,16 @@ import {
   MathCategory,
 } from '../../shared/types.ts';
 import { ALL_RUNES } from '../../shared/runes.ts';
-import { MATH_DOMAINS } from '../../shared/cards.ts';
+import { MATH_DOMAINS, DECK_60_CARDS } from '../../shared/cards.ts';
 import { HowToPlayModal } from './HowToPlayModal.tsx';
 import { RuneIcon } from './RuneIcon.tsx';
+import { MathCard } from './MathCard.tsx';
+import { RuneStone } from './RuneStone.tsx';
+import { DomainArt } from './DomainArt.tsx';
+import { DrawButton } from './DrawButton.tsx';
+import { FlipCardReveal } from './FlipCardReveal.tsx';
+import { BustImpactOverlay } from './BustImpactOverlay.tsx';
+import { AnimatedCounter } from './AnimatedCounter.tsx';
 import {
   Shield,
   ShieldAlert,
@@ -77,6 +84,13 @@ export const GameArena: React.FC<GameArenaProps> = ({
   const isGameOver = gameState.status === 'game_over';
   const isWinner = gameState.winnerId === you?.id;
 
+  // Active drawn card being resolved or answered (fallback to category match if needed)
+  const activeCard: Card | undefined =
+    gameState.currentCard ||
+    (gameState.currentQuestion
+      ? (DECK_60_CARDS.find(c => c.domainId === gameState.currentQuestion?.category) || DECK_60_CARDS[0])
+      : undefined);
+
   // Calculate unique domains on table to show live BUST risk
   const tableDomains = new Set(gameState.tableCards.map(c => c.domainId));
   const bustRiskPercent = Math.min(100, Math.round((tableDomains.size / 10) * 100));
@@ -132,25 +146,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
   return (
     <div className={`relative min-h-[calc(100vh-65px)] flex flex-col justify-between px-3 sm:px-6 py-3 max-w-5xl mx-auto select-none ${lastBustAlert ? 'animate-shake' : ''}`}>
       {/* ⚠️ BUST FULLSCREEN IMPACT OVERLAY */}
-      {lastBustAlert && (
-        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-rose-950/60 backdrop-blur-sm animate-in zoom-in-95 duration-200">
-          <div className="text-center p-6 sm:p-8 rounded-3xl bg-slate-900 border-4 border-rose-500 shadow-2xl shadow-rose-950 max-w-md mx-4 transform scale-105">
-            <div className="text-6xl animate-bounce mb-2">💥</div>
-            <h2 className="font-cinzel text-4xl sm:text-5xl font-black text-rose-400 tracking-wider">
-              BUST!
-            </h2>
-            <p className="text-base font-bold text-amber-300 mt-2">
-              NỔ LƯỢT DO RÚT TRÙNG HỆ TOÁN!
-            </p>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Bạn đã rút trúng một lá bài có <strong>cùng Hệ Toán</strong> với lá bài đã nằm trên bàn trong lượt này. Điểm tạm thời của lượt này trở về 0 và chuyển lượt sang đối thủ!
-            </p>
-            <div className="mt-3 p-2 bg-amber-950/50 border border-amber-500/40 rounded-xl text-xs text-amber-200 font-semibold">
-              💡 Mẹo sống còn: Sau khi giải được 2-3 lá, hãy nhớ bấm [BANK] để cất điểm vào Kho An Toàn!
-            </div>
-          </div>
-        </div>
-      )}
+      {lastBustAlert && <BustImpactOverlay />}
 
       {/* ========================================================= */}
       {/* 🌟 RUNE DRAFTING MODAL: DEALT 2 RUNES, PICK 1 FOR MATCH    */}
@@ -179,14 +175,12 @@ export const GameArena: React.FC<GameArenaProps> = ({
                   return (
                     <div
                       key={rId}
-                      style={{ borderColor: rDef.color, boxShadow: `0 0 16px ${rDef.color}33` }}
-                      className="p-4 bg-slate-950/90 border-2 rounded-2xl flex flex-col justify-between space-y-4 hover:border-amber-400 transition-all group"
+                      style={{ borderColor: rDef.color, boxShadow: `0 0 24px ${rDef.color}44` }}
+                      className="p-5 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-2 rounded-3xl flex flex-col justify-between space-y-4 hover:border-amber-400 transition-all group"
                     >
                       <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <span className="p-2 rounded-xl bg-slate-900 border border-slate-800" style={{ color: rDef.color }}>
-                            <RuneIcon icon={rDef.icon} className="w-8 h-8" />
-                          </span>
+                        <div className="flex items-center gap-3.5">
+                          <RuneStone rune={rDef} size="lg" isActive={true} />
                           <div>
                             <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="font-cinzel text-base font-bold text-amber-200 group-hover:text-amber-100">
@@ -349,7 +343,9 @@ export const GameArena: React.FC<GameArenaProps> = ({
               </div>
               <div className="text-[11px] text-slate-400 flex items-center gap-3 mt-0.5 font-mono">
                 <span>❤️ HP: {opponent?.hp || 100}</span>
-                <span className="text-amber-400">⭐ Kho An Toàn: {opponent?.safeScore || 0}đ</span>
+                <span className="text-amber-400 flex items-center gap-1">
+                  ⭐ Kho An Toàn: <AnimatedCounter value={opponent?.safeScore || 0} suffix="đ" />
+                </span>
               </div>
               {(() => {
                 const oppRuneId = opponent?.chosenRuneId || opponent?.runes?.[0]?.runeId;
@@ -401,7 +397,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
           <div className="text-right font-mono">
             <div className="text-[10px] text-slate-400">Điểm Lượt Này</div>
             <div className="text-lg font-black text-indigo-300">
-              +{opponent?.currentTurnScore || 0}
+              <AnimatedCounter value={opponent?.currentTurnScore || 0} prefix="+" />
             </div>
           </div>
         </div>
@@ -432,68 +428,110 @@ export const GameArena: React.FC<GameArenaProps> = ({
             )}
           </div>
 
-          <div className="flex items-center justify-center gap-2 flex-wrap min-h-[105px] p-2 bg-slate-950/60 border border-slate-800/80 rounded-2xl">
-            {gameState.tableCards.length === 0 ? (
-              <div className="text-xs text-slate-400 italic py-4 text-center">
-                {isMyTurn
-                  ? 'Chưa có lá bài nào trên bàn. Bấm [🃏 DRAW BÀI] để bắt đầu lượt rút!'
-                  : `Đang trong lượt của ${opponent?.name || 'Đối thủ'}. Đang tính toán bước đi...`}
+          <div className="relative flex items-center justify-center gap-3 flex-wrap min-h-[120px] p-3 sm:p-4 bg-gradient-to-b from-slate-950/80 via-slate-900/90 to-slate-950/80 border border-slate-800/90 rounded-3xl shadow-2xl overflow-hidden">
+            {/* Ambient runic watermark on battle table */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+              <div className="w-64 h-64 rounded-full border-2 border-dashed border-amber-400 animate-rune-spin" />
+            </div>
+
+            {gameState.tableCards.length === 0 && !activeCard ? (
+              <div className="text-xs sm:text-sm text-slate-400 italic py-6 text-center z-10 flex flex-col items-center gap-1.5">
+                <div className="w-8 h-8 rounded-full border border-slate-700 flex items-center justify-center text-slate-500 text-sm">
+                  ✨
+                </div>
+                <span>
+                  {isMyTurn
+                    ? 'Chưa có lá bài nào trên bàn. Bấm [🃏 RÚT BÀI] để bắt đầu lượt rút ma pháp!'
+                    : `Đang trong lượt của ${opponent?.name || 'Đối thủ'}. Đang tính toán bước đi...`}
+                </span>
               </div>
             ) : (
-              gameState.tableCards.map((c, idx) => (
-                <button
-                  type="button"
-                  key={`${c.id}-${idx}`}
-                  onClick={() => setInspectedTableCard(c)}
-                  title={`Nhấp để xem tác dụng của lá ${c.domainNameVi}`}
-                  style={{ borderColor: c.elementColor, boxShadow: `0 0 12px ${c.accentGlow}` }}
-                  className="w-20 sm:w-24 p-2 bg-slate-900 rounded-xl border-2 flex flex-col items-center text-center transform transition-transform hover:scale-110 active:scale-95 animate-in zoom-in-75 duration-150 cursor-pointer group"
-                >
-                  <div className="text-[10px] font-black tracking-tight" style={{ color: c.elementColor }}>
-                    {c.domainNameVi}
+              <div className="flex items-center justify-center gap-3 flex-wrap z-10">
+                {gameState.tableCards.map((c, idx) => (
+                  <MathCard
+                    key={`${c.id}-${idx}`}
+                    card={c}
+                    variant="mini"
+                    onClick={() => setInspectedTableCard(c)}
+                  />
+                ))}
+                {/* Active Pending Card being solved */}
+                {activeCard && (
+                  <div className="relative flex flex-col items-center animate-pulse">
+                    <div className="text-[9px] font-mono text-amber-300 font-bold mb-0.5">
+                      ⚡ ĐANG RÚT:
+                    </div>
+                    <MathCard
+                      card={activeCard}
+                      variant="mini"
+                      className="ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-950 scale-105"
+                      onClick={() => setInspectedTableCard(activeCard)}
+                    />
                   </div>
-                  <div className="text-base sm:text-lg font-black text-amber-300 my-0.5">
-                    +{c.pointValue}
-                  </div>
-                  <div className="text-[9px] text-slate-400 truncate w-full group-hover:text-amber-300">
-                    {c.skillName}
-                  </div>
-                </button>
-              ))
+                )}
+              </div>
             )}
           </div>
 
           {/* REALTIME BUST RISK METER & TACTICAL ADVICE */}
           {gameState.tableCards.length > 0 && isMyTurn && !gameState.currentQuestion && (
-            <div className="mt-2.5 p-2.5 px-3.5 bg-slate-950/95 border border-amber-500/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs shadow-lg animate-in fade-in duration-150">
-              <div className="flex items-center gap-2">
-                <span className="text-amber-400 font-bold flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                  RỦI RO BÙM (BUST):
-                </span>
-                <span className={`font-mono font-black text-sm px-2 py-0.5 rounded-lg border ${
-                  bustRiskPercent >= 40
-                    ? 'bg-rose-950/70 border-rose-500 text-rose-300 animate-pulse'
-                    : bustRiskPercent >= 20
-                    ? 'bg-amber-950/70 border-amber-500 text-amber-300'
-                    : 'bg-emerald-950/70 border-emerald-500 text-emerald-300'
-                }`}>
-                  ~{bustRiskPercent}%
-                </span>
-                <span className="text-[11px] text-slate-400">
-                  ({tableDomains.size}/10 hệ toán đã có trên bàn)
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-300 text-center sm:text-right">
-                {bustRiskPercent >= 40 ? (
-                  <span className="text-amber-300 font-bold">
-                    ⚠️ Nguy cơ trùng hệ cao! Cân nhắc bấm <strong>[BANK]</strong> để giữ an toàn +{you?.currentTurnScore || 0}đ!
-                  </span>
-                ) : (
-                  <span>
-                    💡 An toàn! Bạn có thể <strong>[RÚT BÀI]</strong> thêm hoặc <strong>[BANK]</strong> để cất điểm.
-                  </span>
-                )}
+            <div className={`mt-3 p-3 px-4 rounded-2xl border-2 shadow-xl transition-all animate-in fade-in duration-200 ${
+              bustRiskPercent >= 40
+                ? 'bg-gradient-to-r from-rose-950/90 via-slate-900 to-rose-950/90 border-rose-500/80 shadow-rose-950/50'
+                : bustRiskPercent >= 20
+                ? 'bg-gradient-to-r from-amber-950/90 via-slate-900 to-amber-950/90 border-amber-500/80 shadow-amber-950/50'
+                : 'bg-gradient-to-r from-emerald-950/90 via-slate-900 to-emerald-950/90 border-emerald-500/80 shadow-emerald-950/50'
+            }`}>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3">
+                  {/* Gauge Icon & Percentage */}
+                  <div className={`flex items-center gap-1.5 font-mono font-black text-sm sm:text-base px-3 py-1 rounded-xl border shadow-inner ${
+                    bustRiskPercent >= 40
+                      ? 'bg-rose-950 border-rose-400 text-rose-300 animate-pulse'
+                      : bustRiskPercent >= 20
+                      ? 'bg-amber-950 border-amber-400 text-amber-300'
+                      : 'bg-emerald-950 border-emerald-400 text-emerald-300'
+                  }`}>
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>~{bustRiskPercent}%</span>
+                  </div>
+
+                  <div>
+                    <div className="font-bold text-slate-100 flex items-center gap-1.5">
+                      <span>RỦI RO BÙM (BUST TRÙNG HỆ)</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400 font-mono">
+                      {tableDomains.size}/10 hệ toán đã xuất hiện trên bàn
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress bar and hint */}
+                <div className="flex-1 max-w-xs w-full text-center sm:text-right space-y-1">
+                  <div className="w-full bg-slate-950/80 h-2 rounded-full overflow-hidden border border-slate-700/60">
+                    <div
+                      className={`h-full transition-all duration-300 ${
+                        bustRiskPercent >= 40
+                          ? 'bg-gradient-to-r from-amber-500 to-rose-500 animate-pulse'
+                          : bustRiskPercent >= 20
+                          ? 'bg-gradient-to-r from-emerald-500 to-amber-500'
+                          : 'bg-gradient-to-r from-teal-500 to-emerald-500'
+                      }`}
+                      style={{ width: `${bustRiskPercent}%` }}
+                    />
+                  </div>
+                  <div className="text-[11px] text-slate-300 font-medium">
+                    {bustRiskPercent >= 40 ? (
+                      <span className="text-amber-300 font-bold">
+                        ⚠️ Nguy cơ cao! Hãy bấm <strong>[BANK]</strong> để giữ chắc +{you?.currentTurnScore || 0}đ!
+                      </span>
+                    ) : (
+                      <span>
+                        💡 An toàn! Tiếp tục <strong>[RÚT BÀI]</strong> hoặc <strong>[BANK]</strong> tích luỹ.
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -513,40 +551,41 @@ export const GameArena: React.FC<GameArenaProps> = ({
         {/* MATH QUESTION CHAMBER (If a card was drawn and waiting for answer) */}
         {gameState.currentQuestion && (
           <div className="w-full max-w-xl p-4 sm:p-5 bg-gradient-to-b from-slate-900 to-indigo-950/90 border-2 border-amber-500/70 rounded-2xl shadow-2xl space-y-3 animate-in fade-in zoom-in-95 duration-200">
-            {/* ACTIVE DRAWN CARD & TÁC DỤNG HEADER */}
-            {gameState.currentCard && (
+            {/* ACTIVE DRAWN CARD & TÁC DỤNG HEADER WITH 3D FLIP REVEAL */}
+            {activeCard && (
               <div
                 style={{
-                  borderColor: gameState.currentCard.elementColor,
-                  boxShadow: `0 0 16px ${gameState.currentCard.accentGlow}`,
+                  borderColor: activeCard.elementColor,
+                  boxShadow: `0 0 25px ${activeCard.accentGlow}`,
                 }}
-                className="p-3 bg-slate-950/95 border-2 rounded-xl flex items-center justify-between gap-3 animate-in fade-in"
+                className="p-3.5 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-2 rounded-2xl flex flex-col sm:flex-row items-center gap-4 animate-in fade-in shadow-2xl"
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl border shrink-0"
-                    style={{
-                      backgroundColor: `${gameState.currentCard.elementColor}22`,
-                      borderColor: gameState.currentCard.elementColor,
-                    }}
-                  >
-                    🎴
+                <div className="shrink-0 flex flex-col items-center">
+                  <FlipCardReveal card={activeCard} autoFlip={true} size="md" />
+                </div>
+                <div className="flex-1 text-center sm:text-left min-w-0">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                    <span className="font-bold text-lg text-slate-100 font-cinzel">
+                      {activeCard.domainNameVi}
+                    </span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full font-mono font-black bg-amber-400/20 text-amber-300 border border-amber-500/50">
+                      +{activeCard.pointValue} điểm
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded font-mono text-purple-300 bg-purple-950/60 border border-purple-800">
+                      {activeCard.rarity}
+                    </span>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-slate-100">
-                        Lá Rút: {gameState.currentCard.domainNameVi}
-                      </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-500/30">
-                        +{gameState.currentCard.pointValue} điểm
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-amber-200/95 font-medium mt-0.5 flex items-center gap-1.5">
-                      <Zap className="w-3 h-3 text-amber-400 shrink-0" />
-                      <span>
-                        <strong>Tác dụng:</strong> {gameState.currentCard.skillName} — {gameState.currentCard.skillDesc}
-                      </span>
-                    </div>
+                  <div className="text-xs text-amber-200 font-semibold mt-1 flex items-center justify-center sm:justify-start gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>
+                      <strong>Kỹ năng:</strong> {activeCard.skillName}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 font-light mt-0.5">
+                    {activeCard.skillDesc}
+                  </p>
+                  <div className="mt-2 text-[10px] text-indigo-300 font-mono flex items-center justify-center sm:justify-start gap-1">
+                    <span>✨ Nhấp vào lá bài để lật 3D xem mặt sau / mặt trước</span>
                   </div>
                 </div>
               </div>
@@ -761,20 +800,12 @@ export const GameArena: React.FC<GameArenaProps> = ({
         </div>
 
         {/* DRAW & BANK MAJOR ACTIONS */}
-        <div className="grid grid-cols-2 gap-3">
-          {/* DRAW BUTTON */}
-          <button
+        <div className="grid grid-cols-2 gap-3 items-center">
+          {/* DRAW BUTTON (Crown Jewel AAA Button) */}
+          <DrawButton
             onClick={onDraw}
             disabled={!isMyTurn || isGameOver || !!gameState.currentQuestion}
-            className={`py-4 px-4 rounded-2xl font-cinzel font-black text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-xl transition-all active:scale-[0.98] ${
-              isMyTurn && !gameState.currentQuestion && !isGameOver
-                ? 'bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 shadow-amber-950/50 animate-glow'
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50'
-            }`}
-          >
-            <span className="text-xl">🃏</span>
-            <span>RÚT BÀI (DRAW)</span>
-          </button>
+          />
 
           {/* BANK BUTTON */}
           <button
@@ -885,7 +916,15 @@ export const GameArena: React.FC<GameArenaProps> = ({
                 </div>
                 <div className="text-[11px] text-slate-400 flex items-center gap-3 mt-0.5 font-mono">
                   <span>❤️ HP: {you?.hp || 100}</span>
-                  <span className="text-amber-400">⭐ Kho An Toàn: <strong className="text-amber-200 text-sm">{you?.safeScore || 0}đ</strong></span>
+                  <span className="text-amber-400 flex items-center gap-1">
+                    ⭐ Kho An Toàn:{' '}
+                    <AnimatedCounter
+                      value={you?.safeScore || 0}
+                      suffix="đ"
+                      className="text-amber-200 text-sm font-bold"
+                      isHighScore={(you?.safeScore || 0) >= 150}
+                    />
+                  </span>
                 </div>
                 {(() => {
                   const activeRuneId = you?.chosenRuneId || you?.runes?.[0]?.runeId || 'rune_shield';
@@ -905,7 +944,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
             <div className="text-right font-mono">
               <div className="text-[10px] text-slate-400">Điểm Lượt Này</div>
               <div className="text-2xl font-black text-amber-400">
-                +{you?.currentTurnScore || 0}
+                <AnimatedCounter value={you?.currentTurnScore || 0} prefix="+" />
               </div>
             </div>
           </div>
@@ -1010,65 +1049,28 @@ export const GameArena: React.FC<GameArenaProps> = ({
 
       {/* INSPECTED TABLE CARD MODAL */}
       {inspectedTableCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div
-            style={{
-              borderColor: inspectedTableCard.elementColor,
-              boxShadow: `0 0 25px ${inspectedTableCard.accentGlow}`,
-            }}
-            className="relative w-full max-w-md bg-slate-900 border-2 rounded-3xl p-5 text-slate-100 space-y-4 shadow-2xl"
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg">
             <button
               onClick={() => setInspectedTableCard(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
+              className="absolute -top-3 -right-3 z-20 w-9 h-9 bg-slate-900 border-2 border-slate-700 hover:border-amber-400 text-slate-300 hover:text-white rounded-full flex items-center justify-center shadow-xl transition-all"
             >
               <X className="w-5 h-5" />
             </button>
-
-            <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl border"
-                style={{
-                  backgroundColor: `${inspectedTableCard.elementColor}22`,
-                  borderColor: inspectedTableCard.elementColor,
-                }}
-              >
-                🎴
-              </div>
-              <div>
-                <span
-                  className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
-                  style={{ backgroundColor: `${inspectedTableCard.elementColor}22`, color: inspectedTableCard.elementColor }}
+            <div className="flex flex-col items-center">
+              <FlipCardReveal card={inspectedTableCard} autoFlip={false} size="lg" />
+              <div className="mt-3 text-center space-y-2">
+                <p className="text-xs text-amber-300 font-mono flex items-center justify-center gap-1.5">
+                  <span>🔄 Nhấp trực tiếp vào lá bài để lật xem mặt trước / mặt sau</span>
+                </p>
+                <button
+                  onClick={() => setInspectedTableCard(null)}
+                  className="px-6 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-400 text-slate-200 font-bold text-xs rounded-xl uppercase tracking-wider transition-all shadow-md active:scale-95"
                 >
-                  {inspectedTableCard.domainNameVi}
-                </span>
-                <h4 className="font-cinzel text-lg font-black text-amber-200 mt-0.5">
-                  {inspectedTableCard.domainName}
-                </h4>
+                  Đóng Chi Tiết
+                </button>
               </div>
             </div>
-
-            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-              <span className="text-xs text-slate-400">Điểm giá trị lá bài:</span>
-              <span className="font-mono text-base font-black text-amber-300">+{inspectedTableCard.pointValue} điểm</span>
-            </div>
-
-            <div className="p-3.5 bg-amber-950/30 border border-amber-500/40 rounded-xl space-y-1.5">
-              <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span>Tác Dụng: {inspectedTableCard.skillName}</span>
-              </div>
-              <p className="text-xs text-slate-200 font-light leading-relaxed">
-                {inspectedTableCard.skillDesc}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setInspectedTableCard(null)}
-              className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl uppercase tracking-wider"
-            >
-              Đóng
-            </button>
           </div>
         </div>
       )}

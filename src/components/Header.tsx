@@ -139,17 +139,31 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline font-medium text-[11px] text-slate-200">Đổi Nền</span>
           </button>
 
-          {/* User Account / Profile */}
+          {/* User Account / Profile & Level Progress */}
           {user ? (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-2 sm:px-3 py-1 bg-slate-900 border border-slate-800 rounded-xl">
-                <span className="text-lg leading-none">{user.avatar}</span>
+              <div className="flex items-center gap-2.5 px-2.5 sm:px-3.5 py-1 bg-slate-900/90 border border-slate-800 rounded-xl shadow-inner">
+                <span className="text-xl leading-none">{user.avatar}</span>
                 <div className="hidden sm:block text-left">
-                  <div className="text-xs font-bold text-slate-200 truncate max-w-[100px]">
-                    {user.username}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-200 truncate max-w-[110px]">
+                      {user.username}
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-500/40">
+                      LV.{profile?.level || 1}
+                    </span>
                   </div>
-                  <div className="text-[10px] font-mono text-amber-400">
-                    Lv.{profile?.level || 1} • {profile?.xp || 0} XP
+                  {/* XP Progress Bar */}
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className="w-16 h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                      <div
+                        style={{ width: `${Math.min(100, Math.round(((profile?.xp || 0) % 500) / 5))}%` }}
+                        className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300"
+                      />
+                    </div>
+                    <span className="text-[9px] font-mono text-slate-400">
+                      {profile?.xp || 0} XP
+                    </span>
                   </div>
                 </div>
               </div>
@@ -159,7 +173,8 @@ export const Header: React.FC<HeaderProps> = ({
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
                 >
                   <User className="w-3.5 h-3.5" />
-                  <span>Đăng Nhập / Đăng Ký</span>
+                  <span className="hidden sm:inline">Đăng Nhập / Đăng Ký</span>
+                  <span className="sm:hidden">Lưu</span>
                 </button>
               ) : (
                 <button

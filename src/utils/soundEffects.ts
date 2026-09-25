@@ -201,7 +201,55 @@ class SoundSynthesizer {
     });
   }
 
-  // 8. Tiếng Chiến Thắng (Victory Fanfare)
+  // 8. Tiếng Nổ Bùng Cháy (Explosion Shockwave)
+  public playExplosion() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Sub-bass hit + noise burst
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(260, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.6);
+
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.65);
+  }
+
+  // 9. Tiếng Kim Quang Lấp Lánh (Magic Sparkles / Pro Foil)
+  public playSparkle() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    [1318.5, 1568.0, 2093.0, 2637.0].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.04);
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.04 + 0.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime + i * 0.04);
+      osc.stop(ctx.currentTime + i * 0.04 + 0.2);
+    });
+  }
+
+  // 10. Tiếng Chiến Thắng (Victory Fanfare)
   public playVictory() {
     if (this.isMuted) return;
     const ctx = this.getContext();

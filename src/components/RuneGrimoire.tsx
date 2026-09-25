@@ -3,6 +3,7 @@ import { ArrowLeft, Sparkles, Check, Zap, Info } from 'lucide-react';
 import { ALL_RUNES } from '../../shared/runes.ts';
 import { RuneCategory, RuneDef } from '../../shared/types.ts';
 import { RuneIcon } from './RuneIcon.tsx';
+import { RuneStone } from './RuneStone.tsx';
 
 interface RuneGrimoireProps {
   equippedRunes: string[];
@@ -133,21 +134,12 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
         </div>
 
         {activeRuneDef ? (
-          <div className="p-3.5 bg-slate-950/80 border border-indigo-500/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center border-2 shrink-0 shadow-lg"
-                style={{
-                  backgroundColor: `${activeRuneDef.color}22`,
-                  borderColor: activeRuneDef.color,
-                  color: activeRuneDef.color,
-                }}
-              >
-                <RuneIcon icon={activeRuneDef.icon} className="w-7 h-7" />
-              </div>
+          <div className="p-4 bg-slate-950/85 border border-indigo-500/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-inner">
+            <div className="flex items-center gap-4">
+              <RuneStone rune={activeRuneDef} size="lg" isActive={true} />
               <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <h4 className="text-base font-bold text-slate-100 font-cinzel">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-lg font-bold text-amber-200 font-cinzel">
                     {activeRuneDef.name}
                   </h4>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800">
@@ -161,8 +153,8 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
                   <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span><strong>Tác dụng:</strong> {activeRuneDef.description}</span>
                 </div>
-                <div className="text-[11px] text-slate-400 font-light flex items-center gap-1.5">
-                  <Info className="w-3 h-3 text-slate-500 shrink-0" />
+                <div className="text-[11px] text-slate-300 font-light flex items-center gap-1.5">
+                  <Info className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                   <span>{getActivationGuide(activeRuneDef)}</span>
                 </div>
               </div>
@@ -201,32 +193,23 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
               onClick={() => handleSelectRune(rune.id)}
               style={{
                 borderColor: isSelected ? rune.color : '#334155',
-                boxShadow: isSelected ? `0 0 20px ${rune.color}44` : undefined,
+                boxShadow: isSelected ? `0 0 25px ${rune.color}55` : undefined,
               }}
-              className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between hover:scale-[1.02] relative ${
+              className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between hover:scale-[1.02] relative select-none ${
                 isSelected
-                  ? 'bg-indigo-950/70 border-amber-400 ring-2 ring-amber-400/40'
-                  : 'bg-slate-900 hover:bg-slate-850 hover:border-slate-600'
+                  ? 'bg-gradient-to-b from-indigo-950/80 via-slate-900 to-indigo-950/90 border-amber-400 ring-2 ring-amber-400/50 shadow-xl'
+                  : 'bg-slate-900/90 hover:bg-slate-850 hover:border-slate-600'
               }`}
             >
               {isSelected && (
-                <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase flex items-center gap-1 shadow">
+                <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 text-[10px] font-black uppercase flex items-center gap-1 shadow-lg">
                   <Check className="w-3 h-3 stroke-[3]" /> Đang Trang Bị
                 </div>
               )}
 
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center border shrink-0"
-                    style={{
-                      backgroundColor: `${rune.color}22`,
-                      borderColor: rune.color,
-                      color: rune.color,
-                    }}
-                  >
-                    <RuneIcon icon={rune.icon} className="w-6 h-6" />
-                  </div>
+                  <RuneStone rune={rune} size="md" isActive={isSelected} />
                   <div>
                     <h3 className="font-cinzel text-sm font-bold text-slate-100" style={{ color: rune.color }}>
                       {rune.name}
@@ -239,8 +222,8 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
                   </div>
                 </div>
 
-                {/* TÁC DỤNG CỦA RUNE (RẤT RÕ RÀNG VÀ NỔI BẬT) */}
-                <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
+                {/* TÁC DỤNG CỦA RUNE */}
+                <div className="p-2.5 bg-slate-950/90 border border-slate-800 rounded-xl space-y-1">
                   <div className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Tác dụng chính:</span>
