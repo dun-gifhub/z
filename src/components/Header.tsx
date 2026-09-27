@@ -15,6 +15,7 @@ interface HeaderProps {
   currentTheme: ThemeDef;
   onOpenThemeModal: () => void;
   onToggleLightMode?: () => void;
+  onOpenHowToPlay?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -28,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentTheme,
   onOpenThemeModal,
   onToggleLightMode,
+  onOpenHowToPlay,
 }) => {
   const [isMuted, setIsMuted] = useState(sound.getIsMuted());
   const [isBgmOn, setIsBgmOn] = useState(sound.getIsBgmPlaying());
@@ -46,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isGuest = !!user && /^Pháp Sư #\d{4}$/.test(user.username);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-3 sm:px-6 py-2.5 transition-all">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-3 sm:px-6 py-2.5 safe-pt transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         {/* Brand Logo */}
         <button
@@ -138,6 +140,18 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-sm leading-none">{currentTheme.icon}</span>
             <span className="hidden sm:inline font-medium text-[11px] text-slate-200">Đổi Nền</span>
           </button>
+
+          {/* How To Play Guide Button */}
+          {onOpenHowToPlay && (
+            <button
+              onClick={onOpenHowToPlay}
+              title="Mở cẩm nang hướng dẫn chi tiết"
+              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 rounded-lg text-xs text-amber-300 transition-all shadow-sm hover:scale-105 active:scale-95"
+            >
+              <span className="text-sm leading-none">📖</span>
+              <span className="hidden sm:inline font-bold text-[11px]">Hướng Dẫn</span>
+            </button>
+          )}
 
           {/* User Account / Profile & Level Progress */}
           {user ? (

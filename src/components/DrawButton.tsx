@@ -61,12 +61,12 @@ export const DrawButton: React.FC<DrawButtonProps> = ({
         )}
 
         {/* Button Content */}
-        <div className="relative z-10 flex items-center justify-center gap-2.5">
-          <span className="text-xl sm:text-2xl filter drop-shadow">🃏</span>
-          <span className="drop-shadow-sm font-extrabold uppercase">
-            RÚT BÀI (DRAW)
+        <div className="relative z-10 flex items-center justify-center gap-2">
+          <span className="text-xl sm:text-2xl filter drop-shadow">🧮</span>
+          <span className="drop-shadow-sm font-extrabold uppercase text-xs sm:text-base md:text-lg tracking-wider whitespace-nowrap">
+            RÚT THẺ TRI THỨC
           </span>
-          <Sparkles className="w-4 h-4 text-slate-950 animate-bounce" />
+          <Sparkles className="w-4 h-4 text-slate-950 animate-bounce shrink-0" />
         </div>
       </button>
     </div>

@@ -14,7 +14,7 @@ import { HowToPlayModal } from './components/HowToPlayModal.tsx';
 import { ThemeModal } from './components/ThemeModal.tsx';
 import { AtmosphericBackground } from './components/AtmosphericBackground.tsx';
 import { getSavedTheme, saveTheme, ThemeDef, GAME_THEMES } from './utils/themeManager.ts';
-import { MathLevel, AiDifficulty } from '../shared/types.ts';
+import { MathLevel, AiDifficulty, SiteSettings } from '../shared/types.ts';
 
 type AppView = 'main' | 'online' | 'deck' | 'runes' | 'profile' | 'leaderboard' | 'admin';
 
@@ -54,6 +54,15 @@ export function App() {
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeDef>(getSavedTheme());
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+
+  // Fetch public site settings (guide link, package prices, etc.)
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setSiteSettings(data); })
+      .catch(() => {});
+  }, []);
 
   const handleSelectTheme = (theme: ThemeDef) => {
     const saved = saveTheme(theme.id);
@@ -99,6 +108,7 @@ export function App() {
         currentTheme={currentTheme}
         onOpenThemeModal={() => setThemeModalOpen(true)}
         onToggleLightMode={handleToggleLightMode}
+        onOpenHowToPlay={() => setHowToPlayOpen(true)}
       />
 
       {/* Main Container */}
@@ -199,6 +209,7 @@ export function App() {
       <HowToPlayModal
         isOpen={howToPlayOpen}
         onClose={() => setHowToPlayOpen(false)}
+        guideLink={siteSettings?.guideLink}
       />
 
       {/* Theme Background Modal */}

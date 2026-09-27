@@ -271,7 +271,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 text-slate-300">
             <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Bộ Bài: <strong className="text-slate-100">{gameState.deckRemaining}</strong></span>
+            <span>Kho Thẻ: <strong className="text-slate-100">{gameState.deckRemaining}</strong></span>
           </div>
 
           <div className="flex items-center gap-1 text-amber-300 bg-amber-950/40 border border-amber-800/40 px-2 py-0.5 rounded-md">
@@ -420,7 +420,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
         {/* CARDS DRAWN ON TABLE THIS TURN */}
         <div className="w-full mb-3">
           <div className="text-center text-[11px] font-mono text-slate-400 mb-1.5 flex items-center justify-center gap-2">
-            <span>BÀI ĐANG CÓ TRÊN BÀN LƯỢT NÀY ({gameState.tableCards.length} LÁ)</span>
+            <span>THẺ TRI THỨC TRÊN BÀN LƯỢT NÀY ({gameState.tableCards.length} THẺ)</span>
             {gameState.tableCards.length > 0 && (
               <span className="text-amber-400 font-bold">
                 (Tổng: +{gameState.tableCards.reduce((sum, c) => sum + c.pointValue, 0)}đ)
@@ -441,7 +441,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
                 </div>
                 <span>
                   {isMyTurn
-                    ? 'Chưa có lá bài nào trên bàn. Bấm [🃏 RÚT BÀI] để bắt đầu lượt rút ma pháp!'
+                    ? 'Chưa có thẻ tri thức nào trên bàn. Bấm [🧮 RÚT THẺ TRI THỨC] để bắt đầu lượt khai mở toán học!'
                     : `Đang trong lượt của ${opponent?.name || 'Đối thủ'}. Đang tính toán bước đi...`}
                 </span>
               </div>
@@ -459,7 +459,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
                 {activeCard && (
                   <div className="relative flex flex-col items-center animate-pulse">
                     <div className="text-[9px] font-mono text-amber-300 font-bold mb-0.5">
-                      ⚡ ĐANG RÚT:
+                      ⚡ THẺ ĐANG MỞ:
                     </div>
                     <MathCard
                       card={activeCard}
@@ -585,7 +585,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
                     {activeCard.skillDesc}
                   </p>
                   <div className="mt-2 text-[10px] text-indigo-300 font-mono flex items-center justify-center sm:justify-start gap-1">
-                    <span>✨ Nhấp vào lá bài để lật 3D xem mặt sau / mặt trước</span>
+                    <span>✨ Chạm / Nhấp vào thẻ để lật 3D xem cả 2 mặt</span>
                   </div>
                 </div>
               </div>
@@ -1061,7 +1061,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
               <FlipCardReveal card={inspectedTableCard} autoFlip={false} size="lg" />
               <div className="mt-3 text-center space-y-2">
                 <p className="text-xs text-amber-300 font-mono flex items-center justify-center gap-1.5">
-                  <span>🔄 Nhấp trực tiếp vào lá bài để lật xem mặt trước / mặt sau</span>
+                  <span>🔄 Chạm / Nhấp trực tiếp vào thẻ để lật xem cả 2 mặt</span>
                 </p>
                 <button
                   onClick={() => setInspectedTableCard(null)}

@@ -84,24 +84,24 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           {/* Badge Tagline */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-500/40 text-amber-300 text-xs font-mono uppercase tracking-widest shadow-lg shadow-amber-950/30">
             <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-            <span>PREMIUM AAA CARD GAME • PUSH YOUR LUCK</span>
+            <span>ĐẤU TRƯỜNG THẺ TRI THỨC TOÁN HỌC • HỌC ĐƯỜNG</span>
           </div>
 
           {/* Epic Main Logo */}
           <div className="space-y-1">
-            <h1 className="font-cinzel text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-amber-600 drop-shadow-[0_4px_25px_rgba(245,158,11,0.4)]">
+            <h1 className="font-cinzel text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-amber-600 drop-shadow-[0_4px_25px_rgba(245,158,11,0.4)]">
               MATH
               <br />
               RUNE
             </h1>
-            <div className="font-cinzel font-bold text-sm sm:text-base tracking-[0.25em] text-indigo-300 pt-2 uppercase">
+            <div className="font-cinzel font-bold text-xs sm:text-base tracking-[0.25em] text-indigo-300 pt-2 uppercase">
               MASTER THE NUMBERS
             </div>
           </div>
 
           {/* Subtitle Description */}
           <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto lg:mx-0 font-light leading-relaxed">
-            Bước vào thế giới thẻ bài ma thuật toán học đỉnh cao. Vận dụng tư duy sắc bén, làm chủ xác suất Bust và kích hoạt 16 cổ ngữ Rune huyền thoại để xưng vương.
+            Học viện Thẻ Tri Thức Toán Học học đường. Rèn luyện tư duy logic, làm chủ bài toán xác suất rủi ro và kích hoạt 16 cổ ngữ Rune bảo mệnh để chinh phục đỉnh cao tri thức.
           </p>
 
           {/* 10 Domain Glyphs Showcase Strip */}
@@ -135,30 +135,30 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             ))}
           </div>
 
-          {/* CTA Action Buttons: Section 2 format */}
+          {/* CTA Action Buttons */}
           <div className="space-y-3 pt-2 max-w-md mx-auto lg:mx-0">
-            {/* [ CHƠI NGAY ] Mega Button */}
+            {/* [ TRANH TÀI CÙNG AI ] Mega Button */}
             <button
               onClick={handlePlayNow}
-              className="group relative w-full overflow-hidden py-4 px-8 rounded-2xl font-cinzel font-black text-lg sm:text-xl text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:via-yellow-300 hover:to-amber-400 shadow-[0_12px_30px_rgba(245,158,11,0.5),inset_0_2px_4px_rgba(255,255,255,0.6)] flex items-center justify-center gap-3 transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+              className="group relative w-full overflow-hidden py-4 px-6 sm:px-8 rounded-2xl font-cinzel font-black text-base sm:text-xl text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:via-yellow-300 hover:to-amber-400 shadow-[0_12px_30px_rgba(245,158,11,0.5),inset_0_2px_4px_rgba(255,255,255,0.6)] flex items-center justify-center gap-3 transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
             >
               {/* Animated Light Sweep Beam */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-25deg] transform -translate-x-full group-hover:animate-light-sweep" />
               </div>
               <Play className="w-5 h-5 fill-slate-950" />
-              <span className="tracking-wider uppercase">CHƠI NGAY (ĐẤU AI)</span>
+              <span className="tracking-wider uppercase">BẮT ĐẦU TRANH TÀI (ĐẤU AI)</span>
               <Sparkles className="w-4 h-4 text-slate-950 animate-bounce" />
             </button>
 
-            {/* Secondary Buttons Row: [ LUẬT CHƠI ] [ BỘ SƯU TẬP ] [ ĐẤU ONLINE ] */}
+            {/* Secondary Buttons Row: [ HƯỚNG DẪN ] [ KHO THẺ TOÁN ] [ ĐẤU ONLINE ] */}
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={onOpenHowToPlay}
                 className="py-2.5 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 transition-all flex items-center justify-center gap-1 shadow-md hover:scale-105 active:scale-95"
               >
-                <HelpCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">LUẬT CHƠI</span>
+                <BookOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="truncate">HƯỚNG DẪN</span>
               </button>
 
               <button
@@ -166,7 +166,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 className="py-2.5 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 transition-all flex items-center justify-center gap-1 shadow-md hover:scale-105 active:scale-95"
               >
                 <Layers className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">BỘ SƯU TẬP</span>
+                <span className="truncate">KHO THẺ TOÁN</span>
               </button>
 
               <button
@@ -177,6 +177,19 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 <span className="truncate">ĐẤU ONLINE</span>
               </button>
             </div>
+
+            {/* ADMIN EXTERNAL GUIDE LINK (if configured in Admin) */}
+            {guideLink && (
+              <a
+                href={guideLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2 px-3 bg-indigo-950/70 hover:bg-indigo-900/90 border border-indigo-500/40 rounded-xl text-xs font-semibold text-indigo-200 transition-all flex items-center justify-center gap-1.5 shadow-sm group"
+              >
+                <span>📖 Tài Liệu Hướng Dẫn Chi Tiết (Link Quản Trị / Nhà Trường)</span>
+                <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">↗</span>
+              </a>
+            )}
           </div>
         </div>
 
@@ -191,13 +204,27 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       {/* ========================================================= */}
       <div className="relative z-10 max-w-6xl mx-auto w-full pt-8 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
         
-        {/* Daily Challenges Widget (4 Columns) */}
+        {/* Daily Challenges Widget (5 Columns) */}
         <div className="md:col-span-5 w-full">
           <DailyChallengeWidget />
         </div>
 
-        {/* Navigation Portals Grid (7 Columns) */}
-        <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+        {/* Navigation Portals Grid (7 Columns - 5 items) */}
+        <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-5 gap-2.5 w-full">
+          {/* Cẩm Nang Hướng Dẫn */}
+          <button
+            onClick={onOpenHowToPlay}
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-amber-900/50 hover:border-amber-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+          >
+            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <BookOpen className="w-4 h-4" />
+            </div>
+            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-amber-300">
+              CẨM NANG
+            </div>
+            <div className="text-[10px] text-slate-400 truncate">Luật thi đấu</div>
+          </button>
+
           {/* Cổ Ngữ Rune */}
           <button
             onClick={onOpenRunes}
@@ -212,7 +239,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             <div className="text-[10px] text-slate-400 truncate">Bảo mệnh</div>
           </button>
 
-          {/* Hồ Sơ Pháp Sư */}
+          {/* Hồ Sơ Học Viên */}
           <button
             onClick={onOpenProfile}
             className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-emerald-900/50 hover:border-emerald-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
@@ -229,13 +256,13 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           {/* Bảng Xếp Hạng */}
           <button
             onClick={onOpenLeaderboard}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-amber-900/50 hover:border-amber-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-yellow-900/50 hover:border-yellow-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
           >
-            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 group-hover:scale-110 transition-transform">
               <Trophy className="w-4 h-4" />
             </div>
-            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-amber-300">
-              XẾP HẠNG
+            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-yellow-300">
+              BẢNG VÀNG
             </div>
             <div className="text-[10px] text-slate-400 truncate">Vinh danh</div>
           </button>

@@ -3,6 +3,7 @@ import { ArrowLeft, Search, Filter, Sparkles, Layers, Zap, X, Info, ShieldCheck,
 import { DECK_60_CARDS, MATH_DOMAINS } from '../../shared/cards.ts';
 import { Card, CardRarity, MathCategory } from '../../shared/types.ts';
 import { MathCard } from './MathCard.tsx';
+import { FlipCardReveal } from './FlipCardReveal.tsx';
 import { sound } from '../utils/soundEffects.ts';
 
 interface DeckViewerProps {
@@ -62,13 +63,13 @@ export const DeckViewer: React.FC<DeckViewerProps> = ({ onBack }) => {
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-mono">
           <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-          <span>GRIMOIRE OF 60 ARCANE CARDS</span>
+          <span>KHO TÀNG 60 THẺ TRI THỨC TOÁN HỌC HỌC ĐƯỜNG</span>
         </div>
-        <h2 className="font-cinzel text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-500 drop-shadow">
-          BỘ SƯU TẬP THẺ BÀI MA THUẬT
+        <h2 className="font-cinzel text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-500 drop-shadow">
+          BỘ SƯU TẬP THẺ TRI THỨC TOÁN HỌC
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto font-light">
-          Mỗi lá bài mang một Hệ Toán Học và <strong>Tác Dụng Kỹ Năng</strong> kích hoạt. Nhấp vào bất kỳ lá bài nào để chiêm ngưỡng hiệu ứng 3D và thông số chi tiết!
+          Mỗi thẻ tri thức đại diện cho một Phân Môn Toán Học và mang <strong>Kỹ Năng Học Thuật</strong> kích hoạt. Nhấp vào bất kỳ thẻ nào để khám phá hiệu ứng lật 3D và thông số chi tiết!
         </p>
       </div>
 
@@ -159,23 +160,26 @@ export const DeckViewer: React.FC<DeckViewerProps> = ({ onBack }) => {
         ))}
       </div>
 
-      {/* DETAILED CARD INSPECTION MODAL */}
+      {/* DETAILED CARD INSPECTION MODAL WITH 3D FLIP */}
       {inspectedCard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full max-w-lg flex flex-col items-center">
             <button
               onClick={() => setInspectedCard(null)}
               className="absolute -top-3 -right-3 z-20 w-9 h-9 bg-slate-900 border-2 border-slate-700 hover:border-amber-400 text-slate-300 hover:text-white rounded-full flex items-center justify-center shadow-xl transition-all cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
-            <MathCard card={inspectedCard} variant="hero" />
-            <div className="mt-3 text-center">
+            <FlipCardReveal card={inspectedCard} autoFlip={false} size="lg" />
+            <div className="mt-3 text-center space-y-2">
+              <p className="text-xs text-amber-300 font-mono flex items-center justify-center gap-1.5">
+                <span>✨ Chạm / Nhấp trực tiếp vào thẻ để lật 3D xem cả 2 mặt</span>
+              </p>
               <button
                 onClick={() => setInspectedCard(null)}
-                className="px-6 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-400 text-slate-200 font-bold text-xs rounded-xl uppercase tracking-wider transition-all shadow-md cursor-pointer"
+                className="px-6 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-400 text-slate-200 font-bold text-xs rounded-xl uppercase tracking-wider transition-all shadow-md cursor-pointer active:scale-95"
               >
-                Đóng Chi Tiết Lá Bài
+                Đóng Chi Tiết Thẻ
               </button>
             </div>
           </div>

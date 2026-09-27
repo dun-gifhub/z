@@ -154,7 +154,7 @@ export const Hero3DCard: React.FC = () => {
       {/* Interactive Helper Text */}
       <div className="mt-3 flex items-center gap-2 text-xs font-mono text-slate-400">
         <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-        <span>Di chuyển chuột để nghiêng 3D • Nhấp để đổi lá bài ({cardIndex + 1}/{showcaseCards.length})</span>
+        <span>Nghiêng cảm ứng / Chuột 3D • Chạm để đổi Thẻ Tri Thức ({cardIndex + 1}/{showcaseCards.length})</span>
       </div>
     </div>
   );

@@ -333,6 +333,14 @@ async function startServer() {
   });
 
   // ------- Cài đặt hệ thống: link hướng dẫn, giá gói Premium, thông tin chuyển khoản -------
+  app.get('/api/settings', (_req, res) => {
+    return res.json(db.getSettings());
+  });
+
+  app.get('/api/admin/settings', requireAdmin, (_req, res) => {
+    return res.json(db.getSettings());
+  });
+
   app.put('/api/admin/settings', requireAdmin, async (req, res) => {
     const { guideLink, solutionPackagePrice, monthlyPackagePrice, bankAccountName, bankAccountNumber, bankName } = req.body;
     const updated = await db.updateSettings({
