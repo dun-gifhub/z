@@ -520,6 +520,24 @@ class DatabaseManager {
     return expiredIds.length;
   }
 
+  // Xoá TOÀN BỘ tài khoản "Chơi Nhanh" (Khách) ngay lập tức theo yêu cầu của Admin
+  public async deleteAllGuests(): Promise<number> {
+    const guestIds = this.data.users.filter(u => u.role === 'guest').map(u => u.id);
+    if (guestIds.length === 0) return 0;
+
+    const guestSet = new Set(guestIds);
+    this.data.users = this.data.users.filter(u => !guestSet.has(u.id));
+    for (const id of guestIds) delete this.data.profiles[id];
+    this.data.matchHistory = this.data.matchHistory.filter(m => !guestSet.has(m.userId));
+    this.data.premiumRequests = this.data.premiumRequests.filter(r => !guestSet.has(r.userId));
+
+    await this.persist(async () => {
+      await pool!.query(`DELETE FROM users WHERE role = 'guest'`);
+    });
+
+    return guestIds.length;
+  }
+
   public getProfile(userId: string): UserProfile | undefined {
     return this.data.profiles[userId];
   }

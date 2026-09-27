@@ -265,6 +265,22 @@ export function useGameSocket() {
     localStorage.removeItem('mathrune_user');
   };
 
+  const deleteGuestAccount = async () => {
+    if (!user || user.role !== 'guest') return false;
+    try {
+      await fetch('/api/auth/delete-guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+    } catch (e) {
+      console.warn('Failed to call delete guest on server:', e);
+    }
+    logout();
+    await loginAsGuest();
+    return true;
+  };
+
   // Tự động phát hiện tài khoản Khách (Chơi Nhanh) đã quá hạn 1 ngày trong lúc app
   // đang mở (không chỉ lúc tải trang), rồi tự tạo tài khoản Khách mới thay thế.
   useEffect(() => {
@@ -431,6 +447,7 @@ export function useGameSocket() {
     lastBustAlert,
     errorMessage,
     loginAsGuest,
+    deleteGuestAccount,
     login,
     register,
     logout,

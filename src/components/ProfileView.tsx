@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Trophy, Award, Target, Flame, History, BookOpen, User, CheckCircle, XCircle, Crown, Sparkles, Lock, Landmark, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Trophy, Award, Target, Flame, History, BookOpen, User, CheckCircle, XCircle, Crown, Sparkles, Lock, Landmark, Copy, Check, Trash2 } from 'lucide-react';
 import { UserProfile, SiteSettings, PremiumPlan } from '../../shared/types.ts';
 import { BASIC_AVATARS, VIP_AVATARS } from '../../shared/avatars.ts';
 import { ALL_RUNES } from '../../shared/runes.ts';
@@ -10,13 +10,15 @@ interface ProfileViewProps {
   onBack: () => void;
   onUpdateAvatar?: (avatar: string) => Promise<{ success: boolean; error?: string }>;
   onRefreshProfile?: () => void;
+  isGuest?: boolean;
+  onDeleteGuestAccount?: () => void;
 }
 
 function formatVnd(n: number) {
   return n.toLocaleString('vi-VN') + 'đ';
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpdateAvatar, onRefreshProfile }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpdateAvatar, onRefreshProfile, isGuest, onDeleteGuestAccount }) => {
   const [matchHistory, setMatchHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -184,6 +186,38 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
           ID: {profile.id.substring(0, 10)}...
         </span>
       </div>
+
+      {/* Guest Account Banner & Delete Button */}
+      {isGuest && onDeleteGuestAccount && (
+        <div className="p-4 bg-gradient-to-r from-rose-950/60 via-slate-900 to-rose-950/60 border border-rose-800/80 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-lg">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-300 text-lg shrink-0">
+              ⚡
+            </div>
+            <div>
+              <div className="font-bold text-rose-300 flex items-center justify-center sm:justify-start gap-1.5 text-sm">
+                <span>Tài Khoản Khách (Chơi Nhanh)</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Bạn có thể đăng ký để lưu hồ sơ vĩnh viễn, hoặc xóa tài khoản này để làm mới phiên chơi.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              if (confirm('Bạn có chắc chắn muốn XÓA VĨNH VIỄN tài khoản Chơi Nhanh này không? Toàn bộ điểm số, cấp độ và lịch sử tạm thời sẽ bị dọn sạch và một tài khoản khách mới sẽ được tạo.')) {
+                onDeleteGuestAccount();
+                onBack();
+              }
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all active:scale-95 shrink-0 flex items-center justify-center gap-1.5 cursor-pointer uppercase tracking-wider"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>XÓA ACC CHƠI NHANH</span>
+          </button>
+        </div>
+      )}
 
       {/* Profile Overview Card */}
       <div className="p-6 bg-slate-900 border-2 border-indigo-700/60 rounded-3xl space-y-5 shadow-2xl">

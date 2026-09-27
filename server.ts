@@ -144,6 +144,21 @@ async function startServer() {
     }
   });
 
+  app.post('/api/auth/delete-guest', async (req, res) => {
+    try {
+      const { userId } = req.body;
+      if (!userId) return res.status(400).json({ error: 'Thiếu thông tin tài khoản.' });
+      const user = db.findUserById(userId);
+      if (!user || user.role !== 'guest') {
+        return res.status(400).json({ error: 'Chỉ có thể xóa tài khoản Chơi Nhanh qua tính năng này.' });
+      }
+      await db.deleteUser(userId);
+      return res.json({ success: true, message: 'Đã xóa tài khoản Chơi Nhanh thành công.' });
+    } catch (e: any) {
+      return res.status(500).json({ error: e.message });
+    }
+  });
+
   // ==========================================
   // PUBLIC SITE SETTINGS (link hướng dẫn, giá gói Premium, thông tin chuyển khoản)
   // ==========================================
@@ -321,6 +336,12 @@ async function startServer() {
   app.delete('/api/admin/questions/:id', requireAdmin, async (req, res) => {
     await db.deleteCustomQuestion(req.params.id);
     return res.json({ success: true });
+  });
+
+  // ------- Xóa toàn bộ tài khoản Chơi Nhanh (Khách) -------
+  app.delete('/api/admin/users/guests', requireAdmin, async (_req, res) => {
+    const count = await db.deleteAllGuests();
+    return res.json({ success: true, count, message: `Đã xóa thành công ${count} tài khoản Chơi Nhanh (Khách)!` });
   });
 
   // ------- Xóa tài khoản (chỉ 1 tài khoản Admin duy nhất, không thể tự xóa) -------

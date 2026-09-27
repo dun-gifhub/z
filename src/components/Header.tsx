@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Music, Wifi, WifiOff, Sparkles, User, LogOut, Shield, Palette, Sun, Moon } from 'lucide-react';
+import { Volume2, VolumeX, Music, Wifi, WifiOff, Sparkles, User, LogOut, Shield, Palette, Sun, Moon, Trash2 } from 'lucide-react';
 import { sound } from '../utils/soundEffects.ts';
 import { UserProfile } from '../../shared/types.ts';
 import { ThemeDef } from '../utils/themeManager.ts';
@@ -16,6 +16,7 @@ interface HeaderProps {
   onOpenThemeModal: () => void;
   onToggleLightMode?: () => void;
   onOpenHowToPlay?: () => void;
+  onDeleteGuestAccount?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -30,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenThemeModal,
   onToggleLightMode,
   onOpenHowToPlay,
+  onDeleteGuestAccount,
 }) => {
   const [isMuted, setIsMuted] = useState(sound.getIsMuted());
   const [isBgmOn, setIsBgmOn] = useState(sound.getIsBgmPlaying());
@@ -182,14 +184,29 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </div>
               {isGuest ? (
-                <button
-                  onClick={onOpenAuth}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
-                >
-                  <User className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Đăng Nhập / Đăng Ký</span>
-                  <span className="sm:hidden">Lưu</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={onOpenAuth}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Đăng Ký Lưu Acc</span>
+                    <span className="sm:hidden">Lưu</span>
+                  </button>
+                  {onDeleteGuestAccount && (
+                    <button
+                      onClick={() => {
+                        if (confirm('Bạn có chắc chắn muốn xóa tài khoản Chơi Nhanh này để làm mới phiên chơi?')) {
+                          onDeleteGuestAccount();
+                        }
+                      }}
+                      title="Xóa tài khoản Chơi Nhanh và tạo mới"
+                      className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-900 rounded-lg transition-colors border border-slate-800"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               ) : (
                 <button
                   onClick={onLogout}

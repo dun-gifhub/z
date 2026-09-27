@@ -28,6 +28,7 @@ export function App() {
     lastBustAlert,
     errorMessage,
     loginAsGuest,
+    deleteGuestAccount,
     login,
     register,
     logout,
@@ -109,6 +110,7 @@ export function App() {
         onOpenThemeModal={() => setThemeModalOpen(true)}
         onToggleLightMode={handleToggleLightMode}
         onOpenHowToPlay={() => setHowToPlayOpen(true)}
+        onDeleteGuestAccount={deleteGuestAccount}
       />
 
       {/* Main Container */}
@@ -176,6 +178,8 @@ export function App() {
                 onBack={() => setCurrentView('main')}
                 onUpdateAvatar={updateAvatar}
                 onRefreshProfile={refreshProfile}
+                isGuest={user?.role === 'guest' || !!user?.username?.startsWith('Pháp Sư #')}
+                onDeleteGuestAccount={deleteGuestAccount}
               />
             )}
 

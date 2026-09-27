@@ -14,6 +14,9 @@ interface AdminPanelProps {
 
 const ADMIN_KEY_STORAGE = 'mathrune_admin_key';
 
+const isUserGuest = (u: any) => !!(u.isGuest || u.role === 'guest' || u.accountType === 'guest');
+const isUserPro = (u: any) => !!u.isPremium && (!u.premiumExpiresAt || new Date(u.premiumExpiresAt).getTime() > Date.now());
+
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   // ------- Password gate -------
   const [adminKey, setAdminKey] = useState<string>(() => sessionStorage.getItem(ADMIN_KEY_STORAGE) || '');
@@ -215,6 +218,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         fetchStats();
       } else {
         alert(d.error || 'Không thể xóa tài khoản.');
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  // ------- Xóa toàn bộ tài khoản Chơi Nhanh (Khách) -------
+  const handleDeleteAllGuests = async () => {
+    const currentGuests = users.filter(u => isUserGuest(u));
+    if (!confirm(`Bạn có chắc chắn muốn XÓA TẤT CẢ ${currentGuests.length} tài khoản Chơi Nhanh (Khách)? Toàn bộ dữ liệu tạm của các tài khoản này sẽ được dọn sạch hoàn toàn!`)) return;
+    try {
+      const res = await fetch('/api/admin/users/guests', { method: 'DELETE', headers: adminHeaders });
+      const d = await res.json();
+      if (res.ok) {
+        alert(d.message || `Đã xóa thành công ${d.count} tài khoản Chơi Nhanh!`);
+        fetchUsers();
+        fetchStats();
+      } else {
+        alert(d.error || 'Lỗi xóa tài khoản Chơi Nhanh.');
       }
     } catch (e) {
       console.warn(e);
@@ -695,9 +717,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
       {/* TAB 3: USERS LIST (PHÂN LOẠI TÀI KHOẢN ĐĂNG KÝ / CHƠI NHANH & QUẢN LÝ GÓI PRO) */}
       {activeTab === 'users' && (() => {
-        const isUserGuest = (u: any) => u.isGuest || u.role === 'guest' || u.accountType === 'guest';
-        const isUserPro = (u: any) => !!u.isPremium && (!u.premiumExpiresAt || new Date(u.premiumExpiresAt).getTime() > Date.now());
-
         const registeredUsers = users.filter(u => !isUserGuest(u) && u.role !== 'admin');
         const guestUsers = users.filter(u => isUserGuest(u));
         const proUsers = users.filter(u => isUserPro(u));
@@ -836,6 +855,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     <span>PRO ({proUsers.length})</span>
                   </button>
                 </div>
+
+                {guestUsers.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteAllGuests}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-700/80 hover:border-rose-500 text-rose-200 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 self-start sm:self-auto"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Xóa Tất Cả Acc Chơi Nhanh ({guestUsers.length})</span>
+                  </button>
+                )}
               </div>
 
               {/* Search Box */}
@@ -943,14 +973,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                               </button>
                             )}
 
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteUser(u)}
-                              title="Xóa tài khoản này"
-                              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800"
-                            >
-                              <UserX className="w-4 h-4" />
-                            </button>
+                            {isGuest ? (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteUser(u)}
+                                title="Xóa tài khoản Chơi Nhanh này"
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-950/60 border border-rose-800/80 hover:border-rose-500 text-rose-300 rounded-lg hover:bg-rose-900 transition-colors text-[11px] font-medium"
+                              >
+                                <Trash2 className="w-3 h-3 text-rose-400" />
+                                <span>Xóa Acc Khách</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteUser(u)}
+                                title="Xóa tài khoản này"
+                                className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800 transition-colors"
+                              >
+                                <UserX className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
