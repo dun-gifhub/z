@@ -39,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isMuted, setIsMuted] = useState(sound.getIsMuted());
   const [isBgmOn, setIsBgmOn] = useState(sound.getIsBgmPlaying());
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleToggleMute = () => {
     const muted = sound.toggleMute();
@@ -182,24 +183,29 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* User Account / Profile & Level Progress */}
           {user ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2.5 px-2.5 sm:px-3.5 py-1 bg-slate-900/90 border border-slate-800 rounded-xl shadow-inner">
-                <span className="text-xl leading-none">{user.avatar}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Clickable Profile Pill to open Account Info */}
+              <button
+                onClick={() => setShowUserMenu(true)}
+                title="Nhấn để xem thông tin tài khoản và đổi tài khoản"
+                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700/80 rounded-xl shadow-inner active:scale-95 transition-all text-left"
+              >
+                <span className="text-lg sm:text-xl leading-none">{user.avatar}</span>
                 <div className="hidden sm:block text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-200 truncate max-w-[110px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-200 truncate max-w-[100px]">
                       {user.username}
                     </span>
-                    <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-500/40">
+                    <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-500/40">
                       LV.{profile?.level || 1}
                     </span>
                   </div>
                   {/* XP Progress Bar */}
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <div className="w-16 h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <div className="w-14 h-1 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                       <div
                         style={{ width: `${Math.min(100, Math.round(((profile?.xp || 0) % 500) / 5))}%` }}
-                        className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300"
+                        className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full"
                       />
                     </div>
                     <span className="text-[9px] font-mono text-slate-400">
@@ -207,45 +213,49 @@ export const Header: React.FC<HeaderProps> = ({
                     </span>
                   </div>
                 </div>
-              </div>
+              </button>
+
+              {/* Explicit LOGIN & LOGOUT Buttons */}
               {isGuest ? (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 sm:gap-1.5">
                   <button
                     onClick={onOpenAuth}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
+                    title="Đăng nhập hoặc đăng ký tài khoản chính thức để lưu điểm"
+                    className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-lg shadow-md transition-all active:scale-95 whitespace-nowrap"
                   >
                     <User className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Đăng Ký Lưu Acc</span>
-                    <span className="sm:hidden">Lưu</span>
+                    <span>Đăng Nhập</span>
                   </button>
-                  {onDeleteGuestAccount && (
-                    <button
-                      onClick={() => {
-                        if (confirm('Bạn có chắc chắn muốn xóa tài khoản Chơi Nhanh này để làm mới phiên chơi?')) {
-                          onDeleteGuestAccount();
-                        }
-                      }}
-                      title="Xóa tài khoản Chơi Nhanh và tạo mới"
-                      className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-900 rounded-lg transition-colors border border-slate-800"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+
+                  <button
+                    onClick={() => {
+                      if (confirm('Bạn có muốn đăng xuất khỏi tài khoản Khách này để đổi tài khoản khác?')) {
+                        if (onDeleteGuestAccount) onDeleteGuestAccount();
+                        else onLogout();
+                      }
+                    }}
+                    title="Đăng xuất khỏi tài khoản Khách"
+                    className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-900 hover:bg-rose-950/70 border border-slate-700 hover:border-rose-500 text-slate-300 hover:text-rose-200 text-xs font-bold rounded-lg transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                    <span className="hidden sm:inline">Đăng Xuất</span>
+                  </button>
                 </div>
               ) : (
                 <button
                   onClick={onLogout}
-                  title="Đăng xuất"
-                  className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-900 rounded-lg transition-colors"
+                  title="Đăng xuất tài khoản"
+                  className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/70 text-rose-200 text-xs font-bold rounded-lg shadow transition-all active:scale-95 whitespace-nowrap"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5 text-rose-300" />
+                  <span>Đăng Xuất</span>
                 </button>
               )}
             </div>
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-lg shadow-md transition-all active:scale-95 whitespace-nowrap"
             >
               <User className="w-3.5 h-3.5" />
               <span>Đăng Nhập</span>
@@ -253,6 +263,105 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </div>
+
+      {/* USER ACCOUNT QUICK SHEET / MODAL (Easy touch on mobile) */}
+      {showUserMenu && user && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-xs p-5 bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-500/80 rounded-3xl shadow-2xl space-y-4 text-center">
+            {/* Header info */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(false)}
+                className="absolute -top-1 -right-1 p-1 text-slate-400 hover:text-slate-100 rounded-full hover:bg-slate-800"
+              >
+                ✕
+              </button>
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-slate-950 border-2 border-amber-500/50 flex items-center justify-center text-3xl shadow-lg mb-2">
+                {user.avatar}
+              </div>
+              <h3 className="font-bold text-slate-100 text-base">{user.username}</h3>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <span className="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-500/40">
+                  Cấp Độ: {profile?.level || 1}
+                </span>
+                {isGuest ? (
+                  <span className="text-[10px] text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-500/30">
+                    Tài Khoản Khách
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    Đã Xác Thực
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* XP progress */}
+            <div className="p-3 bg-slate-950/90 rounded-2xl border border-slate-800 text-left space-y-1.5">
+              <div className="flex justify-between text-xs font-mono text-slate-300">
+                <span>Tiến Trình Cấp:</span>
+                <span className="text-amber-300 font-bold">{profile?.xp || 0} XP</span>
+              </div>
+              <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                <div
+                  style={{ width: `${Math.min(100, Math.round(((profile?.xp || 0) % 500) / 5))}%` }}
+                  className="h-full bg-gradient-to-r from-amber-500 to-yellow-400"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2 pt-1">
+              {isGuest ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      onOpenAuth();
+                    }}
+                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 uppercase tracking-wide"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>🔑 Đăng Nhập / Đăng Ký Tài Khoản</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      if (confirm('Bạn có muốn đăng xuất khỏi tài khoản Khách này?')) {
+                        if (onDeleteGuestAccount) onDeleteGuestAccount();
+                        else onLogout();
+                      }
+                    }}
+                    className="w-full py-2 bg-rose-950/70 hover:bg-rose-900 border border-rose-600/50 text-rose-200 font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>🚪 Đăng Xuất (Xóa Phiên Khách)</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    onLogout();
+                  }}
+                  className="w-full py-2.5 bg-rose-950 hover:bg-rose-900 border-2 border-rose-500 text-rose-100 font-bold text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>🚪 Đăng Xuất Tài Khoản</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => setShowUserMenu(false)}
+                className="w-full py-1.5 text-xs text-slate-400 hover:text-slate-200"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

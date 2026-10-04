@@ -15,8 +15,10 @@ import {
   BookOpen,
   Play,
   ArrowRight,
+  User,
+  LogOut,
 } from 'lucide-react';
-import { MathLevel, AiDifficulty } from '../../shared/types.ts';
+import { MathLevel, AiDifficulty, UserProfile } from '../../shared/types.ts';
 import { DomainArt } from './DomainArt.tsx';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
 import { Hero3DCard } from './Hero3DCard.tsx';
@@ -34,6 +36,11 @@ interface MainMenuProps {
   onOpenHowToPlay: () => void;
   mathLevel: MathLevel;
   onSetMathLevel: (level: MathLevel) => void;
+  user?: { id: string; username: string; avatar: string; role: string } | null;
+  profile?: UserProfile | null;
+  onOpenAuth?: () => void;
+  onLogout?: () => void;
+  onDeleteGuestAccount?: () => void;
 }
 
 export const MainMenu: React.FC<MainMenuProps> = ({
@@ -47,6 +54,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenHowToPlay,
   mathLevel,
   onSetMathLevel,
+  user,
+  profile,
+  onOpenAuth,
+  onLogout,
+  onDeleteGuestAccount,
 }) => {
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiDiff, setAiDiff] = useState<AiDifficulty>('medium');
@@ -71,8 +83,85 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     setShowAiModal(true);
   };
 
+  const isGuest = !!user && /^Pháp Sư #\d{4}$/.test(user.username);
+
   return (
-    <div className="relative min-h-[calc(100vh-70px)] flex flex-col justify-between px-3 sm:px-6 py-6 overflow-hidden">
+    <div className="relative min-h-[calc(100vh-70px)] flex flex-col justify-between px-3 sm:px-6 py-4 sm:py-6 overflow-hidden">
+      {/* Mobile-Friendly User Status & Quick Auth Card */}
+      {user && (
+        <div className="relative z-10 max-w-6xl mx-auto w-full mb-4 p-3 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xl backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl p-1 bg-slate-950 rounded-xl border border-amber-500/30 shadow-inner">
+              {user.avatar}
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-100 text-sm">{user.username}</span>
+                {isGuest ? (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/40">
+                    Tài Khoản Khách
+                  </span>
+                ) : (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/40">
+                    Đã Xác Thực
+                  </span>
+                )}
+              </div>
+              <div className="text-xs text-slate-400 font-mono">
+                Cấp Độ: <strong className="text-amber-300">LV.{profile?.level || 1}</strong> • {profile?.xp || 0} XP
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {isGuest ? (
+              <>
+                {onOpenAuth && (
+                  <button
+                    onClick={onOpenAuth}
+                    className="flex-1 sm:flex-initial px-3.5 py-2 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>🔑 Đăng Nhập / Đăng Ký</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    if (confirm('Bạn có muốn đăng xuất khỏi tài khoản Khách này để đổi tài khoản khác?')) {
+                      if (onDeleteGuestAccount) onDeleteGuestAccount();
+                      else if (onLogout) onLogout();
+                    }
+                  }}
+                  className="px-3 py-2 bg-slate-850 hover:bg-rose-950/70 text-slate-300 hover:text-rose-200 border border-slate-700 hover:border-rose-500/60 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Đăng Xuất</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={onOpenProfile}
+                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Hồ Sơ</span>
+                </button>
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    className="px-3.5 py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/70 text-rose-200 text-xs font-bold rounded-xl shadow transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-300" />
+                    <span>Đăng Xuất</span>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ========================================================= */}
       {/* 1. CINEMATIC HERO SECTION                                 */}
       {/* ========================================================= */}

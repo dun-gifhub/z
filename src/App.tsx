@@ -180,6 +180,11 @@ export function App() {
                 onOpenHowToPlay={() => setHowToPlayOpen(true)}
                 mathLevel={mathLevel}
                 onSetMathLevel={setMathLevel}
+                user={user}
+                profile={profile}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                onLogout={logout}
+                onDeleteGuestAccount={deleteGuestAccount}
               />
             )}
 
