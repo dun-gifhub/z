@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Plus, Trash2, Database, Users, BookOpen, CheckCircle, RefreshCw, Lock, KeyRound, Settings, Crown, UserX, XCircle, Link2, Landmark, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Shield, Plus, Trash2, Database, Users, BookOpen, CheckCircle, RefreshCw, Lock, KeyRound, Settings, Crown, UserX, XCircle, Link2, Landmark, RotateCcw, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { MathLevel, MathCategory, Question, SiteSettings, PremiumRequest, PremiumPlan } from '../../shared/types.ts';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
 
@@ -102,6 +102,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [qLevel, setQLevel] = useState<MathLevel>('THCS');
   const [qTimeLimit, setQTimeLimit] = useState(15);
   const [formMsg, setFormMsg] = useState<string | null>(null);
+  // AI Question Generator state (từ nguồn web toán học uy tín)
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiCategory, setAiCategory] = useState<MathCategory>('NGUYEN_TO');
+  const [aiLevel, setAiLevel] = useState<MathLevel>('THCS');
+  const [aiPreferredSource, setAiPreferredSource] = useState('VietJack Chuyên Đề Toán (vietjack.com)');
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiGeneratedQuestion, setAiGeneratedQuestion] = useState<Question | null>(null);
+  const [aiSuccessMsg, setAiSuccessMsg] = useState<string | null>(null);
+  const [aiErrorMsg, setAiErrorMsg] = useState<string | null>(null);
+  const [aiSavingToDb, setAiSavingToDb] = useState(false);
 
   const fetchStats = () => {
     fetch('/api/admin/stats', { headers: adminHeaders })
@@ -193,6 +203,63 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       }
     } catch (err: any) {
       setFormMsg(`Lỗi kết nối: ${err.message}`);
+    }
+  };
+
+  // Sinh câu hỏi thông minh bằng AI từ nguồn web toán học uy tín
+  const handleGenerateAiQuestion = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setAiGenerating(true);
+    setAiErrorMsg(null);
+    setAiSuccessMsg(null);
+    try {
+      const res = await fetch('/api/admin/ai/generate-question', {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify({
+          topic: aiTopic,
+          category: aiCategory,
+          level: aiLevel,
+          preferredSource: aiPreferredSource,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Không thể sinh câu hỏi AI.');
+      }
+      setAiGeneratedQuestion(data.question);
+      setAiSuccessMsg('✨ Đã sinh thành công 01 câu hỏi toán học uy tín có thẩm định!');
+    } catch (err: any) {
+      setAiErrorMsg(err?.message || 'Lỗi khi sinh câu hỏi AI.');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
+  // Lưu câu hỏi vừa sinh bằng AI vào ngân hàng đề thi đấu
+  const handleSaveAiQuestionToBank = async () => {
+    if (!aiGeneratedQuestion) return;
+    setAiSavingToDb(true);
+    setAiErrorMsg(null);
+    setAiSuccessMsg(null);
+    try {
+      const res = await fetch('/api/admin/questions', {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify(aiGeneratedQuestion),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Lỗi lưu câu hỏi vào ngân hàng.');
+      }
+      setAiSuccessMsg('🎉 Đã thêm thành công câu hỏi vào Ngân Hàng Đề thi đấu!');
+      setAiGeneratedQuestion(null);
+      fetchQuestions();
+      fetchStats();
+    } catch (err: any) {
+      setAiErrorMsg(err?.message || 'Lỗi lưu câu hỏi.');
+    } finally {
+      setAiSavingToDb(false);
     }
   };
 
@@ -570,11 +637,231 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       {/* TAB 2: QUESTIONS MANAGEMENT */}
       {activeTab === 'questions' && (
         <div className="space-y-6">
-          {/* Add Question Form */}
+          {/* AI QUESTION GENERATOR FROM CREDIBLE WEBSITES */}
+          <div className="p-5 bg-gradient-to-br from-indigo-950/90 via-slate-900 to-purple-950/90 border-2 border-indigo-500/50 rounded-2xl space-y-4 shadow-2xl relative overflow-hidden">
+            {/* Ambient runic glow */}
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-800/40 pb-3">
+              <div>
+                <h3 className="font-cinzel text-base font-bold text-amber-300 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
+                  <span>SINH ĐỀ TOÁN HỌC BẰNG AI (NGUỒN WEB UY TÍN)</span>
+                </h3>
+                <p className="text-[11px] text-indigo-200/80 mt-0.5">
+                  Mô hình AI đối chiếu và trích xuất câu hỏi toán học chuẩn mực từ: VietJack, VMF Diễn Đàn Toán Học, Lời Giải Hay, MathVN, Khan Academy, Bộ GD&ĐT.
+                </p>
+              </div>
+              <span className="self-start sm:self-auto px-2.5 py-1 bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 rounded-full text-[11px] font-mono flex items-center gap-1.5">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Kết Quả & Lời Giải Thẩm Định</span>
+              </span>
+            </div>
+
+            {aiSuccessMsg && (
+              <div className="p-3 bg-emerald-950/80 border border-emerald-600 text-emerald-200 text-xs rounded-xl flex items-center gap-2 animate-in fade-in">
+                <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{aiSuccessMsg}</span>
+              </div>
+            )}
+
+            {aiErrorMsg && (
+              <div className="p-3 bg-rose-950/80 border border-rose-600 text-rose-200 text-xs rounded-xl flex items-center gap-2 animate-in fade-in">
+                <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{aiErrorMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleGenerateAiQuestion} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Chọn Nguồn Toán Học Uy Tín */}
+                <div>
+                  <label className="block text-indigo-200 font-semibold mb-1 flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Nguồn Web Uy Tín Ưu Tiên:</span>
+                  </label>
+                  <select
+                    value={aiPreferredSource}
+                    onChange={e => setAiPreferredSource(e.target.value)}
+                    className="w-full bg-slate-950/90 border border-indigo-700/60 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="VietJack Chuyên Đề Toán (vietjack.com)">🌐 VietJack Chuyên Đề Toán (vietjack.com)</option>
+                    <option value="Diễn đàn Toán học Việt Nam (diendantoanhoc.org - VMF)">🌐 Diễn đàn Toán học VMF (diendantoanhoc.org)</option>
+                    <option value="Lời Giải Hay (loigiaihay.com)">🌐 Lời Giải Hay (loigiaihay.com)</option>
+                    <option value="MathVN Chuyên Toán (mathvn.com)">🌐 MathVN Chuyên Toán (mathvn.com)</option>
+                    <option value="Khan Academy Math (vi.khanacademy.org)">🌐 Khan Academy Math (vi.khanacademy.org)</option>
+                    <option value="Bộ GD&ĐT - Đề Thi Tuyển Sinh Chuẩn">🌐 Bộ GD&ĐT - Đề Thi Chuẩn Quốc Gia</option>
+                  </select>
+                </div>
+
+                {/* Chọn Phân Môn */}
+                <div>
+                  <label className="block text-indigo-200 font-semibold mb-1">Phân Môn Toán Học:</label>
+                  <select
+                    value={aiCategory}
+                    onChange={e => setAiCategory(e.target.value as any)}
+                    className="w-full bg-slate-950/90 border border-indigo-700/60 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400"
+                  >
+                    {Object.entries(MATH_DOMAINS).map(([k, v]) => (
+                      <option key={k} value={k}>{v.nameVi} ({k})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Chọn Cấp Độ */}
+                <div>
+                  <label className="block text-indigo-200 font-semibold mb-1">Cấp Độ Đối Tượng:</label>
+                  <select
+                    value={aiLevel}
+                    onChange={e => setAiLevel(e.target.value as any)}
+                    className="w-full bg-slate-950/90 border border-indigo-700/60 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="THCS">THCS (Lớp 6 - Lớp 9)</option>
+                    <option value="THPT">THPT (Lớp 10 - Lớp 12)</option>
+                    <option value="CO_BAN">Cơ Bản (Tiểu Học Lớp 1 - 5)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Nhập Chủ Đề / Từ Khóa */}
+              <div>
+                <label className="block text-indigo-200 font-semibold mb-1">
+                  Chủ Đề / Từ Khóa Cụ Thể (Tùy chọn):
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={aiTopic}
+                    onChange={e => setAiTopic(e.target.value)}
+                    placeholder="VD: Số nguyên tố & Ước số chung, Định lý Pythagoras, Bất đẳng thức Cauchy, Đạo hàm tiếp tuyến..."
+                    className="flex-1 bg-slate-950/90 border border-indigo-700/60 rounded-xl px-3 py-2 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                  <button
+                    type="submit"
+                    disabled={aiGenerating}
+                    className="px-5 py-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50"
+                  >
+                    {aiGenerating ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                        <span>Đang Đối Chiếu & Sinh Đề...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-slate-950" />
+                        <span>SINH ĐỀ AI NGAY</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            {/* AI Generated Question Result Card */}
+            {aiGeneratedQuestion && (
+              <div className="p-4 bg-slate-950/90 border-2 border-amber-500/60 rounded-xl space-y-3 animate-in fade-in zoom-in-95">
+                <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-slate-800">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40 font-mono">
+                      ✨ ĐỀ THI VỪA SINH
+                    </span>
+                    {aiGeneratedQuestion.sourceName && (
+                      <a
+                        href={aiGeneratedQuestion.sourceUrl || '#'}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-950 text-sky-300 border border-sky-700/60 hover:border-sky-400 transition-colors"
+                      >
+                        <Globe className="w-3 h-3 text-sky-400" />
+                        <span>Nguồn: {aiGeneratedQuestion.sourceName}</span>
+                        <ExternalLink className="w-2.5 h-2.5 text-sky-400" />
+                      </a>
+                    )}
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      Cấp: {aiGeneratedQuestion.level} • Hệ: {aiGeneratedQuestion.category}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-sm font-bold text-slate-100 leading-relaxed">
+                  {aiGeneratedQuestion.question}
+                </div>
+
+                {/* 4 Choices */}
+                {aiGeneratedQuestion.options && aiGeneratedQuestion.options.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {aiGeneratedQuestion.options.map((opt, idx) => {
+                      const isCorrect = opt.trim() === aiGeneratedQuestion.answer.trim();
+                      return (
+                        <div
+                          key={idx}
+                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 font-mono ${
+                            isCorrect
+                              ? 'bg-emerald-950/70 border-emerald-500 text-emerald-200 font-bold ring-1 ring-emerald-500/50'
+                              : 'bg-slate-900 border-slate-800 text-slate-300'
+                          }`}
+                        >
+                          <span>
+                            <strong className="text-amber-300 mr-2">{String.fromCharCode(65 + idx)}.</strong>
+                            {opt}
+                          </span>
+                          {isCorrect && (
+                            <span className="px-2 py-0.5 bg-emerald-500 text-slate-950 text-[10px] font-black rounded-md">
+                              ĐÁP ÁN ĐÚNG
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Explanation */}
+                <div className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-slate-300 space-y-1">
+                  <div className="text-[11px] font-bold text-amber-300 font-mono flex items-center gap-1.5">
+                    <span>📖 LỜI GIẢI THÍCH CHI TIẾT (ĐÃ THẨM ĐỊNH):</span>
+                  </div>
+                  <p className="leading-relaxed text-slate-200">{aiGeneratedQuestion.explanation}</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    onClick={handleSaveAiQuestionToBank}
+                    disabled={aiSavingToDb}
+                    className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-xs uppercase"
+                  >
+                    {aiSavingToDb ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                        <span>Đang Lưu...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-emerald-300" />
+                        <span>Lưu Vào Ngân Hàng Đề Thi Đấu</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => handleGenerateAiQuestion()}
+                    disabled={aiGenerating}
+                    className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl transition-all active:scale-95 text-xs font-semibold flex items-center gap-1.5"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${aiGenerating ? 'animate-spin' : ''}`} />
+                    <span>Sinh Câu Khác</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Add Question Form (Thủ công) */}
           <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
             <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5">
               <Plus className="w-4 h-4" />
-              <span>THÊM CÂU HỎI MỚI VÀO NGÂN HÀNG ĐỀ</span>
+              <span>THÊM CÂU HỎI THỦ CÔNG VÀO NGÂN HÀNG ĐỀ</span>
             </h3>
 
             {formMsg && (
@@ -693,10 +980,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   className="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-start justify-between gap-3 text-xs"
                 >
                   <div>
-                    <div className="font-semibold text-slate-200">{q.question}</div>
-                    {q.formula && <div className="font-mono text-amber-300">{q.formula}</div>}
-                    <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      Hệ: {q.category} • Cấp: {q.level} • Đáp án: <strong className="text-emerald-400">{q.answer}</strong>
+                    <div className="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
+                      <span>{q.question}</span>
+                      {q.sourceName && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-sky-950/80 text-sky-300 border border-sky-800 font-mono font-medium">
+                          🌐 {q.sourceName}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono mt-1 flex items-center gap-2 flex-wrap">
+                      <span>Hệ: {q.category}</span>
+                      <span>•</span>
+                      <span>Cấp: {q.level}</span>
+                      <span>•</span>
+                      <span>Đáp án: <strong className="text-emerald-400">{q.answer}</strong></span>
                     </div>
                   </div>
 

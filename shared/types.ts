@@ -80,6 +80,8 @@ export interface Question {
   tierTitle?: string;
   tierBadge?: string;
   bonusPoints?: number;
+  sourceName?: string; // Tên trang web toán uy tín (VietJack, VMF diendantoanhoc.org, Loigiaihay, MathVN, Khan Academy...)
+  sourceUrl?: string;  // Đường link nguồn toán học đã thẩm định
 }
 
 // Sanitized question sent to client during play (without revealing answer or explanation)
@@ -96,6 +98,8 @@ export interface ClientQuestion {
   tierTitle?: string;
   tierBadge?: string;
   bonusPoints?: number;
+  sourceName?: string;
+  sourceUrl?: string;
 }
 
 export type GameMode = 'ai' | 'pvp';

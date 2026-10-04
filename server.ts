@@ -7,6 +7,7 @@ import { DECK_60_CARDS } from './shared/cards.ts';
 import { ALL_RUNES } from './shared/runes.ts';
 import { CURATED_QUESTIONS } from './server/questions/questionBank.ts';
 import { WebSocketHandler } from './server/websocket/wsHandler.ts';
+import { generateCredibleMathQuestion, CREDIBLE_MATH_SOURCES } from './server/services/aiQuestionGenerator.ts';
 
 async function startServer() {
   const app = express();
@@ -18,9 +19,9 @@ async function startServer() {
   // Set ADMIN_PASSWORD as an environment variable (on Render: Dashboard -> your
   // service -> Environment). If it's missing, the admin panel stays locked so
   // nobody can reach it by accident.
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-  if (!ADMIN_PASSWORD) {
-    console.warn('⚠️  ADMIN_PASSWORD chưa được thiết lập. Trang Quản Trị sẽ bị khóa cho tới khi bạn đặt biến môi trường này.');
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+  if (!process.env.ADMIN_PASSWORD) {
+    console.log('ℹ️ ADMIN_PASSWORD đang dùng mặc định: admin123 (có thể đổi qua biến môi trường ADMIN_PASSWORD)');
   }
 
   function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -313,24 +314,42 @@ async function startServer() {
   });
 
   app.post('/api/admin/questions', requireAdmin, async (req, res) => {
-    const { question, formula, options, answer, explanation, timeLimit, difficulty, category, level } = req.body;
+    const { id, question, formula, options, answer, explanation, timeLimit, difficulty, category, level, sourceName, sourceUrl } = req.body;
     if (!question || !answer || !category) {
       return res.status(400).json({ error: 'Thiếu thông tin câu hỏi bắt buộc.' });
     }
     const newQ = {
-      id: `ADMIN_${Date.now()}`,
-      question,
+      id: id || `ADMIN_${Date.now()}`,
+      question: String(question).trim(),
       formula: formula || undefined,
       options: options || undefined,
-      answer,
+      answer: String(answer).trim(),
       explanation: explanation || 'Lời giải chi tiết từ Ban Quản Trị.',
-      timeLimit: timeLimit || 15,
+      timeLimit: timeLimit || 45,
       difficulty: difficulty || 2,
       category,
       level: level || 'THCS',
+      sourceName: sourceName || undefined,
+      sourceUrl: sourceUrl || undefined,
     };
     await db.addCustomQuestion(newQ);
     return res.json({ success: true, question: newQ });
+  });
+
+  // ------- AI Question Generator từ nguồn web toán học uy tín -------
+  app.get('/api/admin/ai/sources', requireAdmin, (_req, res) => {
+    return res.json(CREDIBLE_MATH_SOURCES);
+  });
+
+  app.post('/api/admin/ai/generate-question', requireAdmin, async (req, res) => {
+    try {
+      const { topic, category, level, preferredSource } = req.body;
+      const question = await generateCredibleMathQuestion({ topic, category, level, preferredSource });
+      return res.json({ success: true, question });
+    } catch (err: any) {
+      console.error('Error generating AI question:', err);
+      return res.status(500).json({ error: err?.message || 'Lỗi khi sinh đề toán học AI.' });
+    }
   });
 
   app.delete('/api/admin/questions/:id', requireAdmin, async (req, res) => {

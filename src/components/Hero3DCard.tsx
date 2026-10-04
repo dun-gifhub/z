@@ -48,28 +48,52 @@ export const Hero3DCard: React.FC = () => {
     setRotateY(0);
   };
 
-  const handleNextShowcase = (e: React.MouseEvent) => {
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!cardRef.current || !e.touches[0]) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    setRotateX(-((y - centerY) / centerY) * 16);
+    setRotateY(((x - centerX) / centerX) * 16);
+    setIsHovered(true);
+    setGlarePos({
+      x: (x / rect.width) * 100,
+      y: (y / rect.height) * 100,
+    });
+  };
+
+  const handleTouchEnd = () => {
+    setIsHovered(false);
+    setRotateX(0);
+    setRotateY(0);
+  };
+
+  const handleNextShowcase = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     sound.playCardFlip();
     setCardIndex(prev => (prev + 1) % showcaseCards.length);
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center perspective-1000 py-4 select-none">
+    <div className="relative flex flex-col items-center justify-center perspective-1000 py-3 select-none">
       {/* Dynamic 3D Card Object */}
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onClick={handleNextShowcase}
         style={{
           transform: isHovered
-            ? `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04, 1.04, 1.04)`
+            ? `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
             : 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
           transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
         }}
-        className="group relative w-72 sm:w-80 h-[430px] sm:h-[460px] rounded-3xl cursor-pointer transform-style-3d shadow-2xl transition-all duration-300"
+        className="group relative w-[270px] sm:w-80 h-[390px] sm:h-[460px] max-w-[88vw] rounded-3xl cursor-pointer transform-style-3d shadow-2xl transition-all duration-300"
       >
         {/* Outer 3D Halo Ambient Glow */}
         <div

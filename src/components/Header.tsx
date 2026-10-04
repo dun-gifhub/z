@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Music, Wifi, WifiOff, Sparkles, User, LogOut, Shield, Palette, Sun, Moon, Trash2 } from 'lucide-react';
+import { Volume2, VolumeX, Music, Wifi, WifiOff, Sparkles, User, LogOut, Shield, Palette, Sun, Moon, Trash2, Smartphone, RotateCw } from 'lucide-react';
 import { sound } from '../utils/soundEffects.ts';
 import { UserProfile } from '../../shared/types.ts';
 import { ThemeDef } from '../utils/themeManager.ts';
@@ -17,6 +17,8 @@ interface HeaderProps {
   onToggleLightMode?: () => void;
   onOpenHowToPlay?: () => void;
   onDeleteGuestAccount?: () => void;
+  isLandscape?: boolean;
+  onToggleLandscape?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,6 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleLightMode,
   onOpenHowToPlay,
   onDeleteGuestAccount,
+  isLandscape = false,
+  onToggleLandscape,
 }) => {
   const [isMuted, setIsMuted] = useState(sound.getIsMuted());
   const [isBgmOn, setIsBgmOn] = useState(sound.getIsBgmPlaying());
@@ -142,6 +146,27 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-sm leading-none">{currentTheme.icon}</span>
             <span className="hidden sm:inline font-medium text-[11px] text-slate-200">Đổi Nền</span>
           </button>
+
+          {/* Nút Xoay Ngang Màn Hình (Mobile / Tablet Orientation Button) */}
+          {onToggleLandscape && (
+            <button
+              onClick={onToggleLandscape}
+              title={isLandscape ? 'Xoay lại màn hình dọc' : 'Xoay ngang màn hình để chơi góc rộng bàn đấu'}
+              className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 border ${
+                isLandscape
+                  ? 'bg-purple-950/80 border-purple-500 text-purple-200'
+                  : 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/50 text-amber-300 hover:bg-amber-500/30 ring-1 ring-amber-500/30 animate-pulse'
+              }`}
+            >
+              <Smartphone className={`w-3.5 h-3.5 transition-transform duration-300 ${isLandscape ? 'rotate-90 text-purple-300' : 'text-amber-400'}`} />
+              <span className="hidden sm:inline font-bold">
+                {isLandscape ? 'Xoay Dọc' : 'Xoay Ngang'}
+              </span>
+              <span className="sm:hidden font-mono text-[10px] font-bold">
+                {isLandscape ? 'Dọc' : 'Ngang'}
+              </span>
+            </button>
+          )}
 
           {/* How To Play Guide Button */}
           {onOpenHowToPlay && (

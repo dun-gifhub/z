@@ -279,6 +279,8 @@ function rowToQuestion(r: any): Question {
     difficulty: r.difficulty,
     category: r.category,
     level: r.level,
+    sourceName: r.source_name || r.sourceName || undefined,
+    sourceUrl: r.source_url || r.sourceUrl || undefined,
   } as Question;
 }
 

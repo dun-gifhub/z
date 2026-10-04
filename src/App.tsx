@@ -15,6 +15,8 @@ import { ThemeModal } from './components/ThemeModal.tsx';
 import { AtmosphericBackground } from './components/AtmosphericBackground.tsx';
 import { getSavedTheme, saveTheme, ThemeDef, GAME_THEMES } from './utils/themeManager.ts';
 import { MathLevel, AiDifficulty, SiteSettings } from '../shared/types.ts';
+import { useMobileLandscape } from './hooks/useMobileLandscape.ts';
+import { MobileRotateButton } from './components/MobileRotateButton.tsx';
 
 type AppView = 'main' | 'online' | 'deck' | 'runes' | 'profile' | 'leaderboard' | 'admin';
 
@@ -56,6 +58,7 @@ export function App() {
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeDef>(getSavedTheme());
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const { isMobile, isLandscape, isForcedLandscape, toggleLandscape } = useMobileLandscape();
 
   // Fetch public site settings (guide link, package prices, etc.)
   useEffect(() => {
@@ -90,10 +93,35 @@ export function App() {
   return (
     <div
       style={{ backgroundColor: currentTheme.bgHex }}
-      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300 relative`}
+      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300 relative ${
+        isForcedLandscape ? 'forced-landscape-container' : ''
+      }`}
     >
       {/* Living 5-Layer Parallax Atmosphere Background */}
       <AtmosphericBackground lowGraphics={false} />
+
+      {/* Floating Mobile Rotation Button for Phones */}
+      <MobileRotateButton
+        isLandscape={isLandscape}
+        isForcedLandscape={isForcedLandscape}
+        onToggle={toggleLandscape}
+      />
+
+      {/* Forced Landscape Notification Banner */}
+      {isForcedLandscape && (
+        <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 text-purple-200 text-xs py-1.5 px-3 flex items-center justify-between border-b border-purple-700/60 sticky top-0 z-50 shadow-md">
+          <span className="flex items-center gap-1.5 font-medium">
+            <span>📱</span>
+            <span>Chế độ xoay ngang đang kích hoạt (Góc rộng TCG)</span>
+          </span>
+          <button
+            onClick={toggleLandscape}
+            className="px-2.5 py-0.5 bg-purple-700 hover:bg-purple-600 text-white rounded-md text-[11px] font-bold transition-all active:scale-95"
+          >
+            Xoay Dọc Lại
+          </button>
+        </div>
+      )}
 
       {/* Top Navbar */}
       <Header
@@ -111,6 +139,8 @@ export function App() {
         onToggleLightMode={handleToggleLightMode}
         onOpenHowToPlay={() => setHowToPlayOpen(true)}
         onDeleteGuestAccount={deleteGuestAccount}
+        isLandscape={isLandscape}
+        onToggleLandscape={toggleLandscape}
       />
 
       {/* Main Container */}

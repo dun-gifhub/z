@@ -40,6 +40,7 @@ import {
   X,
   Info,
   Flag,
+  Smartphone,
 } from 'lucide-react';
 
 interface GameArenaProps {
@@ -144,7 +145,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
   };
 
   return (
-    <div className={`relative min-h-[calc(100vh-65px)] flex flex-col justify-between px-3 sm:px-6 py-3 max-w-5xl mx-auto select-none ${lastBustAlert ? 'animate-shake' : ''}`}>
+    <div className={`relative min-h-[calc(100vh-65px)] flex flex-col justify-between px-2 sm:px-6 py-2 sm:py-3 max-w-5xl mx-auto select-none safe-pb ${lastBustAlert ? 'animate-shake' : ''}`}>
       {/* ⚠️ BUST FULLSCREEN IMPACT OVERLAY */}
       {lastBustAlert && <BustImpactOverlay />}
 
@@ -261,7 +262,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
       )}
 
       {/* TOP BAR: Room Code, Round, Target Score, Rules and Exit */}
-      <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs font-mono">
+      <div className="flex items-center justify-between gap-2 px-2.5 sm:px-3 py-1.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs font-mono flex-wrap sm:flex-nowrap gap-y-1.5">
         <div className="flex items-center gap-2">
           <span className="text-slate-400">PHÒNG:</span>
           <span className="font-bold text-amber-300 tracking-wider">{gameState.roomCode}</span>
@@ -609,14 +610,14 @@ export const GameArena: React.FC<GameArenaProps> = ({
               </div>
             </div>
 
-            {/* Prompt & Formula */}
-            <div className="py-2 text-center bg-slate-950/80 rounded-xl border border-slate-800 px-3">
+            {/* Question Prompt & Credible Source */}
+            <div className="py-2.5 text-center bg-slate-950/80 rounded-xl border border-slate-800 px-3">
               <div className="text-sm sm:text-base font-semibold text-slate-100">
                 {gameState.currentQuestion.question}
               </div>
-              {gameState.currentQuestion.formula && (
-                <div className="mt-1 font-mono text-lg sm:text-xl font-black text-amber-400 tracking-wide">
-                  {gameState.currentQuestion.formula}
+              {gameState.currentQuestion.sourceName && (
+                <div className="mt-1 flex items-center justify-center gap-1.5 text-[10px] text-sky-300 font-mono">
+                  <span>🌐 Nguồn: {gameState.currentQuestion.sourceName}</span>
                 </div>
               )}
             </div>
