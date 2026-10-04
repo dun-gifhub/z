@@ -781,3 +781,37 @@ html.light-theme .fixed .w-full.max-w-2xl .bg-amber-950\/40 {
   }
 }
 
+/* ============================================================
+   CENTERED VIRTUAL LANDSCAPE CONTAINER (100% TOUCH RESPONSIVE)
+   ============================================================ */
+
+.virtual-landscape-90 {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 100vh !important;
+  height: 100vw !important;
+  transform: translate(-50%, -50%) rotate(90deg) !important;
+  transform-origin: center center !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  z-index: 30;
+  box-sizing: border-box !important;
+}
+
+.virtual-landscape-270 {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 100vh !important;
+  height: 100vw !important;
+  transform: translate(-50%, -50%) rotate(-90deg) !important;
+  transform-origin: center center !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  z-index: 30;
+  box-sizing: border-box !important;
+}
+

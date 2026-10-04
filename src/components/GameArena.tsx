@@ -55,6 +55,7 @@ interface GameArenaProps {
   onExit: () => void;
   lastBustAlert: boolean;
   errorMessage: string | null;
+  isLandscape?: boolean;
 }
 
 export const GameArena: React.FC<GameArenaProps> = ({
@@ -69,6 +70,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
   onExit,
   lastBustAlert,
   errorMessage,
+  isLandscape = false,
 }) => {
   const [answerInput, setAnswerInput] = useState('');
   const [timeLeft, setTimeLeft] = useState<number>(45);
