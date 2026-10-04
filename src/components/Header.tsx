@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isGuest = !!user && /^Pháp Sư #\d{4}$/.test(user.username);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-3 sm:px-6 py-2.5 safe-pt transition-all">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-2.5 sm:px-6 py-2 sm:py-2.5 safe-pt transition-all landscape-compact-header">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         {/* Brand Logo */}
         <button

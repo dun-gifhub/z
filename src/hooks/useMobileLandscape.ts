@@ -9,14 +9,14 @@ export function useMobileLandscape() {
     return isMobileUa || window.innerWidth <= 768;
   });
 
-  const [isNativeLandscape, setIsNativeLandscape] = useState<boolean>(() => {
+  const [isLandscape, setIsLandscape] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return window.innerWidth > window.innerHeight;
   });
 
-  const [isForcedLandscape, setIsForcedLandscape] = useState<boolean>(false);
+  const [showRotatePrompt, setShowRotatePrompt] = useState<boolean>(false);
 
-  // Cập nhật trạng thái kích thước và góc xoay thực tế của thiết bị
+  // Lắng nghe sự kiện xoay màn hình tự nhiên của thiết bị
   useEffect(() => {
     const handleResizeOrOrient = () => {
       const w = window.innerWidth;
@@ -26,11 +26,11 @@ export function useMobileLandscape() {
       
       setIsMobile(isMobileDevice);
       const isLand = w > h;
-      setIsNativeLandscape(isLand);
+      setIsLandscape(isLand);
 
-      // Nếu người dùng đã tự xoay thiết bị thực tế sang ngang, tắt chế độ xoay ảo (forced)
-      if (isLand && isForcedLandscape) {
-        setIsForcedLandscape(false);
+      // Khi người dùng đã xoay ngang thiết bị tự nhiên, tự động tắt hướng dẫn xoay
+      if (isLand) {
+        setShowRotatePrompt(false);
       }
     };
 
@@ -48,58 +48,54 @@ export function useMobileLandscape() {
         screen.orientation.removeEventListener('change', handleResizeOrOrient);
       }
     };
-  }, [isForcedLandscape]);
+  }, []);
 
   // Hành động kích hoạt xoay màn hình
   const toggleLandscape = useCallback(async () => {
     sound.playCardFlip();
 
-    // 1. Nếu đang bật xoay ảo thì tắt về bình thường
-    if (isForcedLandscape) {
-      setIsForcedLandscape(false);
-      try {
-        if (screen.orientation && (screen.orientation as any).unlock) {
-          (screen.orientation as any).unlock();
-        }
-        if (document.fullscreenElement && document.exitFullscreen) {
-          await document.exitFullscreen().catch(() => {});
-        }
-      } catch {
-        // Bỏ qua lỗi browser policy
-      }
+    // Nếu đang mở prompt hướng dẫn thì đóng lại
+    if (showRotatePrompt) {
+      setShowRotatePrompt(false);
       return;
     }
 
-    // 2. Thử khoá góc xoay thực tế qua Screen Orientation & Fullscreen API
-    let nativeLocked = false;
+    // 1. Thử khóa xoay màn hình qua Fullscreen & Screen Orientation API chuẩn
     try {
       const docEl = document.documentElement as any;
-      const reqFullscreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      const reqFullscreen =
+        docEl.requestFullscreen ||
+        docEl.webkitRequestFullscreen ||
+        docEl.mozRequestFullScreen ||
+        docEl.msRequestFullscreen;
 
-      if (reqFullscreen && !document.fullscreenElement) {
+      if (!document.fullscreenElement && reqFullscreen) {
         await reqFullscreen.call(docEl).catch(() => {});
       }
 
-      if (screen.orientation && (screen.orientation as any).lock) {
+      if (screen?.orientation && (screen.orientation as any).lock) {
         await (screen.orientation as any).lock('landscape').catch(() => {});
-        nativeLocked = window.innerWidth > window.innerHeight;
       }
     } catch {
-      nativeLocked = false;
+      // Browser policy restriction (iOS Safari, webviews)
     }
 
-    // 3. Nếu trình duyệt di động (như Safari iOS hoặc iframe) chặn API khoá xoay,
-    // áp dụng Chế độ Xoay Ảo CSS (Virtual Landscape 90°)
-    if (!nativeLocked && window.innerHeight > window.innerWidth) {
-      setIsForcedLandscape(true);
+    // 2. Nếu thiết bị vẫn ở hướng dọc (ví dụ iOS Safari không hỗ trợ orientation.lock qua JS),
+    // hiển thị giao diện hướng dẫn người dùng bật tự động xoay và nghiêng điện thoại
+    if (window.innerHeight >= window.innerWidth) {
+      setShowRotatePrompt(true);
     }
-  }, [isForcedLandscape]);
+  }, [showRotatePrompt]);
+
+  const closeRotatePrompt = useCallback(() => {
+    setShowRotatePrompt(false);
+  }, []);
 
   return {
     isMobile,
-    isLandscape: isNativeLandscape || isForcedLandscape,
-    isNativeLandscape,
-    isForcedLandscape,
+    isLandscape,
+    showRotatePrompt,
     toggleLandscape,
+    closeRotatePrompt,
   };
 }

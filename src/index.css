@@ -763,32 +763,21 @@ html.light-theme .fixed .w-full.max-w-2xl .bg-amber-950\/40 {
 }
 
 /* ============================================================
-   MOBILE LANDSCAPE & FORCE ROTATION OPTIMIZATIONS
+   MOBILE LANDSCAPE RESPONSIVE STYLING (NATURAL & ACCESSIBLE)
    ============================================================ */
 
-/* Chế độ xoay ngang ảo 90 độ khi thiết bị đang ở hướng dọc */
-.forced-landscape-container {
-  transform: rotate(90deg);
-  transform-origin: top left;
-  position: fixed !important;
-  top: 0 !important;
-  left: 100vw !important;
-  width: 100vh !important;
-  height: 100vw !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  z-index: 50;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Tối ưu không gian hiển thị khi xoay ngang trên điện thoại (chiều cao hẹp) */
+/* Tối ưu không gian hiển thị khi xoay ngang trên điện thoại (chiều cao hẹp < 550px) */
 @media (orientation: landscape) and (max-height: 550px) {
   .landscape-compact-py {
     padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
+    padding-bottom: 0.5rem !important;
   }
   .landscape-compact-gap {
-    gap: 0.5rem !important;
+    gap: 0.375rem !important;
+  }
+  .landscape-compact-header {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
   }
 }
 
