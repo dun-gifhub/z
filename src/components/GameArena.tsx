@@ -56,6 +56,7 @@ interface GameArenaProps {
   lastBustAlert: boolean;
   errorMessage: string | null;
   isLandscape?: boolean;
+  isWidescreenCompact?: boolean;
 }
 
 export const GameArena: React.FC<GameArenaProps> = ({
@@ -71,6 +72,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
   lastBustAlert,
   errorMessage,
   isLandscape = false,
+  isWidescreenCompact = false,
 }) => {
   const [answerInput, setAnswerInput] = useState('');
   const [timeLeft, setTimeLeft] = useState<number>(45);
@@ -147,7 +149,7 @@ export const GameArena: React.FC<GameArenaProps> = ({
   };
 
   return (
-    <div className={`relative min-h-[calc(100vh-65px)] flex flex-col justify-between px-2 sm:px-6 py-2 sm:py-3 max-w-5xl mx-auto select-none safe-pb ${lastBustAlert ? 'animate-shake' : ''}`}>
+    <div className={`relative min-h-[calc(100vh-65px)] flex flex-col justify-between px-2 sm:px-6 py-2 sm:py-3 max-w-5xl mx-auto select-none safe-pb ${isLandscape || isWidescreenCompact ? 'widescreen-arena-compact landscape-compact-py' : ''} ${lastBustAlert ? 'animate-shake' : ''}`}>
       {/* ⚠️ BUST FULLSCREEN IMPACT OVERLAY */}
       {lastBustAlert && <BustImpactOverlay />}
 

@@ -1,24 +1,28 @@
 import React from 'react';
-import { Smartphone, RotateCw, X, CheckCircle, ExternalLink, Zap } from 'lucide-react';
+import { Smartphone, RotateCw, X, ExternalLink, Sparkles, Check, Monitor } from 'lucide-react';
 
 interface RotateDeviceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onActivateVirtual?: () => void;
+  isInIframe?: boolean;
+  isWidescreenCompact?: boolean;
+  onToggleCompact?: () => void;
   onOpenExternal?: () => void;
 }
 
 export const RotateDeviceModal: React.FC<RotateDeviceModalProps> = ({
   isOpen,
   onClose,
-  onActivateVirtual,
+  isInIframe = false,
+  isWidescreenCompact = false,
+  onToggleCompact,
   onOpenExternal,
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-sm p-6 bg-gradient-to-b from-slate-900 to-indigo-950/95 border-2 border-amber-500/80 rounded-3xl shadow-2xl text-center space-y-4">
+      <div className="relative w-full max-w-sm p-5 sm:p-6 bg-gradient-to-b from-slate-900 to-indigo-950/95 border-2 border-amber-500/80 rounded-3xl shadow-2xl text-center space-y-4">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -27,69 +31,81 @@ export const RotateDeviceModal: React.FC<RotateDeviceModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Animated Phone Rotation Graphic */}
-        <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-          <div className="absolute inset-0 bg-amber-500/15 rounded-full blur-xl animate-pulse" />
-          <div className="w-16 h-16 rounded-2xl bg-slate-950/90 border border-amber-400/50 flex items-center justify-center shadow-lg relative">
-            <Smartphone className="w-8 h-8 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
-            <RotateCw className="w-4 h-4 text-yellow-300 absolute -bottom-1 -right-1 animate-spin" style={{ animationDuration: '3s' }} />
+        {/* Animated Phone Graphic */}
+        <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+          <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl animate-pulse" />
+          <div className="w-14 h-14 rounded-2xl bg-slate-950/90 border border-amber-400/50 flex items-center justify-center shadow-lg relative">
+            <Smartphone className="w-7 h-7 text-amber-400" />
+            <RotateCw
+              className="w-4 h-4 text-yellow-300 absolute -bottom-1 -right-1 animate-spin"
+              style={{ animationDuration: '4s' }}
+            />
           </div>
         </div>
 
         <div className="space-y-1">
           <h3 className="font-cinzel text-base font-bold text-amber-300 tracking-wide">
-            CÁCH XOAY NGANG MÀN HÌNH
+            XOAY NGANG BÀN ĐẤU TOÁN HỌC
           </h3>
-          <p className="text-xs text-indigo-200 font-medium">
-            Góc Rộng Chuẩn Đấu Trường Thẻ Bài TCG
+          <p className="text-xs text-indigo-200">
+            Trải nghiệm góc rộng chuẩn đấu trường thẻ bài TCG
           </p>
         </div>
 
-        <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 text-left text-xs space-y-2.5 text-slate-300">
-          <div className="flex items-start gap-2">
-            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
-              1
-            </span>
-            <span>
-              <strong>Bật Tự Động Xoay:</strong> Vuốt Trung tâm điều khiển điện thoại và đảm bảo tính năng <strong>Khóa Xoay (Auto-Rotate)</strong> đang được BẬT.
-            </span>
+        {/* Note if inside iframe */}
+        {isInIframe ? (
+          <div className="p-3 bg-amber-950/40 border border-amber-500/40 rounded-xl text-left text-xs text-amber-200 space-y-1">
+            <div className="font-bold flex items-center gap-1.5 text-amber-300">
+              <span>⚠️</span>
+              <span>Đang mở trong khung xem trước / ứng dụng nhúng:</span>
+            </div>
+            <p className="text-[11px] text-slate-300">
+              Khung xem trước của ứng dụng đang khóa cố định màn hình dọc. Để xoay ngang cảm biến tự nhiên và thao tác chạm tốt nhất, hãy bấm <strong>[Mở Tab Mới Safari / Chrome]</strong> bên dưới!
+            </p>
           </div>
-
-          <div className="flex items-start gap-2">
-            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
-              2
-            </span>
-            <span>
-              <strong>Nếu xem trong ứng dụng nhúng/khung xem trước:</strong> Trình duyệt nhúng có thể chặn xoay. Hãy bấm <strong>[Bật Xoay Ngang Ảo]</strong> bên dưới để xoay ngay trên màn hình!
-            </span>
+        ) : (
+          <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-left text-xs text-slate-300 space-y-1.5">
+            <div className="font-bold text-slate-200 flex items-center gap-1">
+              <span>💡</span>
+              <span>Hướng dẫn xoay ngang trên điện thoại:</span>
+            </div>
+            <p className="text-[11px] leading-relaxed">
+              Vuốt bảng điều khiển điện thoại, bật <strong>Khóa Xoay (Auto-Rotate)</strong> và cầm ngang điện thoại. Giao diện sẽ tự động co giãn góc rộng!
+            </p>
           </div>
-        </div>
+        )}
 
         {/* Action Buttons */}
         <div className="space-y-2 pt-1">
-          {onActivateVirtual && (
-            <button
-              onClick={() => {
-                onActivateVirtual();
-                onClose();
-              }}
-              className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 uppercase tracking-wide"
-            >
-              <Zap className="w-4 h-4 fill-current" />
-              <span>Bật Xoay Ngang Ảo Ngay</span>
-            </button>
-          )}
-
+          {/* Button 1: Open external tab */}
           {onOpenExternal && (
             <button
               onClick={() => {
                 onOpenExternal();
                 onClose();
               }}
-              className="w-full py-2 bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-600 text-indigo-200 font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wide"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Mở Trực Tiếp Safari / Chrome</span>
+              <ExternalLink className="w-4 h-4" />
+              <span>Mở Tab Mới Trên Safari / Chrome</span>
+            </button>
+          )}
+
+          {/* Button 2: Toggle Compact Widescreen Arena Mode on Portrait */}
+          {onToggleCompact && (
+            <button
+              onClick={() => {
+                onToggleCompact();
+                onClose();
+              }}
+              className="w-full py-2 bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-500/60 text-indigo-100 font-bold text-xs rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>
+                {isWidescreenCompact
+                  ? 'Tắt Chế Độ Bàn Đấu Thu Gọn'
+                  : 'Bật Chế Độ Bàn Đấu Gọn Gàng (Cầm Dọc)'}
+              </span>
             </button>
           )}
 

@@ -62,12 +62,13 @@ export function App() {
   const {
     isMobile,
     isLandscape,
-    isNativeLandscape,
-    isVirtualLandscape,
-    rotationAngle,
+    isWidescreenCompact,
+    isInIframe,
+    showRotateDialog,
     toggleLandscape,
-    toggleRotationAngle,
+    toggleWidescreenCompact,
     openExternalBrowser,
+    closeRotateDialog,
   } = useMobileLandscape();
 
   // Fetch public site settings (guide link, package prices, etc.)
@@ -103,9 +104,7 @@ export function App() {
   return (
     <div
       style={{ backgroundColor: currentTheme.bgHex }}
-      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300 relative ${
-        isVirtualLandscape ? (rotationAngle === 90 ? 'virtual-landscape-90' : 'virtual-landscape-270') : ''
-      }`}
+      className={`min-h-screen ${currentTheme.isLight ? 'text-slate-900' : 'text-slate-100'} flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-300 relative`}
     >
       {/* Living 5-Layer Parallax Atmosphere Background */}
       <AtmosphericBackground lowGraphics={false} />
@@ -113,45 +112,20 @@ export function App() {
       {/* Floating Mobile Rotation Button for Phones */}
       <MobileRotateButton
         isLandscape={isLandscape}
-        isVirtualLandscape={isVirtualLandscape}
-        rotationAngle={rotationAngle}
+        isInIframe={isInIframe}
         onToggle={toggleLandscape}
-        onToggleAngle={toggleRotationAngle}
         onOpenExternal={openExternalBrowser}
       />
 
-      {/* Virtual Landscape Top Helper Banner (Only when in Virtual Rotation) */}
-      {isVirtualLandscape && (
-        <div className="bg-gradient-to-r from-purple-950 via-indigo-950 to-purple-950 text-purple-200 text-xs py-1.5 px-3 flex items-center justify-between border-b border-purple-500/60 sticky top-0 z-50 shadow-md">
-          <div className="flex items-center gap-2">
-            <span>📱</span>
-            <span className="font-bold">Đang Xoay Ngang ({rotationAngle}°)</span>
-            <button
-              onClick={toggleRotationAngle}
-              title="Đảo chiều xoay 180° nếu cầm ngược điện thoại"
-              className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 rounded text-[11px] font-mono transition-all active:scale-95"
-            >
-              ⤺ Đảo {rotationAngle === 90 ? '270°' : '90°'}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={openExternalBrowser}
-              title="Mở tab mới trên Safari / Chrome để xoay cảm biến tự nhiên"
-              className="hidden sm:inline-flex px-2 py-0.5 bg-indigo-800/80 hover:bg-indigo-700 text-indigo-100 rounded text-[11px] font-semibold transition-all active:scale-95"
-            >
-              ↗ Mở Tab Mới
-            </button>
-            <button
-              onClick={toggleLandscape}
-              className="px-2.5 py-0.5 bg-purple-600 hover:bg-purple-500 text-white rounded-md text-[11px] font-bold transition-all active:scale-95"
-            >
-              Xoay Dọc Lại
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Rotate Device Instruction & Action Modal */}
+      <RotateDeviceModal
+        isOpen={showRotateDialog}
+        onClose={closeRotateDialog}
+        isInIframe={isInIframe}
+        isWidescreenCompact={isWidescreenCompact}
+        onToggleCompact={toggleWidescreenCompact}
+        onOpenExternal={openExternalBrowser}
+      />
 
       {/* Top Navbar */}
       <Header
@@ -190,6 +164,7 @@ export function App() {
             lastBustAlert={lastBustAlert}
             errorMessage={errorMessage}
             isLandscape={isLandscape}
+            isWidescreenCompact={isWidescreenCompact}
           />
         ) : (
           <>

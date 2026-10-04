@@ -9,13 +9,16 @@ export function useMobileLandscape() {
     return isMobileUa || window.innerWidth <= 768;
   });
 
-  const [isNativeLandscape, setIsNativeLandscape] = useState<boolean>(() => {
+  const [isLandscape, setIsLandscape] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return window.innerWidth > window.innerHeight;
   });
 
-  const [isVirtualLandscape, setIsVirtualLandscape] = useState<boolean>(false);
-  const [rotationAngle, setRotationAngle] = useState<90 | 270>(90);
+  const [isWidescreenCompact, setIsWidescreenCompact] = useState<boolean>(false);
+  const [showRotateDialog, setShowRotateDialog] = useState<boolean>(false);
+
+  // Kiểm tra xem ứng dụng có đang bị nhúng trong iframe (như preview AI Studio / Zalo / Facebook) không
+  const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
 
   // Lắng nghe sự kiện xoay màn hình tự nhiên của thiết bị
   useEffect(() => {
@@ -28,11 +31,11 @@ export function useMobileLandscape() {
 
       setIsMobile(isMobileDevice);
       const isLand = w > h;
-      setIsNativeLandscape(isLand);
+      setIsLandscape(isLand);
 
-      // Nếu thiết bị đã tự xoay ngang vật lý tự nhiên, tắt chế độ xoay ảo
-      if (isLand && isVirtualLandscape) {
-        setIsVirtualLandscape(false);
+      // Nếu đã xoay sang ngang tự nhiên thành công, tự động tắt modal xoay
+      if (isLand) {
+        setShowRotateDialog(false);
       }
     };
 
@@ -50,30 +53,13 @@ export function useMobileLandscape() {
         screen.orientation.removeEventListener('change', handleResizeOrOrient);
       }
     };
-  }, [isVirtualLandscape]);
+  }, []);
 
   // Hành động kích hoạt xoay màn hình
   const toggleLandscape = useCallback(async () => {
     sound.playCardFlip();
 
-    // 1. Nếu đang bật xoay ảo thì tắt trở về bình thường
-    if (isVirtualLandscape) {
-      setIsVirtualLandscape(false);
-      try {
-        if (screen?.orientation && (screen.orientation as any).unlock) {
-          (screen.orientation as any).unlock();
-        }
-        if (document.fullscreenElement && document.exitFullscreen) {
-          await document.exitFullscreen().catch(() => {});
-        }
-      } catch {
-        // Bỏ qua lỗi browser
-      }
-      return;
-    }
-
-    // 2. Thử khóa xoay màn hình qua Fullscreen & Screen Orientation API
-    let nativeSuccess = false;
+    // 1. Thử khóa xoay màn hình qua Fullscreen & Screen Orientation API chuẩn
     try {
       const docEl = document.documentElement as any;
       const reqFullscreen =
@@ -88,42 +74,45 @@ export function useMobileLandscape() {
 
       if (screen?.orientation && (screen.orientation as any).lock) {
         await (screen.orientation as any).lock('landscape').catch(() => {});
-        nativeSuccess = window.innerWidth > window.innerHeight;
       }
     } catch {
-      nativeSuccess = false;
+      // Browser policy restriction (iOS Safari, iframe, etc.)
     }
 
-    // 3. Nếu đang ở màn dọc (do chạy trong iframe/webview không xoay tự nhiên được),
-    // kích hoạt Chế Độ Xoay Ảo Trọng Tâm (Centered Virtual Landscape)
-    if (!nativeSuccess && window.innerHeight >= window.innerWidth) {
-      setIsVirtualLandscape(true);
+    // 2. Nếu đang ở màn dọc hoặc đang trong iframe, bật hộp thoại hướng dẫn / hỗ trợ mở tab mới
+    if (window.innerHeight >= window.innerWidth) {
+      setShowRotateDialog((prev) => !prev);
     }
-  }, [isVirtualLandscape]);
+  }, []);
 
-  // Đảo góc xoay giữa 90 độ và 270 độ (thuận tay trái / tay phải)
-  const toggleRotationAngle = useCallback(() => {
+  const toggleWidescreenCompact = useCallback(() => {
     sound.playCardFlip();
-    setRotationAngle((prev) => (prev === 90 ? 270 : 90));
+    setIsWidescreenCompact((prev) => !prev);
   }, []);
 
   // Mở trực tiếp link trên trình duyệt ngoài (Safari / Chrome) để thoát khỏi iframe/webview
   const openExternalBrowser = useCallback(() => {
     try {
-      window.open(window.location.href, '_blank');
+      const url = window.location.href;
+      window.open(url, '_blank');
     } catch {
       // Fallback
     }
   }, []);
 
+  const closeRotateDialog = useCallback(() => {
+    setShowRotateDialog(false);
+  }, []);
+
   return {
     isMobile,
-    isLandscape: isNativeLandscape || isVirtualLandscape,
-    isNativeLandscape,
-    isVirtualLandscape,
-    rotationAngle,
+    isLandscape,
+    isWidescreenCompact,
+    isInIframe,
+    showRotateDialog,
     toggleLandscape,
-    toggleRotationAngle,
+    toggleWidescreenCompact,
     openExternalBrowser,
+    closeRotateDialog,
   };
 }
