@@ -70,7 +70,7 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
     <div className={`relative inline-flex flex-col items-center ${className}`}>
       {/* High score fanfare pop-in */}
       {showHighScoreBanner && (
-        <div className="absolute -top-7 px-3 py-0.5 rounded-full text-on-accent font-medium text-[11px] flex items-center gap-1 z-20 bg-amber-500">
+        <div className="absolute -top-7 px-3 py-0.5 rounded text-on-accent font-medium text-[11px] flex items-center gap-1 z-20 bg-brass-500">
           <Trophy className="w-3 h-3 text-on-accent" />
           <span>Kỷ lục mới</span>
         </div>
@@ -78,16 +78,16 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
 
       {/* Floating Delta Badge (+Points) */}
       {delta !== null && (
-        <div className="absolute -top-4 -right-6 font-mono font-medium text-xs text-amber-300 pointer-events-none animate-[score-burst_1.2s_ease-out_forwards] z-20 flex items-center gap-0.5">
+        <div className="absolute -top-4 -right-6 font-mono font-medium text-xs text-brass-300 pointer-events-none animate-[score-burst_1.2s_ease-out_forwards] z-20 flex items-center gap-0.5">
           <span>+{delta}</span>
         </div>
       )}
 
-      {label && <div className="text-[11px] font-mono text-slate-400">{label}</div>}
+      {label && <div className="text-[11px] font-mono text-ink-400">{label}</div>}
 
       <div
         className={`font-mono font-medium transition-transform duration-200 ${
-          isBouncing ? 'scale-125 text-amber-300' : ''
+          isBouncing ? 'scale-125 text-brass-300' : ''
         }`}
       >
         {prefix}

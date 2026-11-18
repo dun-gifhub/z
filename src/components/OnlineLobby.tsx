@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Swords, ArrowLeft, Copy, Check, Users, Shield, Zap } from 'lucide-react';
+import { Globe, ArrowLeft, Users, Zap } from 'lucide-react';
 import { MathLevel } from '../../shared/types.ts';
 
 interface OnlineLobbyProps {
@@ -38,30 +38,30 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="flex items-center gap-2 text-xs text-ink-400 hover:text-ink-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Quay lại sảnh chính</span>
         </button>
 
-        <div className="flex items-center gap-2 px-3 py-1 bg-purple-950/40 border border-purple-800/40 rounded-full text-xs font-mono text-purple-300">
-          <Globe className="w-4 h-4 text-purple-400" />
+        <div className="flex items-center gap-2 px-3 py-1 bg-mauve-950/40 border border-mauve-800/40 rounded text-xs font-mono text-mauve-300">
+          <Globe className="w-4 h-4 text-mauve-400" />
           <span>Đấu online toàn cầu</span>
         </div>
       </div>
 
       <div className="text-center space-y-2">
-        <h2 className="text-2xl sm:text-3xl font-medium text-indigo-200">
+        <h2 className="text-2xl sm:text-3xl font-medium text-dusk-200">
           Đấu trường thời gian thực
         </h2>
-        <p className="text-xs text-slate-400 max-w-md mx-auto">
+        <p className="text-xs text-ink-400 max-w-md mx-auto">
           Đối đầu với các pháp sư toán học khác qua hệ thống WebSocket đồng bộ máy chủ.
         </p>
       </div>
 
       {/* Grade Level Selector */}
-      <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
-        <div className="text-xs font-medium text-slate-300 text-center">
+      <div className="p-3 bg-ink-900 border border-ink-800 rounded-lg space-y-2">
+        <div className="text-xs font-medium text-ink-300 text-center">
           Chọn cấp độ câu hỏi cho trận đấu:
         </div>
         <div className="grid grid-cols-3 gap-2">
@@ -69,10 +69,10 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
             <button
               key={lvl}
               onClick={() => onSetMathLevel(lvl)}
-              className={`py-2 text-xs font-medium rounded-xl border transition-[color,background-color,border-color,opacity,transform] ${
+              className={`py-2 text-xs font-medium rounded-md border transition-[color,background-color,border-color,opacity,transform] ${
                 mathLevel === lvl
-                  ? 'bg-purple-600 border-purple-400 text-white'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'
+                  ? 'bg-mauve-600 border-mauve-400 text-white'
+                  : 'bg-ink-950 border-ink-800 text-ink-400 hover:bg-ink-800'
               }`}
             >
               {lvl === 'CO_BAN' ? 'Cơ Bản (Dễ)' : lvl === 'THCS' ? 'THCS (Vừa)' : 'THPT (Nâng cao)'}
@@ -84,27 +84,27 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
       {/* Two Matching Options */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* OPTION 1: QUICK MATCH */}
-        <div className="p-5 border border-indigo-800/50 rounded-2xl space-y-4 flex flex-col justify-between bg-slate-900">
+        <div className="p-5 border border-dusk-800/50 rounded-lg space-y-4 flex flex-col justify-between bg-ink-900">
           <div className="space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-indigo-900/50 border border-indigo-700/60 flex items-center justify-center text-indigo-300">
+            <div className="w-10 h-10 rounded-md bg-dusk-900/50 border border-dusk-700/60 flex items-center justify-center text-dusk-300">
               <Zap className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-medium text-slate-100">
+            <h3 className="text-base font-medium text-ink-100">
               Ghép trận nhanh (PvP)
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-ink-400">
               Hệ thống tự động tìm kiếm đối thủ đang trực tuyến có cùng cấp độ kiến thức.
             </p>
           </div>
 
           {searchingMatch ? (
             <div className="space-y-2">
-              <div className="p-3 bg-indigo-950 border border-indigo-700 rounded-xl text-center text-xs text-indigo-300 flex items-center justify-center gap-2">
+              <div className="p-3 bg-dusk-950 border border-dusk-700 rounded-md text-center text-xs text-dusk-300 flex items-center justify-center gap-2">
                 <span>Đang tìm đối thủ xứng tầm...</span>
               </div>
               <button
                 onClick={onCancelQuickMatch}
-                className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition-colors"
+                className="w-full py-2 bg-ink-800 hover:bg-ink-700 text-ink-300 text-xs font-medium rounded-md transition-colors"
               >
                 Hủy tìm trận
               </button>
@@ -112,7 +112,7 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
           ) : (
             <button
               onClick={() => onQuickMatch(mathLevel)}
-              className="w-full py-3 text-white font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 bg-indigo-600 hover:bg-indigo-500"
+              className="w-full py-3 text-white font-medium text-xs rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95 bg-dusk-600 hover:bg-dusk-500"
             >
               Tìm trận ngay
             </button>
@@ -120,15 +120,15 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
         </div>
 
         {/* OPTION 2: PRIVATE ROOM */}
-        <div className="p-5 border border-purple-800/50 rounded-2xl space-y-4 flex flex-col justify-between bg-slate-900">
+        <div className="p-5 border border-mauve-800/50 rounded-lg space-y-4 flex flex-col justify-between bg-ink-900">
           <div className="space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-purple-900/50 border border-purple-700/60 flex items-center justify-center text-purple-300">
+            <div className="w-10 h-10 rounded-md bg-mauve-900/50 border border-mauve-700/60 flex items-center justify-center text-mauve-300">
               <Users className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-medium text-slate-100">
+            <h3 className="text-base font-medium text-ink-100">
               Phòng đấu bạn bè
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-ink-400">
               Tạo phòng riêng hoặc nhập mã 6 ký tự để đấu tay đôi với bạn cùng lớp.
             </p>
           </div>
@@ -136,7 +136,7 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
           <div className="space-y-3">
             <button
               onClick={() => onCreateRoom(mathLevel)}
-              className="w-full py-3 bg-purple-700 hover:bg-purple-600 text-white font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95"
+              className="w-full py-3 bg-mauve-700 hover:bg-mauve-600 text-white font-medium text-xs rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95"
             >
               Tạo phòng mới
             </button>
@@ -148,11 +148,11 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
                 value={roomCodeInput}
                 onChange={e => setRoomCodeInput(e.target.value.toUpperCase())}
                 placeholder="Nhập mã phòng..."
-                className="flex-1 bg-slate-950 border border-slate-700 focus:border-purple-400 rounded-xl px-3 py-2 text-xs font-mono text-center text-slate-100 focus:outline-none"
+                className="flex-1 bg-ink-950 border border-ink-700 focus:border-mauve-400 rounded-md px-3 py-2 text-xs font-mono text-center text-ink-100 focus:outline-none"
               />
               <button
                 type="submit"
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl transition-colors"
+                className="px-3 py-2 bg-ink-800 hover:bg-ink-700 text-ink-200 text-xs font-medium rounded-md transition-colors"
               >
                 Vào
               </button>

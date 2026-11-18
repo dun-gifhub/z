@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Trophy, Award, Target, Flame, History, BookOpen, User, CheckCircle, XCircle, Crown, Lock, Landmark, Copy, Check, Trash2 } from 'lucide-react';
+import { ArrowLeft, History, CheckCircle, Crown, Lock, Landmark, Copy, Check, Trash2 } from 'lucide-react';
 import { UserProfile, SiteSettings, PremiumPlan } from '../../shared/types.ts';
 import { BASIC_AVATARS, VIP_AVATARS } from '../../shared/avatars.ts';
 import { ALL_RUNES } from '../../shared/runes.ts';
@@ -157,9 +157,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
 
   if (!profile) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center text-slate-400 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center text-ink-400 space-y-4">
         <p>Vui lòng đăng nhập hoặc chơi một trận để kích hoạt hồ sơ pháp sư</p>
-        <button onClick={onBack} className="px-4 py-2 bg-slate-800 text-slate-200 text-xs rounded-xl">
+        <button onClick={onBack} className="px-4 py-2 bg-ink-800 text-ink-200 text-xs rounded-md">
           Quay lại sảnh
         </button>
       </div>
@@ -176,29 +176,26 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="flex items-center gap-2 text-xs text-ink-400 hover:text-ink-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Quay lại sảnh chính</span>
         </button>
 
-        <span className="text-xs font-mono text-amber-400">
+        <span className="text-xs font-mono text-brass-400">
           ID: {profile.id.substring(0, 10)}...
         </span>
       </div>
 
       {/* Guest Account Banner & Delete Button */}
       {isGuest && onDeleteGuestAccount && (
-        <div className="p-4 border border-rose-800/80 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-rose-950/60">
+        <div className="p-4 border border-garnet-800/80 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-garnet-950/60">
           <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-300 text-lg shrink-0">
-              
-            </div>
             <div>
-              <div className="font-medium text-rose-300 flex items-center justify-center sm:justify-start gap-2 text-sm">
+              <div className="font-medium text-garnet-300 flex items-center justify-center sm:justify-start gap-2 text-sm">
                 <span>Tài Khoản Khách (Chơi Nhanh)</span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-ink-400 mt-0.5">
                 Bạn có thể đăng ký để lưu hồ sơ vĩnh viễn, hoặc xóa tài khoản này để làm mới phiên chơi.
               </p>
             </div>
@@ -211,7 +208,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                 onBack();
               }
             }}
-            className="w-full sm:w-auto px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-4 py-3 bg-garnet-600 hover:bg-garnet-500 text-white font-medium text-xs rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95 shrink-0 flex items-center justify-center gap-2 cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
             <span>Xóa acc chơi nhanh</span>
@@ -220,53 +217,53 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
       )}
 
       {/* Profile Overview Card */}
-      <div className="p-6 bg-slate-900 border border-indigo-700/60 rounded-2xl space-y-5">
+      <div className="p-6 bg-ink-900 border border-dusk-700/60 rounded-lg space-y-5">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
           <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-indigo-950 border border-amber-400 flex items-center justify-center text-4xl">
+            <div className="w-20 h-20 rounded-lg bg-dusk-950 border border-brass-400 flex items-center justify-center text-4xl">
               {profile.avatar}
             </div>
             {onUpdateAvatar && (
               <button
                 onClick={() => setAvatarPickerOpen(v => !v)}
                 title="Đổi Pháp Thân (Avatar)"
-                className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-slate-900 border border-amber-500 text-amber-300 text-xs flex items-center justify-center hover:bg-slate-800 transition-colors"
+                className="absolute -bottom-1.5 -right-1.5 h-7 px-2 rounded bg-ink-900 border border-brass-500 text-brass-300 text-xs flex items-center justify-center hover:bg-ink-800 transition-colors"
               >
-                
+                Đổi
               </button>
             )}
           </div>
 
           <div className="flex-1 space-y-1">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-medium text-amber-200">
+              <h2 className="text-xl sm:text-2xl font-medium text-brass-200">
                 {profile.username}
               </h2>
-              <span className="px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-medium self-center sm:self-auto">
+              <span className="px-3 py-0.5 rounded bg-brass-500/20 border border-brass-400/40 text-brass-300 text-xs font-medium self-center sm:self-auto">
                 {profile.rankTitle}
               </span>
               {isPremiumActive && (
-                <span className="flex items-center gap-1 px-3 py-0.5 rounded-full border border-yellow-400/50 text-yellow-300 text-xs font-medium self-center sm:self-auto bg-yellow-500/20">
+                <span className="flex items-center gap-1 px-3 py-0.5 rounded border border-gilt-400/50 text-gilt-300 text-xs font-medium self-center sm:self-auto bg-gilt-500/20">
                   <Crown className="w-3 h-3" />
                   PREMIUM
                 </span>
               )}
             </div>
 
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-ink-400">
               Cấp Độ {profile.level} • Tổng Điểm Tích Lũy: {profile.xp} XP
             </p>
 
             {/* Level XP Bar */}
             <div className="space-y-1 pt-2">
-              <div className="flex justify-between text-[11px] font-mono text-slate-400">
+              <div className="flex justify-between text-[11px] font-mono text-ink-400">
                 <span>Tiến Độ Cấp {profile.level + 1}</span>
                 <span>{xpCurrentLevel} / 300 XP ({xpPercent}%)</span>
               </div>
-              <div className="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+              <div className="w-full h-3 bg-ink-950 rounded-full overflow-hidden border border-ink-800">
                 <div
                   style={{ width: `${xpPercent}%` }}
-                  className="h-full rounded-full transition-[color,background-color,border-color,opacity,transform] duration-500 bg-amber-500"
+                  className="h-full rounded-full transition-[color,background-color,border-color,opacity,transform] duration-500 bg-brass-500"
                 />
               </div>
             </div>
@@ -275,22 +272,22 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
 
         {/* Avatar Picker (toggle) */}
         {avatarPickerOpen && (
-          <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
+          <div className="p-4 bg-ink-950/80 border border-ink-800 rounded-lg space-y-3">
             {avatarMsg && (
-              <div className="text-xs text-amber-300 font-medium">{avatarMsg}</div>
+              <div className="text-xs text-brass-300 font-medium">{avatarMsg}</div>
             )}
             <div>
-              <div className="text-[11px] font-medium text-slate-400 mb-2">PHÁP THÂN CƠ BẢN (MIỄN PHÍ)</div>
+              <div className="text-[11px] font-medium text-ink-400 mb-2">PHÁP THÂN CƠ BẢN (MIỄN PHÍ)</div>
               <div className="flex flex-wrap gap-2">
                 {BASIC_AVATARS.map(av => (
                   <button
                     key={av}
                     disabled={avatarSaving}
                     onClick={() => handlePickAvatar(av)}
-                    className={`text-xl p-2 rounded-lg transition-[color,background-color,border-color,opacity,transform] disabled:opacity-50 ${
+                    className={`text-xl p-2 rounded-md transition-[color,background-color,border-color,opacity,transform] disabled:opacity-50 ${
                       profile.avatar === av
-                        ? 'bg-amber-500/20 border border-amber-400 scale-110'
-                        : 'bg-slate-900 border border-slate-800 hover:bg-slate-800'
+                        ? 'bg-brass-500/20 border border-brass-400 scale-110'
+                        : 'bg-ink-900 border border-ink-800 hover:bg-ink-800'
                     }`}
                   >
                     {av}
@@ -299,7 +296,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
               </div>
             </div>
             <div>
-              <div className="text-[11px] font-medium text-yellow-400/90 mb-2 flex items-center gap-1">
+              <div className="text-[11px] font-medium text-gilt-400/90 mb-2 flex items-center gap-1">
                 <Crown className="w-3 h-3" /> PHÁP THÂN VIP (DÀNH CHO THÀNH VIÊN PREMIUM)
               </div>
               <div className="flex flex-wrap gap-2">
@@ -311,16 +308,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                       disabled={avatarSaving || locked}
                       onClick={() => handlePickAvatar(av)}
                       title={locked ? 'Nâng cấp gói Premium để mở khóa' : undefined}
-                      className={`relative text-xl p-2 rounded-lg transition-[color,background-color,border-color,opacity,transform] disabled:cursor-not-allowed ${
+                      className={`relative text-xl p-2 rounded-md transition-[color,background-color,border-color,opacity,transform] disabled:cursor-not-allowed ${
                         profile.avatar === av
-                          ? 'bg-yellow-500/20 border border-yellow-400 scale-110'
+                          ? 'bg-gilt-500/20 border border-gilt-400 scale-110'
                           : locked
-                          ? 'bg-slate-900/60 border border-slate-800 opacity-40'
-                          : 'bg-slate-900 border border-slate-800 hover:bg-slate-800'
+                          ? 'bg-ink-900/60 border border-ink-800 opacity-40'
+                          : 'bg-ink-900 border border-ink-800 hover:bg-ink-800'
                       }`}
                     >
                       {av}
-                      {locked && <Lock className="w-3 h-3 absolute -top-1 -right-1 text-slate-500" />}
+                      {locked && <Lock className="w-3 h-3 absolute -top-1 -right-1 text-ink-500" />}
                     </button>
                   );
                 })}
@@ -330,48 +327,48 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
         )}
 
         {/* 4 Stat Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-800 font-mono">
-          <div className="p-3 bg-slate-950 rounded-xl text-center">
-            <div className="text-[11px] text-slate-400">Tổng trận</div>
-            <div className="text-lg font-medium text-slate-100">{profile.totalGames}</div>
-            <div className="text-[11px] text-slate-500">{profile.wins} Thắng / {profile.losses} Bại</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-ink-800 font-mono">
+          <div className="p-3 bg-ink-950 rounded-md text-center">
+            <div className="text-[11px] text-ink-400">Tổng trận</div>
+            <div className="text-lg font-medium text-ink-100">{profile.totalGames}</div>
+            <div className="text-[11px] text-ink-500">{profile.wins} Thắng / {profile.losses} Bại</div>
           </div>
 
-          <div className="p-3 bg-slate-950 rounded-xl text-center">
-            <div className="text-[11px] text-slate-400">Tỉ lệ thắng</div>
-            <div className="text-lg font-medium text-emerald-400">{profile.winRate}%</div>
-            <div className="text-[11px] text-emerald-600">Đấu xếp hạng</div>
+          <div className="p-3 bg-ink-950 rounded-md text-center">
+            <div className="text-[11px] text-ink-400">Tỉ lệ thắng</div>
+            <div className="text-lg font-medium text-moss-400">{profile.winRate}%</div>
+            <div className="text-[11px] text-moss-600">Đấu xếp hạng</div>
           </div>
 
-          <div className="p-3 bg-slate-950 rounded-xl text-center">
-            <div className="text-[11px] text-slate-400">Điểm kỷ lục</div>
-            <div className="text-lg font-medium text-amber-300">{profile.highestScore}đ</div>
-            <div className="text-[11px] text-amber-500">Trong một trận</div>
+          <div className="p-3 bg-ink-950 rounded-md text-center">
+            <div className="text-[11px] text-ink-400">Điểm kỷ lục</div>
+            <div className="text-lg font-medium text-brass-300">{profile.highestScore}đ</div>
+            <div className="text-[11px] text-brass-500">Trong một trận</div>
           </div>
 
-          <div className="p-3 bg-slate-950 rounded-xl text-center flex flex-col items-center justify-center">
-            <div className="text-[11px] text-slate-400">Rune bảo mệnh</div>
+          <div className="p-3 bg-ink-950 rounded-md text-center flex flex-col items-center justify-center">
+            <div className="text-[11px] text-ink-400">Rune bảo mệnh</div>
             {(() => {
               const rId = profile.equippedRunes?.[0] || 'rune_shield';
               const rDef = ALL_RUNES.find(r => r.id === rId);
-              if (!rDef) return <div className="text-lg font-medium text-purple-300">1/1</div>;
+              if (!rDef) return <div className="text-lg font-medium text-mauve-300">1/1</div>;
               return (
                 <div className="flex items-center gap-2 mt-0.5" title={rDef.description}>
                   <RuneStone rune={rDef} size="sm" isActive={true} />
-                  <span className="text-xs font-medium text-amber-200 truncate max-w-[85px]">{rDef.name}</span>
+                  <span className="text-xs font-medium text-brass-200 truncate max-w-[85px]">{rDef.name}</span>
                 </div>
               );
             })()}
-            <div className="text-[11px] text-purple-400 mt-0.5">Ấn chú bảo mệnh</div>
+            <div className="text-[11px] text-mauve-400 mt-0.5">Ấn chú bảo mệnh</div>
           </div>
         </div>
       </div>
 
       {/* Premium Subscription Section */}
-      <div className="p-5 bg-slate-900 border border-yellow-700/50 rounded-2xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-          <h3 className="text-base font-medium text-yellow-300 flex items-center gap-2">
-            <Crown className="w-5 h-5 text-yellow-400" />
+      <div className="p-5 bg-ink-900 border border-gilt-700/50 rounded-lg space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ink-800 pb-3">
+          <h3 className="text-base font-medium text-gilt-300 flex items-center gap-2">
+            <Crown className="w-5 h-5 text-gilt-400" />
             <span>Gói PRO & đặc quyền VIP</span>
           </h3>
 
@@ -382,8 +379,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                 setSelectedPlan(null);
                 setRequestSent(false);
               }}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
-                !giftMode ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
+                !giftMode ? 'bg-brass-500/20 text-brass-300 border border-brass-500/40' : 'text-ink-400 hover:text-ink-200'
               }`}
             >
               Gói của tôi
@@ -393,8 +390,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                 setGiftMode(true);
                 setRequestSent(false);
               }}
-              className={`flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
-                giftMode ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'
+              className={`flex items-center gap-2 px-3 py-1 rounded-md text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
+                giftMode ? 'bg-dusk-500/20 text-dusk-300 border border-dusk-500/40' : 'text-ink-400 hover:text-ink-200'
               }`}
             >
               <span>Gia hạn cho người khác</span>
@@ -403,7 +400,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
         </div>
 
         {cancelMsg && (
-          <div className="p-3 bg-emerald-950 border border-emerald-700 text-emerald-200 text-xs rounded-xl flex items-center gap-2">
+          <div className="p-3 bg-moss-950 border border-moss-700 text-moss-200 text-xs rounded-md flex items-center gap-2">
             <CheckCircle className="w-4 h-4 shrink-0" />
             <span>{cancelMsg}</span>
           </div>
@@ -412,17 +409,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
         {/* MODE 1: FOR ANOTHER USER (GIFT/RENEW FOR ANYONE) */}
         {giftMode ? (
           <div className="space-y-4">
-            <div className="p-4 bg-indigo-950/40 border border-indigo-700/50 rounded-2xl text-xs space-y-1">
-              <div className="font-medium text-indigo-200 flex items-center gap-2">
+            <div className="p-4 bg-dusk-950/40 border border-dusk-700/50 rounded-lg text-xs space-y-1">
+              <div className="font-medium text-dusk-200 flex items-center gap-2">
                 <span>Gia hạn hoặc tặng gói PRO cho người bạn muốn</span>
               </div>
-              <p className="text-slate-300">
+              <p className="text-ink-300">
                 Nhập tên đăng nhập của bạn bè hoặc người chơi bạn muốn gia hạn gói PRO. Sau khi xác nhận thanh toán, hệ thống sẽ kích hoạt trực tiếp cho tài khoản đó
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-medium text-slate-200">
+              <label className="block text-xs font-medium text-ink-200">
                 Tên đăng nhập người nhận gói PRO (*):
               </label>
               <input
@@ -430,7 +427,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                 value={targetGiftUsername}
                 onChange={e => setTargetGiftUsername(e.target.value)}
                 placeholder="VD: dungdaumoi2222, phap_su_toan..."
-                className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-400 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none"
+                className="w-full bg-ink-950 border border-ink-700 focus:border-dusk-400 rounded-md px-4 py-3 text-xs text-ink-100 placeholder:text-ink-500 focus:outline-none"
               />
             </div>
 
@@ -438,78 +435,78 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
               <button
                 type="button"
                 onClick={() => setGiftPlan('monthly')}
-                className={`p-4 rounded-2xl border text-left transition-[color,background-color,border-color,opacity,transform] ${
+                className={`p-4 rounded-lg border text-left transition-[color,background-color,border-color,opacity,transform] ${
                   giftPlan === 'monthly'
-                    ? 'bg-indigo-500/10 border-indigo-400 ring-1 ring-indigo-400/40'
-                    : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                    ? 'bg-dusk-500/10 border-dusk-400 ring-1 ring-dusk-400/40'
+                    : 'bg-ink-950 border-ink-800 hover:bg-ink-900'
                 }`}
               >
-                <div className="text-xs font-medium text-slate-200">Gói Tháng (30 ngày)</div>
-                <div className="text-base font-medium text-indigo-300 mt-1">
+                <div className="text-xs font-medium text-ink-200">Gói Tháng (30 ngày)</div>
+                <div className="text-base font-medium text-dusk-300 mt-1">
                   {formatVnd(settings?.monthlyPackagePrice ?? 15000)}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Tiết kiệm & đầy đủ quyền lợi</div>
+                <div className="text-[11px] text-ink-400 mt-0.5">Tiết kiệm & đầy đủ quyền lợi</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setGiftPlan('solution')}
-                className={`p-4 rounded-2xl border text-left transition-[color,background-color,border-color,opacity,transform] ${
+                className={`p-4 rounded-lg border text-left transition-[color,background-color,border-color,opacity,transform] ${
                   giftPlan === 'solution'
-                    ? 'bg-indigo-500/10 border-indigo-400 ring-1 ring-indigo-400/40'
-                    : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                    ? 'bg-dusk-500/10 border-dusk-400 ring-1 ring-dusk-400/40'
+                    : 'bg-ink-950 border-ink-800 hover:bg-ink-900'
                 }`}
               >
-                <div className="text-xs font-medium text-slate-200">Gói Xem Lời Giải (30 ngày)</div>
-                <div className="text-base font-medium text-amber-300 mt-1">
+                <div className="text-xs font-medium text-ink-200">Gói Xem Lời Giải (30 ngày)</div>
+                <div className="text-base font-medium text-brass-300 mt-1">
                   {formatVnd(settings?.solutionPackagePrice ?? 20000)}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Mở khóa toàn bộ lời giải chi tiết</div>
+                <div className="text-[11px] text-ink-400 mt-0.5">Mở khóa toàn bộ lời giải chi tiết</div>
               </button>
             </div>
 
             {requestSent ? (
-              <div className="p-4 bg-emerald-950/40 border border-emerald-700/60 rounded-2xl text-xs text-emerald-200 space-y-1">
+              <div className="p-4 bg-moss-950/40 border border-moss-700/60 rounded-lg text-xs text-moss-200 space-y-1">
                 <div className="font-medium flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle className="w-4 h-4 text-moss-400" />
                   <span>Đã gửi yêu cầu gia hạn gói PRO cho: {requestRecipient}!</span>
                 </div>
-                <p className="text-slate-300">
+                <p className="text-ink-300">
                   Quản Trị Viên sẽ xác nhận giao dịch chuyển khoản và kích hoạt gói PRO ngay sau ít phút.
                 </p>
               </div>
             ) : (
-              <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 text-xs">
-                <div className="font-medium text-slate-200 flex items-center gap-2">
-                  <Landmark className="w-4 h-4 text-indigo-400" />
+              <div className="p-4 bg-ink-950 border border-ink-800 rounded-lg space-y-3 text-xs">
+                <div className="font-medium text-ink-200 flex items-center gap-2">
+                  <Landmark className="w-4 h-4 text-dusk-400" />
                   <span>Thông tin chuyển khoản gia hạn cho bạn bè:</span>
                 </div>
                 {settings?.bankAccountNumber ? (
-                  <div className="space-y-1 font-mono text-slate-300">
-                    <div>Ngân hàng: <span className="text-slate-100">{settings.bankName || '—'}</span></div>
-                    <div>Chủ TK: <span className="text-slate-100">{settings.bankAccountName || '—'}</span></div>
+                  <div className="space-y-1 font-mono text-ink-300">
+                    <div>Ngân hàng: <span className="text-ink-100">{settings.bankName || '—'}</span></div>
+                    <div>Chủ TK: <span className="text-ink-100">{settings.bankAccountName || '—'}</span></div>
                     <div className="flex items-center gap-2">
-                      <span>Số TK: <span className="text-slate-100 font-medium">{settings.bankAccountNumber}</span></span>
-                      <button onClick={handleCopyBank} className="text-amber-400 hover:text-amber-300">
+                      <span>Số TK: <span className="text-ink-100 font-medium">{settings.bankAccountNumber}</span></span>
+                      <button onClick={handleCopyBank} className="text-brass-400 hover:text-brass-300">
                         {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
-                    <div>Số tiền: <span className="text-amber-300 font-medium">{formatVnd(giftPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
+                    <div>Số tiền: <span className="text-brass-300 font-medium">{formatVnd(giftPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
                     <div>
-                      Nội dung CK: <span className="text-emerald-400 font-medium">PREMIUM {targetGiftUsername.trim() || '[TÊN_BẠN_BÈ]'}</span>
+                      Nội dung CK: <span className="text-moss-400 font-medium">PREMIUM {targetGiftUsername.trim() || '[TÊN_BẠN_BÈ]'}</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-slate-500">Admin chưa cấu hình tài khoản ngân hàng.</div>
+                  <div className="text-ink-500">Admin chưa cấu hình tài khoản ngân hàng.</div>
                 )}
 
-                {requestMsg && <div className="text-rose-400 font-medium">{requestMsg}</div>}
+                {requestMsg && <div className="text-garnet-400 font-medium">{requestMsg}</div>}
 
                 <button
                   type="button"
                   onClick={() => handleSendPremiumRequest(true)}
                   disabled={requestLoading || !targetGiftUsername.trim()}
-                  className="w-full py-3 text-white font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-indigo-600 hover:bg-indigo-500"
+                  className="w-full py-3 text-white font-medium rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-dusk-600 hover:bg-dusk-500"
                 >
                   {requestLoading ? 'Đang gửi yêu cầu...' : `Xác Nhận Đã Chuyển Khoản Gia Hạn Cho ${targetGiftUsername.trim() || 'Người dùng'}`}
                 </button>
@@ -520,18 +517,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
           /* MODE 2: FOR SELF */
           <>
             {isPremiumActive ? (
-              <div className="p-4 bg-yellow-950/30 border border-yellow-700/50 rounded-2xl text-xs text-yellow-200 space-y-3">
+              <div className="p-4 bg-gilt-950/30 border border-gilt-700/50 rounded-lg text-xs text-gilt-200 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="space-y-1">
-                    <div className="font-medium flex items-center gap-2 text-sm text-yellow-300">
+                    <div className="font-medium flex items-center gap-2 text-sm text-gilt-300">
                       <span>Bạn đang là thành viên PRO VIP</span>
                     </div>
-                    <div className="text-slate-300">
-                      Gói hiện tại: <strong className="text-yellow-300">{profile.premiumPlan === 'monthly' ? 'Gói tháng' : 'Gói xem lời giải'}</strong>
+                    <div className="text-ink-300">
+                      Gói hiện tại: <strong className="text-gilt-300">{profile.premiumPlan === 'monthly' ? 'Gói tháng' : 'Gói xem lời giải'}</strong>
                     </div>
                     {profile.premiumExpiresAt && (
-                      <div className="text-slate-400 font-mono">
-                        Hết hạn ngày: <strong className="text-slate-200">{new Date(profile.premiumExpiresAt).toLocaleDateString('vi-VN')}</strong>
+                      <div className="text-ink-400 font-mono">
+                        Hết hạn ngày: <strong className="text-ink-200">{new Date(profile.premiumExpiresAt).toLocaleDateString('vi-VN')}</strong>
                       </div>
                     )}
                   </div>
@@ -541,7 +538,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                     <button
                       type="button"
                       onClick={() => setShowSelfRenew(v => !v)}
-                      className="px-3 py-2 bg-yellow-500/20 border border-yellow-400/60 hover:bg-yellow-500/30 text-yellow-300 font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform]"
+                      className="px-3 py-2 bg-gilt-500/20 border border-gilt-400/60 hover:bg-gilt-500/30 text-gilt-300 font-medium rounded-md transition-[color,background-color,border-color,opacity,transform]"
                     >
                       {showSelfRenew ? 'Đóng gia hạn' : 'Gia hạn thêm gói PRO'}
                     </button>
@@ -549,14 +546,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                       type="button"
                       onClick={handleCancelMyPro}
                       disabled={cancellingPro}
-                      className="px-3 py-2 bg-rose-950/60 border border-rose-700/60 hover:bg-rose-900/60 text-rose-300 font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] disabled:opacity-50"
+                      className="px-3 py-2 bg-garnet-950/60 border border-garnet-700/60 hover:bg-garnet-900/60 text-garnet-300 font-medium rounded-md transition-[color,background-color,border-color,opacity,transform] disabled:opacity-50"
                     >
                       {cancellingPro ? 'Đang gỡ...' : 'Gỡ gói PRO'}
                     </button>
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-400 border-t border-yellow-800/40 pt-2 flex items-center gap-3 flex-wrap">
+                <div className="text-[11px] text-ink-400 border-t border-gilt-800/40 pt-2 flex items-center gap-3 flex-wrap">
                   <span> Xem lời giải chi tiết mọi câu hỏi</span>
                   <span>•</span>
                   <span> Mở khóa Pháp Thân VIP</span>
@@ -569,84 +566,84 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
             {(!isPremiumActive || showSelfRenew) && (
               <>
                 {requestSent ? (
-                  <div className="p-4 bg-indigo-950/40 border border-indigo-700/50 rounded-2xl text-xs text-indigo-200 space-y-1">
+                  <div className="p-4 bg-dusk-950/40 border border-dusk-700/50 rounded-lg text-xs text-dusk-200 space-y-1">
                     <div className="font-medium flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-indigo-300" />
+                      <CheckCircle className="w-4 h-4 text-dusk-300" />
                       <span>⏳ Yêu cầu kích hoạt/gia hạn của bạn đang chờ Admin duyệt.</span>
                     </div>
-                    <div className="text-slate-400">Sau khi nhận chuyển khoản, gói PRO sẽ tự động kích hoạt ngay cho tài khoản {profile.username}.</div>
+                    <div className="text-ink-400">Sau khi nhận chuyển khoản, gói PRO sẽ tự động kích hoạt ngay cho tài khoản {profile.username}.</div>
                   </div>
                 ) : (
                   <>
-                    <p className="text-xs text-slate-400">
-                      Mở khóa <strong className="text-yellow-300">xem lời giải chi tiết từng bước</strong> cho mọi câu hỏi và <strong className="text-yellow-300">Pháp thân VIP</strong> độc quyền.
+                    <p className="text-xs text-ink-400">
+                      Mở khóa <strong className="text-gilt-300">xem lời giải chi tiết từng bước</strong> cho mọi câu hỏi và <strong className="text-gilt-300">Pháp thân VIP</strong> độc quyền.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         onClick={() => setSelectedPlan('solution')}
-                        className={`p-4 rounded-2xl border text-left transition-[color,background-color,border-color,opacity,transform] ${
+                        className={`p-4 rounded-lg border text-left transition-[color,background-color,border-color,opacity,transform] ${
                           selectedPlan === 'solution'
-                            ? 'bg-amber-500/10 border-amber-400 ring-1 ring-amber-400/40'
-                            : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                            ? 'bg-brass-500/10 border-brass-400 ring-1 ring-brass-400/40'
+                            : 'bg-ink-950 border-ink-800 hover:bg-ink-900'
                         }`}
                       >
-                        <div className="text-xs font-medium text-slate-200">Gói xem lời giải</div>
-                        <div className="text-lg font-medium text-amber-300 mt-1">
+                        <div className="text-xs font-medium text-ink-200">Gói xem lời giải</div>
+                        <div className="text-lg font-medium text-brass-300 mt-1">
                           {formatVnd(settings?.solutionPackagePrice ?? 20000)}
                         </div>
-                        <div className="text-[11px] text-slate-500 mt-1">Hiệu lực 30 ngày</div>
+                        <div className="text-[11px] text-ink-500 mt-1">Hiệu lực 30 ngày</div>
                       </button>
 
                       <button
                         onClick={() => setSelectedPlan('monthly')}
-                        className={`relative p-4 rounded-2xl border text-left transition-[color,background-color,border-color,opacity,transform] ${
+                        className={`relative p-4 rounded-lg border text-left transition-[color,background-color,border-color,opacity,transform] ${
                           selectedPlan === 'monthly'
-                            ? 'bg-emerald-500/10 border-emerald-400 ring-1 ring-emerald-400/40'
-                            : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                            ? 'bg-moss-500/10 border-moss-400 ring-1 ring-moss-400/40'
+                            : 'bg-ink-950 border-ink-800 hover:bg-ink-900'
                         }`}
                       >
-                        <div className="absolute -top-2 right-3 px-2 py-0.5 bg-emerald-500 text-on-accent text-[11px] font-medium rounded-full">
+                        <div className="absolute -top-2 right-3 px-2 py-0.5 bg-moss-500 text-on-accent text-[11px] font-medium rounded">
                           Tiết kiệm hơn
                         </div>
-                        <div className="text-xs font-medium text-slate-200">Gói tháng</div>
-                        <div className="text-lg font-medium text-emerald-400 mt-1">
+                        <div className="text-xs font-medium text-ink-200">Gói tháng</div>
+                        <div className="text-lg font-medium text-moss-400 mt-1">
                           {formatVnd(settings?.monthlyPackagePrice ?? 15000)}
-                          <span className="text-[11px] text-slate-500 font-normal">/tháng</span>
+                          <span className="text-[11px] text-ink-500 font-normal">/tháng</span>
                         </div>
-                        <div className="text-[11px] text-slate-500 mt-1">Tự động gia hạn 30 ngày mỗi lần đăng ký</div>
+                        <div className="text-[11px] text-ink-500 mt-1">Tự động gia hạn 30 ngày mỗi lần đăng ký</div>
                       </button>
                     </div>
 
                     {selectedPlan && (
-                      <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 text-xs">
-                        <div className="font-medium text-slate-200 flex items-center gap-2">
-                          <Landmark className="w-4 h-4 text-amber-400" />
+                      <div className="p-4 bg-ink-950 border border-ink-800 rounded-lg space-y-3 text-xs">
+                        <div className="font-medium text-ink-200 flex items-center gap-2">
+                          <Landmark className="w-4 h-4 text-brass-400" />
                           <span>Chuyển khoản để kích hoạt gói PRO</span>
                         </div>
                         {settings?.bankAccountNumber ? (
-                          <div className="space-y-1 font-mono text-slate-300">
-                            <div>Ngân hàng: <span className="text-slate-100">{settings.bankName || '—'}</span></div>
-                            <div>Chủ TK: <span className="text-slate-100">{settings.bankAccountName || '—'}</span></div>
+                          <div className="space-y-1 font-mono text-ink-300">
+                            <div>Ngân hàng: <span className="text-ink-100">{settings.bankName || '—'}</span></div>
+                            <div>Chủ TK: <span className="text-ink-100">{settings.bankAccountName || '—'}</span></div>
                             <div className="flex items-center gap-2">
-                              <span>Số TK: <span className="text-slate-100 font-medium">{settings.bankAccountNumber}</span></span>
-                              <button onClick={handleCopyBank} className="text-amber-400 hover:text-amber-300">
+                              <span>Số TK: <span className="text-ink-100 font-medium">{settings.bankAccountNumber}</span></span>
+                              <button onClick={handleCopyBank} className="text-brass-400 hover:text-brass-300">
                                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                               </button>
                             </div>
-                            <div>Số tiền: <span className="text-amber-300 font-medium">{formatVnd(selectedPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
-                            <div>Nội dung CK: <span className="text-emerald-400 font-medium">PREMIUM {profile.username}</span></div>
+                            <div>Số tiền: <span className="text-brass-300 font-medium">{formatVnd(selectedPlan === 'monthly' ? (settings?.monthlyPackagePrice ?? 15000) : (settings?.solutionPackagePrice ?? 20000))}</span></div>
+                            <div>Nội dung CK: <span className="text-moss-400 font-medium">PREMIUM {profile.username}</span></div>
                           </div>
                         ) : (
-                          <div className="text-slate-500">Admin chưa cập nhật thông tin chuyển khoản. Vui lòng liên hệ trực tiếp Quản Trị Viên.</div>
+                          <div className="text-ink-500">Admin chưa cập nhật thông tin chuyển khoản. Vui lòng liên hệ trực tiếp Quản Trị Viên.</div>
                         )}
 
-                        {requestMsg && <div className="text-rose-400">{requestMsg}</div>}
+                        {requestMsg && <div className="text-garnet-400">{requestMsg}</div>}
 
                         <button
                           onClick={() => handleSendPremiumRequest(false)}
                           disabled={requestLoading}
-                          className="w-full py-2 text-on-accent font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-amber-600 hover:bg-amber-500"
+                          className="w-full py-2 text-on-accent font-medium rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-brass-600 hover:bg-brass-500"
                         >
                           {requestLoading ? 'Đang gửi...' : 'Tôi đã chuyển khoản - xác nhận'}
                         </button>
@@ -662,15 +659,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
 
       {/* Match History Table */}
       <div className="space-y-3">
-        <h3 className="text-base font-medium text-slate-200 flex items-center gap-2">
-          <History className="w-4 h-4 text-amber-400" />
+        <h3 className="text-base font-medium text-ink-200 flex items-center gap-2">
+          <History className="w-4 h-4 text-brass-400" />
           <span>Lịch sử thi đấu gần đây</span>
         </h3>
 
         {loadingHistory ? (
-          <div className="p-6 text-center text-xs text-slate-500">Đang tải lịch sử đấu...</div>
+          <div className="p-6 text-center text-xs text-ink-500">Đang tải lịch sử đấu...</div>
         ) : matchHistory.length === 0 ? (
-          <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">
+          <div className="p-6 bg-ink-900 rounded-lg border border-ink-800 text-center text-xs text-ink-400">
             Chưa có trận đấu nào được ghi lại. Hãy tham gia một ván đấu với AI hoặc Online
           </div>
         ) : (
@@ -678,20 +675,20 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
             {matchHistory.map(m => (
               <div
                 key={m.id}
-                className="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between gap-2"
+                className="p-4 bg-ink-900 border border-ink-800 rounded-lg flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-xl text-xs font-medium ${
-                    m.isWin ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'
+                  <div className={`p-2 rounded-md text-xs font-medium ${
+                    m.isWin ? 'bg-moss-950 text-moss-300 border border-moss-800' : 'bg-garnet-950 text-garnet-300 border border-garnet-800'
                   }`}>
                     {m.isWin ? 'THẮNG' : 'THUA'}
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-slate-200">
-                      Đấu với: <span className="text-amber-300">{m.opponentName}</span> ({m.mode.toUpperCase()})
+                    <div className="text-xs font-medium text-ink-200">
+                      Đấu với: <span className="text-brass-300">{m.opponentName}</span> ({m.mode.toUpperCase()})
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono flex items-center gap-3 mt-0.5">
+                    <div className="text-[11px] text-ink-400 font-mono flex items-center gap-3 mt-0.5">
                       <span>Điểm: {m.score}đ</span>
                       <span>Chính xác: {m.accuracy}% ({m.correctAnswers}/{m.totalQuestions})</span>
                       <span>Bust: {m.busts} lần</span>
@@ -699,7 +696,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onUpd
                   </div>
                 </div>
 
-                <div className="text-right text-[11px] text-slate-500 font-mono">
+                <div className="text-right text-[11px] text-ink-500 font-mono">
                   {new Date(m.timestamp).toLocaleDateString('vi-VN')}
                 </div>
               </div>

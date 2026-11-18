@@ -62,54 +62,54 @@ export const FlipCardReveal: React.FC<FlipCardRevealProps> = ({
         {/* ========================================================= */}
         {/* FRONT FACE (LÁ BÀI THẬT)                                 */}
         {/* ========================================================= */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rounded-2xl">
+        <div className="absolute inset-0 w-full h-full backface-hidden rounded-lg">
           <MathCard card={card} variant="standard" />
 
           {/* Reveal Shimmer Starburst */}
           {isAnimating && (
-            <div className="absolute inset-0 rounded-2xl pointer-events-none flex items-center justify-center">
-              <div className="w-full h-full rounded-2xl bg-amber-400/20 opacity-60" />
+            <div className="absolute inset-0 rounded-lg pointer-events-none flex items-center justify-center">
+              <div className="w-full h-full rounded-lg bg-brass-400/20 opacity-60" />
             </div>
           )}
 
           {/* Flip Hint Icon */}
-          <div className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-slate-950/80 border border-slate-700/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <RotateCcw className="w-4 h-4 text-amber-400" />
+          <div className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-ink-950/80 border border-ink-700/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <RotateCcw className="w-4 h-4 text-brass-400" />
           </div>
         </div>
 
         {/* ========================================================= */}
         {/* BACK FACE (MẶT SAU Cổ ngữ MA THUẬT)                      */}
         {/* ========================================================= */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-2xl border border-amber-500/70 p-3 flex flex-col items-center justify-between overflow-hidden bg-slate-950">
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-lg border border-brass-500/70 p-3 flex flex-col items-center justify-between overflow-hidden bg-ink-950">
           {/* Ornate corner gold brackets */}
-          <div className="absolute top-1.5 left-1.5 w-3 h-3 border-t-2 border-l-2 border-amber-400/80" />
-          <div className="absolute top-1.5 right-1.5 w-3 h-3 border-t-2 border-r-2 border-amber-400/80" />
-          <div className="absolute bottom-1.5 left-1.5 w-3 h-3 border-b-2 border-l-2 border-amber-400/80" />
-          <div className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b-2 border-r-2 border-amber-400/80" />
+          <div className="absolute top-1.5 left-1.5 w-3 h-3 border-t-2 border-l-2 border-brass-400/80" />
+          <div className="absolute top-1.5 right-1.5 w-3 h-3 border-t-2 border-r-2 border-brass-400/80" />
+          <div className="absolute bottom-1.5 left-1.5 w-3 h-3 border-b-2 border-l-2 border-brass-400/80" />
+          <div className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b-2 border-r-2 border-brass-400/80" />
 
           {/* Top text */}
-          <div className="text-[11px] font-medium text-amber-400/90">
+          <div className="text-[11px] font-medium text-brass-400/90">
             Math Rune
           </div>
 
           {/* Center Magic Seal */}
           <div className="relative flex items-center justify-center">
             {/* Spinning rune orbit ring */}
-            <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full border border-dashed border-amber-400/50" />
-            <div className="w-14 sm:w-16 h-14 sm:h-16 rounded-full border border-indigo-400/40 absolute" />
+            <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full border border-dashed border-brass-400/50" />
+            <div className="w-14 sm:w-16 h-14 sm:h-16 rounded-full border border-dusk-400/40 absolute" />
             
             {/* Center Symbol */}
             <div className="absolute flex flex-col items-center justify-center">
-              <Calculator className="w-7 h-7 text-amber-300" />
-              <span className="text-[11px] font-mono text-amber-300 font-medium mt-0.5">
+              <Calculator className="w-7 h-7 text-brass-300" />
+              <span className="text-[11px] font-mono text-brass-300 font-medium mt-0.5">
                 Cổ ngữ
               </span>
             </div>
           </div>
 
           {/* Bottom text */}
-          <div className="flex items-center gap-1 text-[11px] font-mono text-indigo-300/80">
+          <div className="flex items-center gap-1 text-[11px] font-mono text-dusk-300/80">
             <RotateCcw className="w-3 h-3" />
             <span>Nhấp để lật</span>
           </div>

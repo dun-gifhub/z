@@ -1,23 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Swords,
-  Globe,
-  Layers,
-  Sparkles,
-  UserCheck,
-  Trophy,
-  Settings,
-  Bot,
-  Flame,
-  Zap,
-  ChevronRight,
-  HelpCircle,
-  BookOpen,
-  Play,
-  ArrowRight,
-  User,
-  LogOut, Gem
-} from 'lucide-react';
+import { User } from 'lucide-react';
 import { MathLevel, AiDifficulty, UserProfile } from '../../shared/types.ts';
 import { DomainArt } from './DomainArt.tsx';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
@@ -72,10 +54,10 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   }, []);
 
   const diffLabels: Record<AiDifficulty, { label: string; desc: string; badge: string }> = {
-    easy: { label: 'Tân Thủ (Dễ)', desc: 'AI tính toán cẩn trọng, bank sớm, độ chính xác toán 55%', badge: 'text-emerald-400 border-emerald-500/50' },
-    medium: { label: 'Pháp Sư (Vừa)', desc: 'AI đánh giá rủi ro cơ bản, độ chính xác toán 75%', badge: 'text-amber-400 border-amber-500/50' },
-    hard: { label: 'Đại Pháp Sư (Khó)', desc: 'Tính toán tỷ lệ Bust & sử dụng Rune tối ưu, chính xác 90%', badge: 'text-rose-400 border-rose-500/50' },
-    expert: { label: 'Hiền Triết (Cực Khó)', desc: 'Tối ưu hóa điểm kỳ vọng, hiếm khi sai sót, chính xác 98%', badge: 'text-purple-400 border-purple-500/50' },
+    easy: { label: 'Tân Thủ (Dễ)', desc: 'AI tính toán cẩn trọng, bank sớm, độ chính xác toán 55%', badge: 'text-moss-400 border-moss-500/50' },
+    medium: { label: 'Pháp Sư (Vừa)', desc: 'AI đánh giá rủi ro cơ bản, độ chính xác toán 75%', badge: 'text-brass-400 border-brass-500/50' },
+    hard: { label: 'Đại Pháp Sư (Khó)', desc: 'Tính toán tỷ lệ Bust & sử dụng Rune tối ưu, chính xác 90%', badge: 'text-garnet-400 border-garnet-500/50' },
+    expert: { label: 'Hiền Triết (Cực Khó)', desc: 'Tối ưu hóa điểm kỳ vọng, hiếm khi sai sót, chính xác 98%', badge: 'text-mauve-400 border-mauve-500/50' },
   };
 
   const handlePlayNow = () => {
@@ -89,26 +71,26 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     <div className="relative min-h-[calc(100vh-70px)] flex flex-col justify-between px-3 sm:px-6 py-4 sm:py-6 overflow-hidden">
       {/* Mobile-Friendly User Status & Quick Auth Card */}
       {user && (
-        <div className="relative z-10 max-w-6xl mx-auto w-full mb-4 p-3 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+        <div className="relative z-10 max-w-6xl mx-auto w-full mb-4 p-3 bg-ink-900/90 border border-ink-800 rounded-lg flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="text-3xl p-1 bg-slate-950 rounded-xl border border-amber-500/30">
-              {user.avatar}
+            <span aria-hidden="true" className="w-10 h-10 rounded-md bg-ink-800 text-ink-200 font-medium flex items-center justify-center shrink-0">
+              {(user.username || '?').trim().charAt(0).toUpperCase()}
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-slate-100 text-sm">{user.username}</span>
+                <span className="font-medium text-ink-100 text-sm">{user.username}</span>
                 {isGuest ? (
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/40">
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-brass-500/20 text-brass-300 font-mono border border-brass-500/40">
                     Tài khoản khách
                   </span>
                 ) : (
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/40">
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-moss-500/20 text-moss-300 font-mono border border-moss-500/40">
                     Đã xác thực
                   </span>
                 )}
               </div>
-              <div className="text-xs text-slate-400 font-mono">
-                Cấp độ: <strong className="text-amber-300">LV.{profile?.level || 1}</strong> • {profile?.xp || 0} XP
+              <div className="text-xs text-ink-400 font-mono">
+                Cấp độ: <strong className="text-brass-300">LV.{profile?.level || 1}</strong> • {profile?.xp || 0} XP
               </div>
             </div>
           </div>
@@ -119,9 +101,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 {onOpenAuth && (
                   <button
                     onClick={onOpenAuth}
-                    className="flex-1 sm:flex-initial px-4 py-2 text-on-accent font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap bg-amber-500 hover:bg-amber-400"
+                    className="flex-1 sm:flex-initial px-4 py-2 text-on-accent font-medium text-xs rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap bg-brass-500 hover:bg-brass-400"
                   >
-                    <User className="w-4 h-4" />
                     <span> Đăng nhập / đăng ký</span>
                   </button>
                 )}
@@ -132,9 +113,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                       else if (onLogout) onLogout();
                     }
                   }}
-                  className="px-3 py-2 bg-slate-850 hover:bg-rose-950/70 text-slate-300 hover:text-rose-200 border border-slate-700 hover:border-rose-500/60 rounded-xl text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                  className="px-3 py-2 bg-ink-850 hover:bg-garnet-950/70 text-ink-300 hover:text-garnet-200 border border-ink-700 hover:border-garnet-500/60 rounded-md text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
                 >
-                  <LogOut className="w-4 h-4 text-rose-400" />
                   <span>Đăng xuất</span>
                 </button>
               </>
@@ -142,17 +122,15 @@ export const MainMenu: React.FC<MainMenuProps> = ({
               <>
                 <button
                   onClick={onOpenProfile}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                  className="px-3 py-2 bg-ink-800 hover:bg-ink-700 text-ink-200 border border-ink-700 rounded-md text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
                 >
-                  <UserCheck className="w-4 h-4 text-indigo-400" />
                   <span>Hồ sơ</span>
                 </button>
                 {onLogout && (
                   <button
                     onClick={onLogout}
-                    className="px-4 py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/70 text-rose-200 text-xs font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                    className="px-4 py-2 bg-garnet-950/80 hover:bg-garnet-900 border border-garnet-500/70 text-garnet-200 text-xs font-medium rounded-md transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
                   >
-                    <LogOut className="w-4 h-4 text-rose-300" />
                     <span>Đăng xuất</span>
                   </button>
                 )}
@@ -171,22 +149,22 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <div className="lg:col-span-7 text-center lg:text-left space-y-6">
           
           {/* Badge Tagline */}
-          <p className="text-xs font-mono text-slate-400">Đấu trường thẻ tri thức toán học • học đường</p>
+          <p className="text-xs font-mono text-ink-400">Đấu trường thẻ tri thức toán học • học đường</p>
 
           {/* Epic Main Logo */}
           <div className="space-y-1">
-            <h1 className="font-cinzel text-5xl sm:text-7xl font-medium leading-none text-amber-300">
+            <h1 className="font-cinzel text-5xl sm:text-7xl font-medium leading-none text-brass-300">
               Math
               <br />
               Rune
             </h1>
-            <div className="font-mono text-xs sm:text-sm text-slate-400 pt-3">
+            <div className="font-mono text-xs sm:text-sm text-ink-400 pt-3">
               Master the numbers
             </div>
           </div>
 
           {/* Subtitle Description */}
-          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+          <p className="text-xs sm:text-sm text-ink-300 max-w-lg mx-auto lg:mx-0 leading-relaxed">
             Học viện thẻ tri thức toán học học đường. Rèn luyện tư duy logic, làm chủ bài toán xác suất rủi ro và kích hoạt 16 cổ ngữ Rune bảo mệnh để chinh phục đỉnh cao tri thức.
           </p>
 
@@ -197,7 +175,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 key={key}
                 title={`Hệ ${d.nameVi}: ${d.description}`}
 style={{ borderColor: d.color, }}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-950/90 border flex items-center justify-center p-0.5 transition-transform cursor-pointer"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-ink-950/90 border flex items-center justify-center p-0.5 transition-transform cursor-pointer"
               >
                 <DomainArt category={key} size="sm" className="w-full h-full" />
               </div>
@@ -205,15 +183,15 @@ style={{ borderColor: d.color, }}
           </div>
 
           {/* Math Level Selector Pills */}
-          <div className="flex items-center justify-center lg:justify-start gap-2 p-1 bg-slate-950/80 border border-slate-800 rounded-2xl max-w-md mx-auto lg:mx-0">
+          <div className="flex items-center justify-center lg:justify-start gap-2 p-1 bg-ink-950/80 border border-ink-800 rounded-lg max-w-md mx-auto lg:mx-0">
             {(['CO_BAN', 'THCS', 'THPT'] as MathLevel[]).map(lvl => (
               <button
                 key={lvl}
                 onClick={() => onSetMathLevel(lvl)}
-                className={`flex-1 py-2 px-3 text-xs font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] ${
+                className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-[color,background-color,border-color,opacity,transform] ${
                   mathLevel === lvl
-                    ? 'text-on-accent font-medium bg-amber-500'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'text-on-accent font-medium bg-brass-500'
+                    : 'text-ink-400 hover:text-ink-200'
                 }`}
               >
                 {lvl === 'CO_BAN' ? 'Cơ bản' : lvl === 'THCS' ? 'Cấp 2 (THCS)' : 'Nâng cao (cấp 3)'}
@@ -226,9 +204,8 @@ style={{ borderColor: d.color, }}
             {/* [ TRANH TÀI CÙNG AI ] Mega Button */}
             <button
               onClick={handlePlayNow}
-              className="group relative w-full overflow-hidden py-4 px-6 sm:px-8 rounded-2xl font-medium text-base sm:text-xl text-on-accent flex items-center justify-center gap-3 transition-[color,background-color,border-color,opacity,transform] active:scale-[0.97] cursor-pointer bg-amber-500 hover:bg-amber-400"
+              className="group relative w-full overflow-hidden py-4 px-6 sm:px-8 rounded-lg font-medium text-base sm:text-xl text-on-accent flex items-center justify-center gap-3 transition-[color,background-color,border-color,opacity,transform] active:scale-[0.97] cursor-pointer bg-brass-500 hover:bg-brass-400"
             >
-              <Play className="w-5 h-5 fill-current" />
               <span>Bắt đầu tranh tài (đấu AI)</span>
             </button>
 
@@ -236,25 +213,22 @@ style={{ borderColor: d.color, }}
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={onOpenHowToPlay}
-                className="py-3 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-medium text-slate-200 hover:text-amber-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95"
+                className="py-3 px-2 bg-ink-950/80 hover:bg-ink-900 border border-ink-800 hover:border-brass-500/60 rounded-md text-xs font-medium text-ink-200 hover:text-brass-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95"
               >
-                <BookOpen className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="truncate">Hướng dẫn</span>
               </button>
 
               <button
                 onClick={onOpenDeck}
-                className="py-3 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-medium text-slate-200 hover:text-amber-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95"
+                className="py-3 px-2 bg-ink-950/80 hover:bg-ink-900 border border-ink-800 hover:border-brass-500/60 rounded-md text-xs font-medium text-ink-200 hover:text-brass-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95"
               >
-                <Layers className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="truncate">Kho thẻ toán</span>
               </button>
 
               <button
                 onClick={onOpenOnline}
-                className="py-3 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-medium text-slate-200 hover:text-amber-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95 bg-purple-950/60 hover:bg-purple-900"
+                className="py-3 px-2 bg-ink-950/80 hover:bg-ink-900 border border-ink-800 hover:border-brass-500/60 rounded-md text-xs font-medium text-ink-200 hover:text-brass-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95 bg-mauve-950/60 hover:bg-mauve-900"
               >
-                <Globe className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="truncate">Đấu online</span>
               </button>
             </div>
@@ -265,10 +239,10 @@ style={{ borderColor: d.color, }}
                 href={guideLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2 px-3 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-2 group"
+                className="w-full py-2 px-3 bg-ink-950/80 hover:bg-ink-900 border border-ink-800 rounded-md text-xs font-medium text-ink-200 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-2 group"
               >
                 <span> Tài Liệu Hướng Dẫn Chi Tiết (Link Quản Trị / Nhà Trường)</span>
-                <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">↗</span>
+                <span className="text-brass-400 group-hover:translate-x-0.5 transition-transform">↗</span>
               </a>
             )}
           </div>
@@ -295,71 +269,56 @@ style={{ borderColor: d.color, }}
           {/* Cẩm Nang Hướng Dẫn */}
           <button
             onClick={onOpenHowToPlay}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-amber-900/50 hover:border-amber-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
+            className="p-3 bg-ink-950/80 hover:bg-ink-900 border border-brass-900/50 hover:border-brass-500/80 rounded-lg text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-slate-400 transition-transform">
-              <BookOpen className="w-4 h-4" />
-            </div>
-            <div className="text-xs font-medium text-slate-200 group-hover:text-amber-300">
+            <div className="text-xs font-medium text-ink-200 group-hover:text-brass-300">
               Cẩm nang
             </div>
-            <div className="text-[11px] text-slate-400 truncate">Luật thi đấu</div>
+            <div className="text-[11px] text-ink-400 truncate">Luật thi đấu</div>
           </button>
 
           {/* Cổ Ngữ Rune */}
           <button
             onClick={onOpenRunes}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-purple-900/50 hover:border-purple-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
+            className="p-3 bg-ink-950/80 hover:bg-ink-900 border border-mauve-900/50 hover:border-mauve-500/80 rounded-lg text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-purple-400 transition-transform">
-              <Gem className="w-4 h-4" />
-            </div>
-            <div className="text-xs font-medium text-slate-200 group-hover:text-purple-300">
+            <div className="text-xs font-medium text-ink-200 group-hover:text-mauve-300">
               16 RUNE
             </div>
-            <div className="text-[11px] text-slate-400 truncate">Bảo mệnh</div>
+            <div className="text-[11px] text-ink-400 truncate">Bảo mệnh</div>
           </button>
 
           {/* Hồ Sơ Học Viên */}
           <button
             onClick={onOpenProfile}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-emerald-900/50 hover:border-emerald-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
+            className="p-3 bg-ink-950/80 hover:bg-ink-900 border border-moss-900/50 hover:border-moss-500/80 rounded-lg text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-slate-400 transition-transform">
-              <UserCheck className="w-4 h-4" />
-            </div>
-            <div className="text-xs font-medium text-slate-200 group-hover:text-emerald-300">
+            <div className="text-xs font-medium text-ink-200 group-hover:text-moss-300">
               Hồ sơ
             </div>
-            <div className="text-[11px] text-slate-400 truncate">Cấp độ & XP</div>
+            <div className="text-[11px] text-ink-400 truncate">Cấp độ & XP</div>
           </button>
 
           {/* Bảng Xếp Hạng */}
           <button
             onClick={onOpenLeaderboard}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-yellow-900/50 hover:border-yellow-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
+            className="p-3 bg-ink-950/80 hover:bg-ink-900 border border-gilt-900/50 hover:border-gilt-500/80 rounded-lg text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-2 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 transition-transform">
-              <Trophy className="w-4 h-4" />
-            </div>
-            <div className="text-xs font-medium text-slate-200 group-hover:text-yellow-300">
+            <div className="text-xs font-medium text-ink-200 group-hover:text-gilt-300">
               Bảng vàng
             </div>
-            <div className="text-[11px] text-slate-400 truncate">Vinh danh</div>
+            <div className="text-[11px] text-ink-400 truncate">Vinh danh</div>
           </button>
 
           {/* Quản Trị Viên */}
           <button
             onClick={onOpenAdmin}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-indigo-900/50 hover:border-indigo-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
+            className="p-3 bg-ink-950/80 hover:bg-ink-900 border border-dusk-900/50 hover:border-dusk-500/80 rounded-lg text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-slate-400 transition-transform">
-              <Settings className="w-4 h-4" />
-            </div>
-            <div className="text-xs font-medium text-slate-200 group-hover:text-indigo-300">
+            <div className="text-xs font-medium text-ink-200 group-hover:text-dusk-300">
               ADMIN
             </div>
-            <div className="text-[11px] text-slate-400 truncate">Cấu hình</div>
+            <div className="text-[11px] text-ink-400 truncate">Cấu hình</div>
           </button>
         </div>
       </div>
@@ -368,18 +327,15 @@ style={{ borderColor: d.color, }}
       {/* 3. AI DIFFICULTY SELECTION MODAL                          */}
       {/* ========================================================= */}
       {showAiModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md border border-amber-500/70 rounded-2xl p-6 space-y-4 bg-slate-900">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/80 p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md border border-brass-500/70 rounded-lg p-6 space-y-4 bg-ink-900">
+            <div className="flex items-center justify-between border-b border-ink-800 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
-                  <Bot className="w-5 h-5" />
-                </div>
                 <div>
-                  <h3 className="text-base font-medium text-amber-200">
+                  <h3 className="text-base font-medium text-brass-200">
                     Thiết lập trận đấu AI
                   </h3>
-                  <div className="text-[11px] font-mono text-slate-400">
+                  <div className="text-[11px] font-mono text-ink-400">
                     Mục tiêu đạt 150 Điểm trước đối thủ
                   </div>
                 </div>
@@ -387,7 +343,7 @@ style={{ borderColor: d.color, }}
 
               <button
                 onClick={() => setShowAiModal(false)}
-                className="text-xs text-slate-400 hover:text-slate-200 underline"
+                className="text-xs text-ink-400 hover:text-ink-200 underline"
               >
                 Đóng
               </button>
@@ -399,19 +355,19 @@ style={{ borderColor: d.color, }}
                 <button
                   key={d}
                   onClick={() => setAiDiff(d)}
-                  className={`w-full p-3 rounded-2xl border text-left transition-[color,background-color,border-color,opacity,transform] ${
+                  className={`w-full p-3 rounded-lg border text-left transition-[color,background-color,border-color,opacity,transform] ${
                     aiDiff === d
-                      ? 'bg-amber-500/20 border-amber-400 scale-[1.02]'
-                      : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
+                      ? 'bg-brass-500/20 border-brass-400 scale-[1.02]'
+                      : 'bg-ink-950 border-ink-800 hover:bg-ink-900'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-xs text-slate-100">{diffLabels[d].label}</span>
+                    <span className="font-medium text-xs text-ink-100">{diffLabels[d].label}</span>
                     <span className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${diffLabels[d].badge}`}>
                       {d.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                  <p className="text-[11px] text-ink-400 mt-1 leading-relaxed">
                     {diffLabels[d].desc}
                   </p>
                 </button>
@@ -424,10 +380,9 @@ style={{ borderColor: d.color, }}
                 setShowAiModal(false);
                 onStartAi(aiDiff, mathLevel);
               }}
-              className="w-full py-3 text-on-accent font-medium text-sm rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400"
+              className="w-full py-3 text-on-accent font-medium text-sm rounded-md transition-transform active:scale-95 flex items-center justify-center gap-2 bg-brass-500 hover:bg-brass-400"
             >
               <span>Bắt đầu vào đấu trường</span>
-              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
