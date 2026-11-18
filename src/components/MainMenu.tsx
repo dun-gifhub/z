@@ -16,7 +16,7 @@ import {
   Play,
   ArrowRight,
   User,
-  LogOut,
+  LogOut, Gem
 } from 'lucide-react';
 import { MathLevel, AiDifficulty, UserProfile } from '../../shared/types.ts';
 import { DomainArt } from './DomainArt.tsx';
@@ -89,26 +89,26 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     <div className="relative min-h-[calc(100vh-70px)] flex flex-col justify-between px-3 sm:px-6 py-4 sm:py-6 overflow-hidden">
       {/* Mobile-Friendly User Status & Quick Auth Card */}
       {user && (
-        <div className="relative z-10 max-w-6xl mx-auto w-full mb-4 p-3 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xl backdrop-blur-md">
+        <div className="relative z-10 max-w-6xl mx-auto w-full mb-4 p-3 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="text-3xl p-1 bg-slate-950 rounded-xl border border-amber-500/30 shadow-inner">
+            <span className="text-3xl p-1 bg-slate-950 rounded-xl border border-amber-500/30">
               {user.avatar}
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-100 text-sm">{user.username}</span>
+                <span className="font-medium text-slate-100 text-sm">{user.username}</span>
                 {isGuest ? (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/40">
-                    Tài Khoản Khách
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/40">
+                    Tài khoản khách
                   </span>
                 ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/40">
-                    Đã Xác Thực
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/40">
+                    Đã xác thực
                   </span>
                 )}
               </div>
               <div className="text-xs text-slate-400 font-mono">
-                Cấp Độ: <strong className="text-amber-300">LV.{profile?.level || 1}</strong> • {profile?.xp || 0} XP
+                Cấp độ: <strong className="text-amber-300">LV.{profile?.level || 1}</strong> • {profile?.xp || 0} XP
               </div>
             </div>
           </div>
@@ -119,10 +119,10 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 {onOpenAuth && (
                   <button
                     onClick={onOpenAuth}
-                    className="flex-1 sm:flex-initial px-3.5 py-2 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 uppercase tracking-wide whitespace-nowrap"
+                    className="flex-1 sm:flex-initial px-4 py-2 text-on-accent font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap bg-amber-500 hover:bg-amber-400"
                   >
-                    <User className="w-3.5 h-3.5" />
-                    <span>🔑 Đăng Nhập / Đăng Ký</span>
+                    <User className="w-4 h-4" />
+                    <span> Đăng nhập / đăng ký</span>
                   </button>
                 )}
                 <button
@@ -132,28 +132,28 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                       else if (onLogout) onLogout();
                     }
                   }}
-                  className="px-3 py-2 bg-slate-850 hover:bg-rose-950/70 text-slate-300 hover:text-rose-200 border border-slate-700 hover:border-rose-500/60 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+                  className="px-3 py-2 bg-slate-850 hover:bg-rose-950/70 text-slate-300 hover:text-rose-200 border border-slate-700 hover:border-rose-500/60 rounded-xl text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
                 >
-                  <LogOut className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Đăng Xuất</span>
+                  <LogOut className="w-4 h-4 text-rose-400" />
+                  <span>Đăng xuất</span>
                 </button>
               </>
             ) : (
               <>
                 <button
                   onClick={onOpenProfile}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Hồ Sơ</span>
+                  <UserCheck className="w-4 h-4 text-indigo-400" />
+                  <span>Hồ sơ</span>
                 </button>
                 {onLogout && (
                   <button
                     onClick={onLogout}
-                    className="px-3.5 py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/70 text-rose-200 text-xs font-bold rounded-xl shadow transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+                    className="px-4 py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/70 text-rose-200 text-xs font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center gap-2 whitespace-nowrap"
                   >
-                    <LogOut className="w-3.5 h-3.5 text-rose-300" />
-                    <span>Đăng Xuất</span>
+                    <LogOut className="w-4 h-4 text-rose-300" />
+                    <span>Đăng xuất</span>
                   </button>
                 )}
               </>
@@ -171,36 +171,33 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <div className="lg:col-span-7 text-center lg:text-left space-y-6">
           
           {/* Badge Tagline */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-500/40 text-amber-300 text-xs font-mono uppercase tracking-widest shadow-lg shadow-amber-950/30">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-            <span>ĐẤU TRƯỜNG THẺ TRI THỨC TOÁN HỌC • HỌC ĐƯỜNG</span>
-          </div>
+          <p className="text-xs font-mono text-slate-400">Đấu trường thẻ tri thức toán học • học đường</p>
 
           {/* Epic Main Logo */}
           <div className="space-y-1">
-            <h1 className="font-cinzel text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-amber-600 drop-shadow-[0_4px_25px_rgba(245,158,11,0.4)]">
-              MATH
+            <h1 className="font-cinzel text-5xl sm:text-7xl font-medium leading-none text-amber-300">
+              Math
               <br />
-              RUNE
+              Rune
             </h1>
-            <div className="font-cinzel font-bold text-xs sm:text-base tracking-[0.25em] text-indigo-300 pt-2 uppercase">
-              MASTER THE NUMBERS
+            <div className="font-mono text-xs sm:text-sm text-slate-400 pt-3">
+              Master the numbers
             </div>
           </div>
 
           {/* Subtitle Description */}
-          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto lg:mx-0 font-light leading-relaxed">
-            Học viện Thẻ Tri Thức Toán Học học đường. Rèn luyện tư duy logic, làm chủ bài toán xác suất rủi ro và kích hoạt 16 cổ ngữ Rune bảo mệnh để chinh phục đỉnh cao tri thức.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            Học viện thẻ tri thức toán học học đường. Rèn luyện tư duy logic, làm chủ bài toán xác suất rủi ro và kích hoạt 16 cổ ngữ Rune bảo mệnh để chinh phục đỉnh cao tri thức.
           </p>
 
           {/* 10 Domain Glyphs Showcase Strip */}
-          <div className="flex items-center justify-center lg:justify-start gap-1.5 flex-wrap">
+          <div className="flex items-center justify-center lg:justify-start gap-2 flex-wrap">
             {Object.entries(MATH_DOMAINS).map(([key, d]) => (
               <div
                 key={key}
                 title={`Hệ ${d.nameVi}: ${d.description}`}
-                style={{ borderColor: d.color, boxShadow: `0 0 10px ${d.glow}` }}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-950/90 border flex items-center justify-center p-0.5 hover:scale-125 transition-transform cursor-pointer"
+style={{ borderColor: d.color, }}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-950/90 border flex items-center justify-center p-0.5 transition-transform cursor-pointer"
               >
                 <DomainArt category={key} size="sm" className="w-full h-full" />
               </div>
@@ -208,18 +205,18 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           </div>
 
           {/* Math Level Selector Pills */}
-          <div className="flex items-center justify-center lg:justify-start gap-1.5 p-1 bg-slate-950/80 border border-slate-800 rounded-2xl max-w-md mx-auto lg:mx-0 shadow-inner">
+          <div className="flex items-center justify-center lg:justify-start gap-2 p-1 bg-slate-950/80 border border-slate-800 rounded-2xl max-w-md mx-auto lg:mx-0">
             {(['CO_BAN', 'THCS', 'THPT'] as MathLevel[]).map(lvl => (
               <button
                 key={lvl}
                 onClick={() => onSetMathLevel(lvl)}
-                className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all ${
+                className={`flex-1 py-2 px-3 text-xs font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] ${
                   mathLevel === lvl
-                    ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-md font-black scale-105'
+                    ? 'text-on-accent font-medium bg-amber-500'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {lvl === 'CO_BAN' ? 'Cơ Bản' : lvl === 'THCS' ? 'Cấp 2 (THCS)' : 'Nâng Cao (Cấp 3)'}
+                {lvl === 'CO_BAN' ? 'Cơ bản' : lvl === 'THCS' ? 'Cấp 2 (THCS)' : 'Nâng cao (cấp 3)'}
               </button>
             ))}
           </div>
@@ -229,41 +226,36 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             {/* [ TRANH TÀI CÙNG AI ] Mega Button */}
             <button
               onClick={handlePlayNow}
-              className="group relative w-full overflow-hidden py-4 px-6 sm:px-8 rounded-2xl font-cinzel font-black text-base sm:text-xl text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:via-yellow-300 hover:to-amber-400 shadow-[0_12px_30px_rgba(245,158,11,0.5),inset_0_2px_4px_rgba(255,255,255,0.6)] flex items-center justify-center gap-3 transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+              className="group relative w-full overflow-hidden py-4 px-6 sm:px-8 rounded-2xl font-medium text-base sm:text-xl text-on-accent flex items-center justify-center gap-3 transition-[color,background-color,border-color,opacity,transform] active:scale-[0.97] cursor-pointer bg-amber-500 hover:bg-amber-400"
             >
-              {/* Animated Light Sweep Beam */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-25deg] transform -translate-x-full group-hover:animate-light-sweep" />
-              </div>
-              <Play className="w-5 h-5 fill-slate-950" />
-              <span className="tracking-wider uppercase">BẮT ĐẦU TRANH TÀI (ĐẤU AI)</span>
-              <Sparkles className="w-4 h-4 text-slate-950 animate-bounce" />
+              <Play className="w-5 h-5 fill-current" />
+              <span>Bắt đầu tranh tài (đấu AI)</span>
             </button>
 
             {/* Secondary Buttons Row: [ HƯỚNG DẪN ] [ KHO THẺ TOÁN ] [ ĐẤU ONLINE ] */}
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={onOpenHowToPlay}
-                className="py-2.5 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 transition-all flex items-center justify-center gap-1 shadow-md hover:scale-105 active:scale-95"
+                className="py-3 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-medium text-slate-200 hover:text-amber-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95"
               >
-                <BookOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">HƯỚNG DẪN</span>
+                <BookOpen className="w-4 h-4 text-slate-400 shrink-0" />
+                <span className="truncate">Hướng dẫn</span>
               </button>
 
               <button
                 onClick={onOpenDeck}
-                className="py-2.5 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 transition-all flex items-center justify-center gap-1 shadow-md hover:scale-105 active:scale-95"
+                className="py-3 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-medium text-slate-200 hover:text-amber-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95"
               >
-                <Layers className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">KHO THẺ TOÁN</span>
+                <Layers className="w-4 h-4 text-slate-400 shrink-0" />
+                <span className="truncate">Kho thẻ toán</span>
               </button>
 
               <button
                 onClick={onOpenOnline}
-                className="py-2.5 px-2 bg-gradient-to-r from-purple-950/60 to-indigo-950/60 hover:from-purple-900 hover:to-indigo-900 border border-purple-500/50 hover:border-purple-400 rounded-xl text-xs font-bold text-purple-200 transition-all flex items-center justify-center gap-1 shadow-md hover:scale-105 active:scale-95"
+                className="py-3 px-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl text-xs font-medium text-slate-200 hover:text-amber-300 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-1 active:scale-95 bg-purple-950/60 hover:bg-purple-900"
               >
-                <Globe className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                <span className="truncate">ĐẤU ONLINE</span>
+                <Globe className="w-4 h-4 text-slate-400 shrink-0" />
+                <span className="truncate">Đấu online</span>
               </button>
             </div>
 
@@ -273,9 +265,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 href={guideLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2 px-3 bg-indigo-950/70 hover:bg-indigo-900/90 border border-indigo-500/40 rounded-xl text-xs font-semibold text-indigo-200 transition-all flex items-center justify-center gap-1.5 shadow-sm group"
+                className="w-full py-2 px-3 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 transition-[color,background-color,border-color,opacity,transform] flex items-center justify-center gap-2 group"
               >
-                <span>📖 Tài Liệu Hướng Dẫn Chi Tiết (Link Quản Trị / Nhà Trường)</span>
+                <span> Tài Liệu Hướng Dẫn Chi Tiết (Link Quản Trị / Nhà Trường)</span>
                 <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">↗</span>
               </a>
             )}
@@ -299,75 +291,75 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         </div>
 
         {/* Navigation Portals Grid (7 Columns - 5 items) */}
-        <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-5 gap-2.5 w-full">
+        <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-5 gap-3 w-full">
           {/* Cẩm Nang Hướng Dẫn */}
           <button
             onClick={onOpenHowToPlay}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-amber-900/50 hover:border-amber-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-amber-900/50 hover:border-amber-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-slate-400 transition-transform">
               <BookOpen className="w-4 h-4" />
             </div>
-            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-amber-300">
-              CẨM NANG
+            <div className="text-xs font-medium text-slate-200 group-hover:text-amber-300">
+              Cẩm nang
             </div>
-            <div className="text-[10px] text-slate-400 truncate">Luật thi đấu</div>
+            <div className="text-[11px] text-slate-400 truncate">Luật thi đấu</div>
           </button>
 
           {/* Cổ Ngữ Rune */}
           <button
             onClick={onOpenRunes}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-purple-900/50 hover:border-purple-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-purple-900/50 hover:border-purple-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-purple-400 transition-transform">
+              <Gem className="w-4 h-4" />
             </div>
-            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-purple-300">
+            <div className="text-xs font-medium text-slate-200 group-hover:text-purple-300">
               16 RUNE
             </div>
-            <div className="text-[10px] text-slate-400 truncate">Bảo mệnh</div>
+            <div className="text-[11px] text-slate-400 truncate">Bảo mệnh</div>
           </button>
 
           {/* Hồ Sơ Học Viên */}
           <button
             onClick={onOpenProfile}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-emerald-900/50 hover:border-emerald-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-emerald-900/50 hover:border-emerald-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-slate-400 transition-transform">
               <UserCheck className="w-4 h-4" />
             </div>
-            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-emerald-300">
-              HỒ SƠ
+            <div className="text-xs font-medium text-slate-200 group-hover:text-emerald-300">
+              Hồ sơ
             </div>
-            <div className="text-[10px] text-slate-400 truncate">Cấp độ & XP</div>
+            <div className="text-[11px] text-slate-400 truncate">Cấp độ & XP</div>
           </button>
 
           {/* Bảng Xếp Hạng */}
           <button
             onClick={onOpenLeaderboard}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-yellow-900/50 hover:border-yellow-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-yellow-900/50 hover:border-yellow-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 transition-transform">
               <Trophy className="w-4 h-4" />
             </div>
-            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-yellow-300">
-              BẢNG VÀNG
+            <div className="text-xs font-medium text-slate-200 group-hover:text-yellow-300">
+              Bảng vàng
             </div>
-            <div className="text-[10px] text-slate-400 truncate">Vinh danh</div>
+            <div className="text-[11px] text-slate-400 truncate">Vinh danh</div>
           </button>
 
           {/* Quản Trị Viên */}
           <button
             onClick={onOpenAdmin}
-            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-indigo-900/50 hover:border-indigo-500/80 rounded-2xl text-center group transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-indigo-900/50 hover:border-indigo-500/80 rounded-2xl text-center group transition-[color,background-color,border-color,opacity,transform] active:scale-95"
           >
-            <div className="w-8 h-8 mx-auto mb-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-xl border border-slate-700 flex items-center justify-center text-slate-400 transition-transform">
               <Settings className="w-4 h-4" />
             </div>
-            <div className="font-cinzel text-xs font-bold text-slate-200 group-hover:text-indigo-300">
+            <div className="text-xs font-medium text-slate-200 group-hover:text-indigo-300">
               ADMIN
             </div>
-            <div className="text-[10px] text-slate-400 truncate">Cấu hình</div>
+            <div className="text-[11px] text-slate-400 truncate">Cấu hình</div>
           </button>
         </div>
       </div>
@@ -376,18 +368,18 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       {/* 3. AI DIFFICULTY SELECTION MODAL                          */}
       {/* ========================================================= */}
       {showAiModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-2 border-amber-500/70 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md border border-amber-500/70 rounded-2xl p-6 space-y-4 bg-slate-900">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-cinzel text-base font-bold text-amber-200">
-                    THIẾT LẬP TRẬN ĐẤU AI
+                  <h3 className="text-base font-medium text-amber-200">
+                    Thiết lập trận đấu AI
                   </h3>
-                  <div className="text-[10px] font-mono text-slate-400">
+                  <div className="text-[11px] font-mono text-slate-400">
                     Mục tiêu đạt 150 Điểm trước đối thủ
                   </div>
                 </div>
@@ -407,19 +399,19 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 <button
                   key={d}
                   onClick={() => setAiDiff(d)}
-                  className={`w-full p-3 rounded-2xl border text-left transition-all ${
+                  className={`w-full p-3 rounded-2xl border text-left transition-[color,background-color,border-color,opacity,transform] ${
                     aiDiff === d
-                      ? 'bg-amber-500/20 border-amber-400 shadow-md scale-[1.02]'
+                      ? 'bg-amber-500/20 border-amber-400 scale-[1.02]'
                       : 'bg-slate-950 border-slate-800 hover:bg-slate-900'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-slate-100">{diffLabels[d].label}</span>
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${diffLabels[d].badge}`}>
+                    <span className="font-medium text-xs text-slate-100">{diffLabels[d].label}</span>
+                    <span className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${diffLabels[d].badge}`}>
                       {d.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1 font-light leading-relaxed">
+                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
                     {diffLabels[d].desc}
                   </p>
                 </button>
@@ -432,9 +424,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 setShowAiModal(false);
                 onStartAi(aiDiff, mathLevel);
               }}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-400 text-slate-950 font-cinzel font-black text-sm rounded-xl shadow-lg transition-transform active:scale-95 uppercase tracking-wider flex items-center justify-center gap-2"
+              className="w-full py-3 text-on-accent font-medium text-sm rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400"
             >
-              <span>BẮT ĐẦU VÀO ĐẤU TRƯỜNG</span>
+              <span>Bắt đầu vào đấu trường</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

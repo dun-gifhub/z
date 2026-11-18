@@ -21,10 +21,10 @@ export const MobileRotateButton: React.FC<MobileRotateButtonProps> = ({
         <button
           onClick={onOpenExternal}
           title="Mở tab mới trên Safari / Chrome để xoay toàn màn hình"
-          className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-indigo-950/90 border border-indigo-600/70 text-indigo-200 text-[10px] font-bold shadow-lg backdrop-blur-md active:scale-95"
+          className="flex items-center gap-1 px-3 py-1 rounded-xl bg-indigo-950/90 border border-indigo-600/70 text-indigo-200 text-[11px] font-medium active:scale-95"
         >
           <ExternalLink className="w-3 h-3 text-amber-400" />
-          <span>Mở Tab Safari/Chrome</span>
+          <span>Mở tab Safari/Chrome</span>
         </button>
       )}
 
@@ -32,35 +32,35 @@ export const MobileRotateButton: React.FC<MobileRotateButtonProps> = ({
       <button
         onClick={onToggle}
         title={isLandscape ? 'Màn hình đang ở góc ngang' : 'Bấm để xem hướng dẫn và xoay ngang màn hình'}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl shadow-xl transition-all active:scale-95 border backdrop-blur-md ${
+        className={`flex items-center gap-2 px-3 py-2 rounded-2xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 border ${
           isLandscape
             ? 'bg-slate-900/90 border-slate-700 text-slate-300 text-xs'
-            : 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 border-amber-300 text-slate-950 font-black shadow-amber-950/40 animate-pulse text-xs'
+            : 'border-amber-300 text-on-accent font-medium text-xs bg-amber-500'
         }`}
       >
         <div className="relative">
           <Smartphone
-            className={`w-3.5 h-3.5 transition-transform duration-300 ${
-              isLandscape ? 'rotate-90 text-amber-400' : 'text-slate-950'
+            className={`w-4 h-4 transition-transform duration-300 ${
+              isLandscape ? 'rotate-90 text-amber-400' : 'text-on-accent'
             }`}
           />
           <RotateCw
             className={`w-2 h-2 absolute -top-1 -right-1 ${
-              isLandscape ? 'text-amber-400' : 'text-slate-950 animate-spin'
+              isLandscape ? 'text-amber-400' : 'text-on-accent'
             }`}
             style={{ animationDuration: '4s' }}
           />
         </div>
 
-        <span className="text-[11px] font-bold tracking-tight">
-          {isLandscape ? '📱 Góc Ngang' : '📱 Xoay Ngang'}
+        <span className="text-[11px] font-medium">
+          {isLandscape ? 'Góc ngang' : 'Xoay ngang'}
         </span>
       </button>
 
       {/* Hint badge only in portrait */}
       {!isLandscape && (
-        <span className="text-[9px] font-mono text-amber-300 bg-slate-950/90 px-2 py-0.5 rounded-full border border-amber-500/40 shadow">
-          Góc rộng bàn đấu 🎴
+        <span className="text-[11px] font-mono text-amber-300 bg-slate-950/90 px-2 py-0.5 rounded-full border border-amber-500/40">
+          Góc rộng bàn đấu 
         </span>
       )}
     </div>

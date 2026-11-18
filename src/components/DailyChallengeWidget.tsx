@@ -66,24 +66,21 @@ export const DailyChallengeWidget: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-slate-950/85 backdrop-blur-md border border-amber-500/40 rounded-2xl p-3.5 shadow-xl transition-all select-none">
+    <div className="w-full max-w-sm mx-auto bg-slate-950/85 border border-amber-500/40 rounded-2xl p-4 transition-[color,background-color,border-color,opacity,transform] select-none">
       {/* Header */}
       <div
         onClick={() => setCollapsed(!collapsed)}
         className="flex items-center justify-between cursor-pointer group"
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+          <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 transition-transform">
             <Zap className="w-4 h-4 fill-amber-400" />
           </div>
           <div>
-            <div className="font-cinzel text-xs sm:text-sm font-bold text-amber-200 tracking-wide flex items-center gap-1.5">
-              <span>THỬ THÁCH HÔM NAY</span>
-              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">
-                MỚI
-              </span>
+            <div className="text-xs sm:text-sm font-medium text-amber-200 flex items-center gap-2">
+              <span>Thử thách hôm nay</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
+            <div className="text-[11px] text-slate-400 font-mono">
               Hoàn thành để nhận thêm kinh nghiệm & danh hiệu
             </div>
           </div>
@@ -102,31 +99,31 @@ export const DailyChallengeWidget: React.FC = () => {
             return (
               <div
                 key={quest.id}
-                className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-3 text-xs"
+                className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-3 text-xs"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 text-slate-200 font-medium">
+                  <div className="flex items-center gap-2 text-slate-200 font-medium">
                     {quest.completed ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     ) : (
-                      <Circle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <Circle className="w-4 h-4 text-slate-500 shrink-0" />
                     )}
                     <span className="truncate">{quest.title}</span>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                  <div className="mt-2 flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                       <div
                         style={{ width: `${progress}%` }}
-                        className={`h-full rounded-full transition-all duration-500 ${
+                        className={`h-full rounded-full transition-[color,background-color,border-color,opacity,transform] duration-500 ${
                           quest.completed
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
-                            : 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                            ? 'bg-emerald-500'
+                            : 'bg-amber-500'
                         }`}
                       />
                     </div>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[11px] font-mono text-slate-400">
                       {quest.current}/{quest.target}
                     </span>
                   </div>
@@ -136,17 +133,17 @@ export const DailyChallengeWidget: React.FC = () => {
                 <div>
                   {quest.completed ? (
                     quest.claimed ? (
-                      <span className="text-[10px] font-mono text-slate-500">Đã Nhận</span>
+                      <span className="text-[11px] font-mono text-slate-500">Đã nhận</span>
                     ) : (
                       <button
                         onClick={() => handleClaim(quest.id)}
-                        className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-[10px] rounded-lg shadow-md animate-pulse uppercase tracking-wider"
+                        className="px-3 py-1 text-on-accent font-medium text-[11px] rounded-lg bg-amber-500 hover:bg-amber-400"
                       >
                         +{quest.rewardXp} XP
                       </button>
                     )
                   ) : (
-                    <span className="text-[10px] font-mono text-amber-400/80">
+                    <span className="text-[11px] font-mono text-amber-400/80">
                       +{quest.rewardXp} XP
                     </span>
                   )}
