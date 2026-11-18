@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Trophy } from 'lucide-react';
+import { Sparkles, Trophy } from 'lucide-react';
 import { sound } from '../utils/soundEffects.ts';
 
 interface AnimatedCounterProps {
@@ -70,24 +70,25 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
     <div className={`relative inline-flex flex-col items-center ${className}`}>
       {/* High score fanfare pop-in */}
       {showHighScoreBanner && (
-        <div className="absolute -top-7 px-3 py-0.5 rounded-full text-on-accent font-medium text-[11px] flex items-center gap-1 z-20 bg-amber-500">
-          <Trophy className="w-3 h-3 text-on-accent" />
-          <span>Kỷ lục mới</span>
+        <div className="absolute -top-7 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-[10px] uppercase tracking-wider flex items-center gap-1 shadow-lg animate-bounce z-20">
+          <Trophy className="w-3 h-3 text-slate-950" />
+          <span>KỶ LỤC MỚI!</span>
         </div>
       )}
 
       {/* Floating Delta Badge (+Points) */}
       {delta !== null && (
-        <div className="absolute -top-4 -right-6 font-mono font-medium text-xs text-amber-300 pointer-events-none animate-[score-burst_1.2s_ease-out_forwards] z-20 flex items-center gap-0.5">
+        <div className="absolute -top-4 -right-6 font-mono font-black text-xs text-amber-300 pointer-events-none animate-[score-burst_1.2s_ease-out_forwards] z-20 flex items-center gap-0.5">
+          <Sparkles className="w-3 h-3 text-yellow-400" />
           <span>+{delta}</span>
         </div>
       )}
 
-      {label && <div className="text-[11px] font-mono text-slate-400">{label}</div>}
+      {label && <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">{label}</div>}
 
       <div
-        className={`font-mono font-medium transition-transform duration-200 ${
-          isBouncing ? 'scale-125 text-amber-300' : ''
+        className={`font-mono font-black transition-transform duration-200 ${
+          isBouncing ? 'scale-125 text-amber-300 filter drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]' : ''
         }`}
       >
         {prefix}

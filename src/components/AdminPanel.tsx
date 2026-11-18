@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Plus, Trash2, Database, Users, BookOpen, CheckCircle, RefreshCw, Lock, KeyRound, Settings, Crown, UserX, XCircle, Link2, Landmark, RotateCcw, Globe, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Shield, Plus, Trash2, Database, Users, BookOpen, CheckCircle, RefreshCw, Lock, KeyRound, Settings, Crown, UserX, XCircle, Link2, Landmark, RotateCcw, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { MathLevel, MathCategory, Question, SiteSettings, PremiumRequest, PremiumPlan } from '../../shared/types.ts';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
 
@@ -188,7 +188,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       });
 
       if (res.ok) {
-        setFormMsg('Đã thêm câu hỏi vào Ngân Hàng Đề');
+        setFormMsg('✓ Đã thêm câu hỏi vào Ngân Hàng Đề!');
         setQText('');
         setQFormula('');
         setQAnswer('');
@@ -228,7 +228,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         throw new Error(data.error || 'Không thể sinh câu hỏi AI.');
       }
       setAiGeneratedQuestion(data.question);
-      setAiSuccessMsg('Đã sinh thành công 01 câu hỏi toán học uy tín có thẩm định');
+      setAiSuccessMsg('✨ Đã sinh thành công 01 câu hỏi toán học uy tín có thẩm định!');
     } catch (err: any) {
       setAiErrorMsg(err?.message || 'Lỗi khi sinh câu hỏi AI.');
     } finally {
@@ -252,7 +252,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Lỗi lưu câu hỏi vào ngân hàng.');
       }
-      setAiSuccessMsg('Đã thêm thành công câu hỏi vào Ngân Hàng Đề thi đấu');
+      setAiSuccessMsg('🎉 Đã thêm thành công câu hỏi vào Ngân Hàng Đề thi đấu!');
       setAiGeneratedQuestion(null);
       fetchQuestions();
       fetchStats();
@@ -341,7 +341,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        alert(data.message || 'Đã gỡ gói PRO thành công');
+        alert(data.message || 'Đã gỡ gói PRO thành công!');
         fetchUsers();
         fetchStats();
       } else {
@@ -369,7 +369,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        setGrantActionMsg(` ${data.message || 'Đã gia hạn gói PRO thành công'}`);
+        setGrantActionMsg(`✓ ${data.message || 'Đã gia hạn gói PRO thành công!'}`);
         setCustomGrantUsername('');
         fetchUsers();
         fetchStats();
@@ -392,7 +392,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         headers: adminHeaders,
       });
       if (res.ok) {
-        setPremiumActionMsg(approve ? 'Đã duyệt và kích hoạt Premium cho người dùng' : 'Đã từ chối yêu cầu.');
+        setPremiumActionMsg(approve ? '✓ Đã duyệt và kích hoạt Premium cho người dùng!' : 'Đã từ chối yêu cầu.');
         fetchPremiumRequests();
         fetchUsers();
         fetchStats();
@@ -417,7 +417,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       const data = await res.json();
       if (res.ok) {
         setSettings(data);
-        setSettingsMsg('Đã lưu cài đặt');
+        setSettingsMsg('✓ Đã lưu cài đặt!');
       } else {
         setSettingsMsg(`Lỗi: ${data.error}`);
       }
@@ -438,7 +438,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       const d = await res.json();
       if (res.ok) {
         setSettings(prev => prev ? { ...prev, lastLeaderboardReset: d.settings.lastLeaderboardReset } : prev);
-        setSettingsMsg('Đã reset Bảng Xếp Hạng Tuần về 0đ');
+        setSettingsMsg('✓ Đã reset Bảng Xếp Hạng Tuần về 0đ!');
         setTimeout(() => setSettingsMsg(null), 3000);
       }
     } catch (e) {
@@ -456,7 +456,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     try {
       const res = await fetch('/api/admin/leaderboard/reset-alltime', { method: 'POST', headers: adminHeaders });
       if (res.ok) {
-        setSettingsMsg('Đã reset Bảng Xếp Hạng Toàn Thời Gian về 0đ');
+        setSettingsMsg('✓ Đã reset Bảng Xếp Hạng Toàn Thời Gian về 0đ!');
         setTimeout(() => setSettingsMsg(null), 3000);
       }
     } catch (e) {
@@ -472,17 +472,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       <div className="max-w-md mx-auto px-4 py-10">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors mb-6"
+          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Quay lại sảnh chính</span>
+          <span>Quay Lại Sảnh Chính</span>
         </button>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-700/40 text-amber-400">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-700/40 text-amber-400 shadow-inner">
             <Lock className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-medium text-amber-100">Khu vực quản trị</h3>
+          <h3 className="font-cinzel text-lg font-black text-amber-100">KHU VỰC QUẢN TRỊ</h3>
           <p className="text-xs text-slate-400">
             Nhập mật khẩu Admin để tiếp tục. Khu vực này không dành cho khách hay người chơi thường.
           </p>
@@ -497,12 +497,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 value={pwInput}
                 onChange={e => setPwInput(e.target.value)}
                 placeholder="Mật khẩu Admin"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
               />
             </div>
 
             {authError && (
-              <div className="p-3 bg-rose-950/50 border border-rose-800 text-rose-300 text-xs rounded-xl">
+              <div className="p-2.5 bg-rose-950/50 border border-rose-800 text-rose-300 text-xs rounded-xl">
                 {authError}
               </div>
             )}
@@ -510,9 +510,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             <button
               type="submit"
               disabled={authLoading}
-              className="w-full py-3 font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-amber-600 hover:bg-amber-500"
+              className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 font-bold text-xs rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
             >
-              {authLoading ? 'Đang kiểm tra...' : 'Mở khóa'}
+              {authLoading ? 'Đang kiểm tra...' : 'Mở Khóa'}
             </button>
           </form>
         </div>
@@ -526,21 +526,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Quay lại sảnh chính</span>
+          <span>Quay Lại Sảnh Chính</span>
         </button>
 
-        <div className="flex items-center gap-2 px-3 py-1 bg-amber-950/40 border border-amber-800/40 rounded-full text-xs font-mono text-amber-300">
-          <Shield className="w-4 h-4 text-amber-400" />
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-950/40 border border-amber-800/40 rounded-full text-xs font-mono text-amber-300">
+          <Shield className="w-3.5 h-3.5 text-amber-400" />
           <span>Trang Quản Trị Hệ Thống (Admin Panel)</span>
         </div>
       </div>
 
       <div className="text-center space-y-1">
-        <h2 className="text-2xl sm:text-3xl font-medium text-amber-200">
-          Quản trị viên & hệ thống
+        <h2 className="font-cinzel text-2xl sm:text-3xl font-black text-amber-200">
+          QUẢN TRỊ VIÊN & HỆ THỐNG
         </h2>
         <p className="text-xs text-slate-400">
           Giám sát tài nguyên máy chủ, quản lý ngân hàng câu hỏi toán học và danh sách pháp sư.
@@ -550,18 +550,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       {/* Tabs */}
       <div className="flex flex-wrap justify-center gap-2">
         {[
-          { id: 'stats', label: 'Tổng Quan Máy Chủ' },
-          { id: 'questions', label: 'Ngân hàng câu hỏi' },
-          { id: 'users', label: 'Người Dùng' },
-          { id: 'premium', label: 'Gói premium' },
-          { id: 'settings', label: 'Cài đặt' },
+          { id: 'stats', label: '📊 Tổng Quan Máy Chủ' },
+          { id: 'questions', label: '🧮 Ngân Hàng Câu Hỏi' },
+          { id: 'users', label: '👥 Người Dùng' },
+          { id: 'premium', label: '💎 Gói Premium' },
+          { id: 'settings', label: '⚙️ Cài Đặt' },
         ].map(t => (
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id as any)}
-            className={`px-4 py-2 text-xs font-medium rounded-xl border transition-[color,background-color,border-color,opacity,transform] ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all ${
               activeTab === t.id
-                ? 'bg-amber-600 border-amber-400 text-on-accent'
+                ? 'bg-amber-600 border-amber-400 text-slate-950 shadow-md'
                 : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'
             }`}
           >
@@ -575,43 +575,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-center">
-              <div className="text-xs text-slate-400">Tổng người dùng</div>
-              <div className="text-2xl font-medium text-amber-300 font-mono mt-1">
+              <div className="text-xs text-slate-400">Tổng Người Dùng</div>
+              <div className="text-2xl font-black text-amber-300 font-mono mt-1">
                 {stats?.totalUsers ?? '...'}
               </div>
             </div>
 
             <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-center">
-              <div className="text-xs text-slate-400">Tổng câu hỏi toán</div>
-              <div className="text-2xl font-medium text-indigo-300 font-mono mt-1">
+              <div className="text-xs text-slate-400">Tổng Câu Hỏi Toán</div>
+              <div className="text-2xl font-black text-indigo-300 font-mono mt-1">
                 {stats?.totalQuestions ?? '...'}
               </div>
             </div>
 
             <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-center">
               <div className="text-xs text-slate-400">Bộ Bài 10 Hệ</div>
-              <div className="text-2xl font-medium text-emerald-400 font-mono mt-1">
+              <div className="text-2xl font-black text-emerald-400 font-mono mt-1">
                 {stats?.totalCards ?? 60} Lá
               </div>
             </div>
 
             <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-center">
-              <div className="text-xs text-slate-400">Bộ ấn chú</div>
-              <div className="text-2xl font-medium text-purple-300 font-mono mt-1">
+              <div className="text-xs text-slate-400">Bộ Ấn Chú</div>
+              <div className="text-2xl font-black text-purple-300 font-mono mt-1">
                 {stats?.totalRunes ?? 16} Rune
               </div>
             </div>
 
             <div className="p-4 bg-slate-900 border border-yellow-800/50 rounded-2xl text-center">
-              <div className="text-xs text-slate-400">Thành viên premium</div>
-              <div className="text-2xl font-medium text-yellow-300 font-mono mt-1">
+              <div className="text-xs text-slate-400">Thành Viên Premium</div>
+              <div className="text-2xl font-black text-yellow-300 font-mono mt-1">
                 {stats?.totalPremiumUsers ?? 0}
               </div>
             </div>
 
             <div className="p-4 bg-slate-900 border border-indigo-800/50 rounded-2xl text-center">
-              <div className="text-xs text-slate-400">Yêu cầu premium chờ duyệt</div>
-              <div className="text-2xl font-medium text-indigo-300 font-mono mt-1">
+              <div className="text-xs text-slate-400">Yêu Cầu Premium Chờ Duyệt</div>
+              <div className="text-2xl font-black text-indigo-300 font-mono mt-1">
                 {stats?.pendingPremiumRequests ?? 0}
               </div>
             </div>
@@ -619,16 +619,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
           <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-2 text-xs font-mono text-slate-300">
             <div className="flex justify-between">
-              <span>Trạng thái hệ thống:</span>
-              <span className="text-emerald-400 font-medium">● Đang Hoạt Động (Healthy)</span>
+              <span>Trạng Thái Hệ Thống:</span>
+              <span className="text-emerald-400 font-bold">● Đang Hoạt Động (Healthy)</span>
             </div>
             <div className="flex justify-between">
-              <span>Bộ nhớ RAM đang chiếm:</span>
+              <span>Bộ Nhớ RAM Đang Chiếm:</span>
               <span className="text-amber-300">{stats?.activeMemoryUsage ?? '34 MB'}</span>
             </div>
             <div className="flex justify-between">
-              <span>Engine đồng bộ:</span>
-              <span className="text-indigo-300">WebSocket authoritative server</span>
+              <span>Engine Đồng Bộ:</span>
+              <span className="text-indigo-300">WebSocket Authoritative Server</span>
             </div>
           </div>
         </div>
@@ -638,22 +638,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       {activeTab === 'questions' && (
         <div className="space-y-6">
           {/* AI QUESTION GENERATOR FROM CREDIBLE WEBSITES */}
-          <div className="p-5 border border-indigo-500/50 rounded-2xl space-y-4 relative overflow-hidden bg-indigo-950/90">
+          <div className="p-5 bg-gradient-to-br from-indigo-950/90 via-slate-900 to-purple-950/90 border-2 border-indigo-500/50 rounded-2xl space-y-4 shadow-2xl relative overflow-hidden">
             {/* Ambient runic glow */}
-            <div className="hidden" />
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-800/40 pb-3">
               <div>
-                <h3 className="text-base font-medium text-amber-300 flex items-center gap-2">
+                <h3 className="font-cinzel text-base font-bold text-amber-300 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
                   <span>SINH ĐỀ TOÁN HỌC BẰNG AI (NGUỒN WEB UY TÍN)</span>
                 </h3>
                 <p className="text-[11px] text-indigo-200/80 mt-0.5">
                   Mô hình AI đối chiếu và trích xuất câu hỏi toán học chuẩn mực từ: VietJack, VMF Diễn Đàn Toán Học, Lời Giải Hay, MathVN, Khan Academy, Bộ GD&ĐT.
                 </p>
               </div>
-              <span className="self-start sm:self-auto px-3 py-1 bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 rounded-full text-[11px] font-mono flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>Kết quả & lời giải thẩm định</span>
+              <span className="self-start sm:self-auto px-2.5 py-1 bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 rounded-full text-[11px] font-mono flex items-center gap-1.5">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Kết Quả & Lời Giải Thẩm Định</span>
               </span>
             </div>
 
@@ -671,31 +672,31 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               </div>
             )}
 
-            <form onSubmit={handleGenerateAiQuestion} className="space-y-4 text-xs">
+            <form onSubmit={handleGenerateAiQuestion} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Chọn Nguồn Toán Học Uy Tín */}
                 <div>
-                  <label className="block text-indigo-200 font-medium mb-1 flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-sky-400" />
-                    <span>Nguồn web uy tín ưu tiên:</span>
+                  <label className="block text-indigo-200 font-semibold mb-1 flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Nguồn Web Uy Tín Ưu Tiên:</span>
                   </label>
                   <select
                     value={aiPreferredSource}
                     onChange={e => setAiPreferredSource(e.target.value)}
                     className="w-full bg-slate-950/90 border border-indigo-700/60 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-400"
                   >
-                    <option value="VietJack Chuyên Đề Toán (vietjack.com)"> VietJack Chuyên Đề Toán (vietjack.com)</option>
-                    <option value="Diễn đàn Toán học Việt Nam (diendantoanhoc.org - VMF)"> Diễn đàn Toán học VMF (diendantoanhoc.org)</option>
-                    <option value="Lời Giải Hay (loigiaihay.com)"> Lời Giải Hay (loigiaihay.com)</option>
-                    <option value="MathVN Chuyên Toán (mathvn.com)"> MathVN Chuyên Toán (mathvn.com)</option>
-                    <option value="Khan Academy Math (vi.khanacademy.org)"> Khan Academy Math (vi.khanacademy.org)</option>
-                    <option value="Bộ GD&ĐT - đề thi tuyển sinh chuẩn"> Bộ GD&ĐT - đề thi chuẩn quốc gia</option>
+                    <option value="VietJack Chuyên Đề Toán (vietjack.com)">🌐 VietJack Chuyên Đề Toán (vietjack.com)</option>
+                    <option value="Diễn đàn Toán học Việt Nam (diendantoanhoc.org - VMF)">🌐 Diễn đàn Toán học VMF (diendantoanhoc.org)</option>
+                    <option value="Lời Giải Hay (loigiaihay.com)">🌐 Lời Giải Hay (loigiaihay.com)</option>
+                    <option value="MathVN Chuyên Toán (mathvn.com)">🌐 MathVN Chuyên Toán (mathvn.com)</option>
+                    <option value="Khan Academy Math (vi.khanacademy.org)">🌐 Khan Academy Math (vi.khanacademy.org)</option>
+                    <option value="Bộ GD&ĐT - Đề Thi Tuyển Sinh Chuẩn">🌐 Bộ GD&ĐT - Đề Thi Chuẩn Quốc Gia</option>
                   </select>
                 </div>
 
                 {/* Chọn Phân Môn */}
                 <div>
-                  <label className="block text-indigo-200 font-medium mb-1">Phân môn toán học:</label>
+                  <label className="block text-indigo-200 font-semibold mb-1">Phân Môn Toán Học:</label>
                   <select
                     value={aiCategory}
                     onChange={e => setAiCategory(e.target.value as any)}
@@ -709,7 +710,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
                 {/* Chọn Cấp Độ */}
                 <div>
-                  <label className="block text-indigo-200 font-medium mb-1">Cấp độ đối tượng:</label>
+                  <label className="block text-indigo-200 font-semibold mb-1">Cấp Độ Đối Tượng:</label>
                   <select
                     value={aiLevel}
                     onChange={e => setAiLevel(e.target.value as any)}
@@ -724,7 +725,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
               {/* Nhập Chủ Đề / Từ Khóa */}
               <div>
-                <label className="block text-indigo-200 font-medium mb-1">
+                <label className="block text-indigo-200 font-semibold mb-1">
                   Chủ Đề / Từ Khóa Cụ Thể (Tùy chọn):
                 </label>
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -738,16 +739,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <button
                     type="submit"
                     disabled={aiGenerating}
-                    className="px-5 py-3 text-on-accent font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 bg-amber-500 hover:bg-amber-400"
+                    className="px-5 py-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50"
                   >
                     {aiGenerating ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin text-on-accent" />
-                        <span>Đang đối chiếu & sinh đề...</span>
+                        <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                        <span>Đang Đối Chiếu & Sinh Đề...</span>
                       </>
                     ) : (
                       <>
-                        <span>Sinh đề AI ngay</span>
+                        <Sparkles className="w-4 h-4 text-slate-950" />
+                        <span>SINH ĐỀ AI NGAY</span>
                       </>
                     )}
                   </button>
@@ -757,31 +759,31 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
             {/* AI Generated Question Result Card */}
             {aiGeneratedQuestion && (
-              <div className="p-4 bg-slate-950/90 border border-amber-500/60 rounded-xl space-y-3 animate-in fade-in zoom-in-95">
+              <div className="p-4 bg-slate-950/90 border-2 border-amber-500/60 rounded-xl space-y-3 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-slate-800">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-3 py-0.5 rounded-full text-[11px] font-medium bg-amber-400/20 text-amber-300 border border-amber-400/40 font-mono">
-                       Đề thi vừa sinh
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40 font-mono">
+                      ✨ ĐỀ THI VỪA SINH
                     </span>
                     {aiGeneratedQuestion.sourceName && (
                       <a
                         href={aiGeneratedQuestion.sourceUrl || '#'}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-medium bg-sky-950 text-sky-300 border border-sky-700/60 hover:border-sky-400 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-950 text-sky-300 border border-sky-700/60 hover:border-sky-400 transition-colors"
                       >
                         <Globe className="w-3 h-3 text-sky-400" />
                         <span>Nguồn: {aiGeneratedQuestion.sourceName}</span>
-                        <ExternalLink className="w-3 h-3 text-sky-400" />
+                        <ExternalLink className="w-2.5 h-2.5 text-sky-400" />
                       </a>
                     )}
-                    <span className="text-[11px] text-slate-400 font-mono">
+                    <span className="text-[10px] text-slate-400 font-mono">
                       Cấp: {aiGeneratedQuestion.level} • Hệ: {aiGeneratedQuestion.category}
                     </span>
                   </div>
                 </div>
 
-                <div className="text-sm font-medium text-slate-100 leading-relaxed">
+                <div className="text-sm font-bold text-slate-100 leading-relaxed">
                   {aiGeneratedQuestion.question}
                 </div>
 
@@ -793,9 +795,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                       return (
                         <div
                           key={idx}
-                          className={`p-3 rounded-xl border flex items-center justify-between gap-2 font-mono ${
+                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 font-mono ${
                             isCorrect
-                              ? 'bg-emerald-950/70 border-emerald-500 text-emerald-200 font-medium ring-1 ring-emerald-500/50'
+                              ? 'bg-emerald-950/70 border-emerald-500 text-emerald-200 font-bold ring-1 ring-emerald-500/50'
                               : 'bg-slate-900 border-slate-800 text-slate-300'
                           }`}
                         >
@@ -804,8 +806,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                             {opt}
                           </span>
                           {isCorrect && (
-                            <span className="px-2 py-0.5 bg-emerald-500 text-on-accent text-[11px] font-medium rounded-md">
-                              Đáp án đúng
+                            <span className="px-2 py-0.5 bg-emerald-500 text-slate-950 text-[10px] font-black rounded-md">
+                              ĐÁP ÁN ĐÚNG
                             </span>
                           )}
                         </div>
@@ -816,8 +818,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
                 {/* Explanation */}
                 <div className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-slate-300 space-y-1">
-                  <div className="text-[11px] font-medium text-amber-300 font-mono flex items-center gap-2">
-                    <span> LỜI GIẢI THÍCH CHI TIẾT (ĐÃ THẨM ĐỊNH):</span>
+                  <div className="text-[11px] font-bold text-amber-300 font-mono flex items-center gap-1.5">
+                    <span>📖 LỜI GIẢI THÍCH CHI TIẾT (ĐÃ THẨM ĐỊNH):</span>
                   </div>
                   <p className="leading-relaxed text-slate-200">{aiGeneratedQuestion.explanation}</p>
                 </div>
@@ -827,17 +829,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <button
                     onClick={handleSaveAiQuestionToBank}
                     disabled={aiSavingToDb}
-                    className="flex-1 py-3 text-white font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 flex items-center justify-center gap-2 text-xs bg-emerald-600 hover:bg-emerald-500"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-xs uppercase"
                   >
                     {aiSavingToDb ? (
                       <>
                         <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                        <span>Đang lưu...</span>
+                        <span>Đang Lưu...</span>
                       </>
                     ) : (
                       <>
                         <CheckCircle className="w-4 h-4 text-emerald-300" />
-                        <span>Lưu vào ngân hàng đề thi đấu</span>
+                        <span>Lưu Vào Ngân Hàng Đề Thi Đấu</span>
                       </>
                     )}
                   </button>
@@ -845,10 +847,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <button
                     onClick={() => handleGenerateAiQuestion()}
                     disabled={aiGenerating}
-                    className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 text-xs font-medium flex items-center gap-2"
+                    className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl transition-all active:scale-95 text-xs font-semibold flex items-center gap-1.5"
                   >
-                    <RefreshCw className={`w-4 h-4 text-amber-400 ${aiGenerating ?'animate-spin' : ''}`} />
-                    <span>Sinh câu khác</span>
+                    <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${aiGenerating ? 'animate-spin' : ''}`} />
+                    <span>Sinh Câu Khác</span>
                   </button>
                 </div>
               </div>
@@ -857,13 +859,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
           {/* Add Question Form (Thủ công) */}
           <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
-            <h3 className="text-sm font-medium text-amber-300 flex items-center gap-2">
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5">
               <Plus className="w-4 h-4" />
-              <span>Thêm câu hỏi thủ công vào ngân hàng đề</span>
+              <span>THÊM CÂU HỎI THỦ CÔNG VÀO NGÂN HÀNG ĐỀ</span>
             </h3>
 
             {formMsg && (
-              <div className="p-3 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
+              <div className="p-2.5 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
                 {formMsg}
               </div>
             )}
@@ -883,7 +885,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-300 mb-1">Hệ toán học:</label>
+                  <label className="block text-slate-300 mb-1">Hệ Toán Học:</label>
                   <select
                     value={qCategory}
                     onChange={e => setQCategory(e.target.value as any)}
@@ -896,7 +898,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 mb-1">Cấp độ:</label>
+                  <label className="block text-slate-300 mb-1">Cấp Độ:</label>
                   <select
                     value={qLevel}
                     onChange={e => setQLevel(e.target.value as any)}
@@ -904,7 +906,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   >
                     <option value="THCS">THCS (Cấp 2)</option>
                     <option value="THPT">THPT (Cấp 3)</option>
-                    <option value="DAI_HOC">Đại học</option>
+                    <option value="DAI_HOC">Đại Học</option>
                   </select>
                 </div>
 
@@ -947,7 +949,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-1">Lời giải thích chi tiết:</label>
+                <label className="block text-slate-300 mb-1">Lời Giải Thích Chi Tiết:</label>
                 <textarea
                   rows={2}
                   value={qExplanation}
@@ -959,16 +961,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
               <button
                 type="submit"
-                className="px-5 py-3 text-on-accent font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 bg-amber-600 hover:bg-amber-500"
+                className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold rounded-xl shadow transition-all active:scale-95 uppercase"
               >
-                Thêm vào ngân hàng
+                Thêm Vào Ngân Hàng
               </button>
             </form>
           </div>
 
           {/* Questions List */}
           <div className="space-y-2">
-            <h4 className="text-xs font-medium text-slate-300">
+            <h4 className="text-xs font-bold text-slate-300">
               DANH SÁCH CÂU HỎI HIỆN CÓ ({questions.length} CÂU)
             </h4>
             <div className="max-h-96 overflow-y-auto space-y-2 pr-1">
@@ -978,15 +980,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   className="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-start justify-between gap-3 text-xs"
                 >
                   <div>
-                    <div className="font-medium text-slate-100 flex items-center gap-2 flex-wrap">
+                    <div className="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
                       <span>{q.question}</span>
                       {q.sourceName && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-sky-950/80 text-sky-300 border border-sky-800 font-mono font-medium">
-                           {q.sourceName}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-sky-950/80 text-sky-300 border border-sky-800 font-mono font-medium">
+                          🌐 {q.sourceName}
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono mt-1 flex items-center gap-2 flex-wrap">
+                    <div className="text-[10px] text-slate-400 font-mono mt-1 flex items-center gap-2 flex-wrap">
                       <span>Hệ: {q.category}</span>
                       <span>•</span>
                       <span>Cấp: {q.level}</span>
@@ -998,7 +1000,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   {q.id?.startsWith('ADMIN_') && (
                     <button
                       onClick={() => handleDeleteQuestion(q.id)}
-                      className="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800"
+                      className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1037,23 +1039,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         return (
           <div className="space-y-4">
             {/* TOOL: GIA HẠN GÓI PRO CHO NGƯỜI MÌNH MUỐN */}
-            <div className="p-4 bg-slate-900 border border-yellow-600/50 rounded-2xl space-y-3">
+            <div className="p-4 bg-slate-900 border-2 border-yellow-600/50 rounded-2xl space-y-3 shadow-lg">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-yellow-300 flex items-center gap-2">
+                <h3 className="font-cinzel text-sm font-bold text-yellow-300 flex items-center gap-2">
                   <Crown className="w-4 h-4 text-yellow-400" />
-                  <span>Gia hạn / cấp gói PRO cho người bạn muốn</span>
+                  <span>GIA HẠN / CẤP GÓI PRO CHO NGƯỜI BẠN MUỐN</span>
                 </h3>
                 <span className="text-[11px] text-slate-400">Công cụ độc quyền Admin</span>
               </div>
 
               {grantActionMsg && (
-                <div className="p-3 bg-emerald-950 border border-emerald-700 text-emerald-200 text-xs rounded-xl flex items-center gap-2">
+                <div className="p-2.5 bg-emerald-950 border border-emerald-700 text-emerald-200 text-xs rounded-xl flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   <span>{grantActionMsg}</span>
                 </div>
               )}
 
-              <form onSubmit={handleCustomGrantByUsername} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <form onSubmit={handleCustomGrantByUsername} className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                 <div className="sm:col-span-2">
                   <input
                     type="text"
@@ -1068,7 +1070,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <select
                     value={customGrantDays}
                     onChange={e => setCustomGrantDays(Number(e.target.value))}
-                    className="w-full bg-slate-950 border border-slate-700 focus:border-yellow-400 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-yellow-400 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none"
                   >
                     <option value={7}>7 Ngày (1 Tuần)</option>
                     <option value={30}>30 Ngày (1 Tháng)</option>
@@ -1083,30 +1085,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <button
                     type="submit"
                     disabled={grantActionLoading || !customGrantUsername.trim()}
-                    className="w-full py-2 text-on-accent font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-yellow-500 hover:bg-yellow-400"
+                    className="w-full py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow transition-all active:scale-95 disabled:opacity-50"
                   >
-                    {grantActionLoading ? 'Đang cấp...' : 'Gia hạn PRO ngay'}
+                    {grantActionLoading ? 'Đang cấp...' : 'Gia Hạn PRO Ngay'}
                   </button>
                 </div>
               </form>
             </div>
 
             {/* USERS OVERVIEW & FILTERS */}
-            <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
+            <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <h3 className="text-sm font-medium text-slate-200 flex items-center gap-2">
+                <h3 className="font-cinzel text-sm font-bold text-slate-200 flex items-center gap-2">
                   <Users className="w-4 h-4 text-amber-400" />
                   <span>DANH SÁCH NGƯỜI DÙNG ({users.length} PHÁP SƯ)</span>
                 </h3>
 
                 {/* Filter Tabs */}
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     type="button"
                     onClick={() => setUserFilter('all')}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                       userFilter === 'all'
-                        ? 'bg-amber-500 text-on-accent'
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
                         : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
                     }`}
                   >
@@ -1116,33 +1118,33 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <button
                     type="button"
                     onClick={() => setUserFilter('registered')}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                       userFilter === 'registered'
-                        ? 'bg-emerald-600 text-white'
+                        ? 'bg-emerald-600 text-white shadow-sm'
                         : 'bg-slate-950 text-emerald-400/80 hover:text-emerald-300 border border-slate-800'
                     }`}
                   >
-                     Đã Đăng Ký ({registeredUsers.length})
+                    🟢 Đã Đăng Ký ({registeredUsers.length})
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setUserFilter('guest')}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                       userFilter === 'guest'
-                        ? 'bg-amber-600 text-white'
+                        ? 'bg-amber-600 text-white shadow-sm'
                         : 'bg-slate-950 text-amber-400/80 hover:text-amber-300 border border-slate-800'
                     }`}
                   >
-                     Chơi Nhanh ({guestUsers.length})
+                    ⚡ Chơi Nhanh ({guestUsers.length})
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setUserFilter('pro')}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-[color,background-color,border-color,opacity,transform] ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                       userFilter === 'pro'
-                        ? 'bg-yellow-500 text-on-accent'
+                        ? 'bg-yellow-500 text-slate-950 shadow-sm'
                         : 'bg-slate-950 text-yellow-400/80 hover:text-yellow-300 border border-slate-800'
                     }`}
                   >
@@ -1155,9 +1157,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   <button
                     type="button"
                     onClick={handleDeleteAllGuests}
-                    className="flex items-center gap-2 px-3 py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-700/80 hover:border-rose-500 text-rose-200 rounded-xl text-xs font-medium transition-[color,background-color,border-color,opacity,transform] active:scale-95 self-start sm:self-auto"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-700/80 hover:border-rose-500 text-rose-200 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 self-start sm:self-auto"
                   >
-                    <Trash2 className="w-4 h-4 text-rose-400" />
+                    <Trash2 className="w-3.5 h-3.5 text-rose-400" />
                     <span>Xóa Tất Cả Acc Chơi Nhanh ({guestUsers.length})</span>
                   </button>
                 )}
@@ -1175,7 +1177,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               </div>
 
               {/* User rows */}
-              <div className="space-y-3 pt-1">
+              <div className="space-y-2.5 pt-1">
                 {filteredUsers.length === 0 ? (
                   <div className="p-6 text-center text-xs text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
                     Không tìm thấy người dùng nào phù hợp với bộ lọc.
@@ -1189,46 +1191,46 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     return (
                       <div
                         key={u.id}
-                        className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                        className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-3xl shrink-0">{u.avatar}</span>
                           <div className="space-y-1">
-                            <div className="font-medium text-slate-200 flex items-center gap-2 flex-wrap">
+                            <div className="font-bold text-slate-200 flex items-center gap-2 flex-wrap">
                               <span className="text-sm">{u.username}</span>
 
                               {/* Account Type Classification Badges */}
                               {isAdmin ? (
-                                <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[11px] font-medium rounded-md">
-                                   ADMIN
+                                <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-black rounded-md">
+                                  🛡️ ADMIN
                                 </span>
                               ) : isGuest ? (
-                                <span className="px-2 py-0.5 bg-amber-500/10 border border-amber-400/40 text-amber-300 text-[11px] font-medium rounded-md flex items-center gap-1">
-                                   CHƠI NHANH (KHÁCH)
+                                <span className="px-2 py-0.5 bg-amber-500/10 border border-amber-400/40 text-amber-300 text-[10px] font-bold rounded-md flex items-center gap-1">
+                                  ⚡ CHƠI NHANH (KHÁCH)
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-[11px] font-medium rounded-md flex items-center gap-1">
-                                   Đã đăng ký
+                                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold rounded-md flex items-center gap-1">
+                                  🟢 ĐÃ ĐĂNG KÝ
                                 </span>
                               )}
 
                               {/* Pro VIP Badge */}
                               {activePro && (
-                                <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-500/20 border border-yellow-400/50 text-yellow-300 text-[11px] font-medium rounded-md">
+                                <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-500/20 border border-yellow-400/50 text-yellow-300 text-[10px] font-black rounded-md">
                                   <Crown className="w-3 h-3" />
-                                  <span>PRO VIP ({u.premiumPlan === 'monthly' ? 'Tháng' : 'Lời giải'})</span>
+                                  <span>PRO VIP ({u.premiumPlan === 'monthly' ? 'Tháng' : 'Lời Giải'})</span>
                                 </span>
                               )}
                             </div>
 
-                            <div className="text-[11px] font-mono text-slate-400 flex items-center gap-3 flex-wrap">
+                            <div className="text-[11px] font-mono text-slate-400 flex items-center gap-2.5 flex-wrap">
                               <span>ID: <span className="text-slate-300">{u.id}</span></span>
                               <span>•</span>
                               <span>Tạo: {new Date(u.createdAt).toLocaleDateString('vi-VN')}</span>
                               {activePro && u.premiumExpiresAt && (
                                 <>
                                   <span>•</span>
-                                  <span className="text-yellow-300 font-medium">
+                                  <span className="text-yellow-300 font-semibold">
                                     Hạn PRO: {new Date(u.premiumExpiresAt).toLocaleDateString('vi-VN')}
                                   </span>
                                 </>
@@ -1239,29 +1241,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
                         {/* Actions: Gia hạn gói PRO & Gỡ gói PRO */}
                         {!isAdmin && (
-                          <div className="flex items-center gap-2 flex-wrap self-end md:self-auto">
+                          <div className="flex items-center gap-1.5 flex-wrap self-end md:self-auto">
                             {activePro ? (
                               <>
                                 <button
                                   type="button"
                                   onClick={() => handleRevokePremium(u.id)}
-                                  className="px-3 py-2 bg-rose-950/60 border border-rose-700/60 hover:border-rose-500 text-rose-300 rounded-lg transition-colors font-medium text-[11px]"
+                                  className="px-2.5 py-1.5 bg-rose-950/60 border border-rose-700/60 hover:border-rose-500 text-rose-300 rounded-lg transition-colors font-medium text-[11px]"
                                 >
-                                   Gỡ gói PRO
+                                  ❌ Gỡ Gói PRO
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleGrantPremium(u.id, 'monthly', 30)}
-                                  className="flex items-center gap-1 px-3 py-2 bg-yellow-500/10 border border-yellow-500/40 hover:border-yellow-400 text-yellow-300 rounded-lg transition-colors font-medium text-[11px]"
+                                  className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/40 hover:border-yellow-400 text-yellow-300 rounded-lg transition-colors font-medium text-[11px]"
                                 >
-                                   +30 Ngày
+                                  🔄 +30 Ngày
                                 </button>
                               </>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => handleGrantPremium(u.id, 'monthly', 30)}
-                                className="flex items-center gap-1 px-3 py-2 bg-yellow-950/50 border border-yellow-700/60 hover:border-yellow-400 text-yellow-300 rounded-lg transition-colors font-medium text-[11px]"
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-950/50 border border-yellow-700/60 hover:border-yellow-400 text-yellow-300 rounded-lg transition-colors font-medium text-[11px]"
                               >
                                 <Crown className="w-3 h-3" />
                                 <span>Cấp PRO 30 Ngày</span>
@@ -1273,17 +1275,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                                 type="button"
                                 onClick={() => handleDeleteUser(u)}
                                 title="Xóa tài khoản Chơi Nhanh này"
-                                className="flex items-center gap-1 px-3 py-2 bg-rose-950/60 border border-rose-800/80 hover:border-rose-500 text-rose-300 rounded-lg hover:bg-rose-900 transition-colors text-[11px] font-medium"
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-950/60 border border-rose-800/80 hover:border-rose-500 text-rose-300 rounded-lg hover:bg-rose-900 transition-colors text-[11px] font-medium"
                               >
                                 <Trash2 className="w-3 h-3 text-rose-400" />
-                                <span>Xóa acc khách</span>
+                                <span>Xóa Acc Khách</span>
                               </button>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => handleDeleteUser(u)}
                                 title="Xóa tài khoản này"
-                                className="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800 transition-colors"
+                                className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 border border-slate-800 transition-colors"
                               >
                                 <UserX className="w-4 h-4" />
                               </button>
@@ -1304,12 +1306,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       {activeTab === 'premium' && (
         <div className="space-y-4">
           {premiumActionMsg && (
-            <div className="p-3 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
+            <div className="p-2.5 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
               {premiumActionMsg}
             </div>
           )}
           <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
-            <h3 className="text-sm font-medium text-slate-200 flex items-center gap-2">
+            <h3 className="font-cinzel text-sm font-bold text-slate-200 flex items-center gap-1.5">
               <Crown className="w-4 h-4 text-yellow-400" />
               <span>YÊU CẦU MUA GÓI PREMIUM ({premiumRequests.filter(r => r.status === 'pending').length} ĐANG CHỜ)</span>
             </h3>
@@ -1324,32 +1326,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                   >
                     <div>
-                      <div className="font-medium text-slate-200">
-                        {r.username} — <span className="text-amber-300">{r.plan === 'monthly' ? 'Gói tháng' : 'Gói xem lời giải'}</span>
+                      <div className="font-bold text-slate-200">
+                        {r.username} — <span className="text-amber-300">{r.plan === 'monthly' ? 'Gói Tháng' : 'Gói Xem Lời Giải'}</span>
                       </div>
-                      <div className="text-[11px] font-mono text-slate-500">
+                      <div className="text-[10px] font-mono text-slate-500">
                         {formatVnd(r.price)} • {new Date(r.createdAt).toLocaleString('vi-VN')} •{' '}
                         <span className={
                           r.status === 'pending' ? 'text-amber-400' : r.status === 'approved' ? 'text-emerald-400' : 'text-rose-400'
                         }>
-                          {r.status === 'pending' ? 'Đang chờ' : r.status === 'approved' ? 'Đã duyệt' : 'Đã từ chối'}
+                          {r.status === 'pending' ? 'ĐANG CHỜ' : r.status === 'approved' ? 'ĐÃ DUYỆT' : 'ĐÃ TỪ CHỐI'}
                         </span>
                       </div>
                     </div>
 
                     {r.status === 'pending' && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => handleResolvePremiumRequest(r.id, true)}
-                          className="flex items-center gap-1 px-3 py-2 bg-emerald-950/40 border border-emerald-800/50 hover:border-emerald-500 text-emerald-300 rounded-lg transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-950/40 border border-emerald-800/50 hover:border-emerald-500 text-emerald-300 rounded-lg transition-colors"
                         >
                           <CheckCircle className="w-3 h-3" /> Duyệt
                         </button>
                         <button
                           onClick={() => handleResolvePremiumRequest(r.id, false)}
-                          className="flex items-center gap-1 px-3 py-2 bg-rose-950/40 border border-rose-800/50 hover:border-rose-500 text-rose-300 rounded-lg transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-950/40 border border-rose-800/50 hover:border-rose-500 text-rose-300 rounded-lg transition-colors"
                         >
-                          <XCircle className="w-3 h-3" /> Từ chối
+                          <XCircle className="w-3 h-3" /> Từ Chối
                         </button>
                       </div>
                     )}
@@ -1365,12 +1367,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       {activeTab === 'settings' && (
         <div className="space-y-6">
           <form onSubmit={handleSaveSettings} className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
-            <h3 className="text-sm font-medium text-amber-300 flex items-center gap-2">
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5">
               <Link2 className="w-4 h-4" />
-              <span>Đường link hướng dẫn ở trang chủ</span>
+              <span>ĐƯỜNG LINK HƯỚNG DẪN Ở TRANG CHỦ</span>
             </h3>
             <p className="text-[11px] text-slate-500">
-              Link này sẽ hiện ở nút "Hướng dẫn chi tiết" trên Trang Chủ (VD: link nhóm Zalo, Facebook, video Youtube hướng dẫn...).
+              Link này sẽ hiện ở nút "Hướng Dẫn Chi Tiết" trên Trang Chủ (VD: link nhóm Zalo, Facebook, video Youtube hướng dẫn...).
             </p>
             <input
               type="url"
@@ -1380,9 +1382,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400"
             />
 
-            <h3 className="text-sm font-medium text-amber-300 flex items-center gap-2 pt-2">
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5 pt-2">
               <Crown className="w-4 h-4" />
-              <span>Giá gói premium</span>
+              <span>GIÁ GÓI PREMIUM</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -1407,13 +1409,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               </div>
             </div>
 
-            <h3 className="text-sm font-medium text-amber-300 flex items-center gap-2 pt-2">
+            <h3 className="font-cinzel text-sm font-bold text-amber-300 flex items-center gap-1.5 pt-2">
               <Landmark className="w-4 h-4" />
               <span>THÔNG TIN CHUYỂN KHOẢN (HIỂN THỊ CHO NGƯỜI MUA GÓI)</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-slate-300 mb-1 text-xs">Ngân hàng:</label>
+                <label className="block text-slate-300 mb-1 text-xs">Ngân Hàng:</label>
                 <input
                   type="text"
                   value={settingsForm.bankName || ''}
@@ -1423,7 +1425,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 />
               </div>
               <div>
-                <label className="block text-slate-300 mb-1 text-xs">Chủ tài khoản:</label>
+                <label className="block text-slate-300 mb-1 text-xs">Chủ Tài Khoản:</label>
                 <input
                   type="text"
                   value={settingsForm.bankAccountName || ''}
@@ -1432,7 +1434,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 />
               </div>
               <div>
-                <label className="block text-slate-300 mb-1 text-xs">Số tài khoản:</label>
+                <label className="block text-slate-300 mb-1 text-xs">Số Tài Khoản:</label>
                 <input
                   type="text"
                   value={settingsForm.bankAccountNumber || ''}
@@ -1443,7 +1445,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             </div>
 
             {settingsMsg && (
-              <div className="p-3 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
+              <div className="p-2.5 bg-indigo-950 border border-indigo-700 text-indigo-200 text-xs rounded-xl">
                 {settingsMsg}
               </div>
             )}
@@ -1451,45 +1453,45 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             <button
               type="submit"
               disabled={settingsSaving}
-              className="px-5 py-3 text-on-accent font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-amber-600 hover:bg-amber-500"
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
             >
-              {settingsSaving ? 'Đang lưu...' : 'Lưu cài đặt'}
+              {settingsSaving ? 'Đang lưu...' : 'Lưu Cài Đặt'}
             </button>
           </form>
 
           <div className="p-5 bg-slate-900 border border-rose-900/50 rounded-2xl space-y-3">
-            <h3 className="text-sm font-medium text-rose-300 flex items-center gap-2">
+            <h3 className="font-cinzel text-sm font-bold text-rose-300 flex items-center gap-1.5">
               <RotateCcw className="w-4 h-4" />
-              <span>Reset bảng xếp hạng tuần</span>
+              <span>RESET BẢNG XẾP HẠNG TUẦN</span>
             </h3>
             <p className="text-[11px] text-slate-500">
               Hệ thống tự động reset điểm Bảng Xếp Hạng về 0đ mỗi 7 ngày. Bạn cũng có thể bấm nút dưới đây để reset thủ công ngay bây giờ.
               Lần reset gần nhất: {settings?.lastLeaderboardReset ? new Date(settings.lastLeaderboardReset).toLocaleString('vi-VN') : '—'}.
-              (Điểm kỷ lục mọi thời đại ở mục "Tất cả thời gian" không bị ảnh hưởng.)
+              (Điểm kỷ lục mọi thời đại ở mục "Tất Cả Thời Gian" không bị ảnh hưởng.)
             </p>
             <button
               onClick={handleResetLeaderboard}
               disabled={resetLoading}
-              className="px-5 py-3 text-white font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-rose-700 hover:bg-rose-600"
+              className="px-5 py-2.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
             >
               {resetLoading ? 'Đang reset...' : 'Reset Ngay (Về 0đ)'}
             </button>
           </div>
 
           <div className="p-5 bg-slate-900 border border-rose-900/50 rounded-2xl space-y-3">
-            <h3 className="text-sm font-medium text-rose-300 flex items-center gap-2">
+            <h3 className="font-cinzel text-sm font-bold text-rose-300 flex items-center gap-1.5">
               <RotateCcw className="w-4 h-4" />
-              <span>Reset bảng xếp hạng toàn thời gian</span>
+              <span>RESET BẢNG XẾP HẠNG TOÀN THỜI GIAN</span>
             </h3>
             <p className="text-[11px] text-slate-500">
-              Đưa điểm kỷ lục "Tất cả thời gian" của TOÀN BỘ người chơi về 0đ. Khác với reset tuần ở trên
+              Đưa điểm kỷ lục "Tất Cả Thời Gian" của TOÀN BỘ người chơi về 0đ. Khác với reset tuần ở trên
               (chỉ ảnh hưởng bảng xếp hạng tuần), thao tác này xoá sạch thành tích cao nhất mọi thời đại và
               KHÔNG THỂ hoàn tác — chỉ dùng khi thật sự cần (ví dụ: bắt đầu mùa giải mới).
             </p>
             <button
               onClick={handleResetAllTimeLeaderboard}
               disabled={resetAllTimeLoading}
-              className="px-5 py-3 text-white font-medium rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-rose-700 hover:bg-rose-600"
+              className="px-5 py-2.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow transition-all active:scale-95 uppercase disabled:opacity-50"
             >
               {resetAllTimeLoading ? 'Đang reset...' : 'Reset Ngay (Về 0đ)'}
             </button>

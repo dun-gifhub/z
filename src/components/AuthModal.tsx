@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, User, Key, Mail, ShieldAlert, KeyRound } from 'lucide-react';
+import { X, Sparkles, User, Key, Mail, ShieldAlert } from 'lucide-react';
 import { BASIC_AVATARS } from '../../shared/avatars.ts';
 
 interface AuthModalProps {
@@ -62,10 +62,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 overflow-hidden">
-{/* Magic gradient border light */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-amber-500" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 overflow-hidden">
+        {/* Magic gradient border light */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-indigo-500 to-purple-500" />
 
         <button
           onClick={onClose}
@@ -75,11 +75,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </button>
 
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-950/60 border border-indigo-700/40 text-amber-400 mb-2">
-            <KeyRound className="w-6 h-6" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-950/60 border border-indigo-700/40 text-amber-400 mb-2 shadow-inner">
+            <Sparkles className="w-6 h-6" />
           </div>
-          <h3 className="text-xl font-medium text-amber-100">
-            Hội pháp sư toán học
+          <h3 className="font-cinzel text-xl font-black text-amber-100">
+            HỘI PHÁP SƯ TOÁN HỌC
           </h3>
           <p className="text-xs text-slate-400 mt-1">
             Đăng nhập để lưu hồ sơ, lịch sử trận đấu, cấp độ và bảng xếp hạng
@@ -91,24 +91,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="button"
             onClick={() => { setTab('login'); setError(null); }}
-            className={`py-2 text-xs font-medium rounded-lg transition-[color,background-color,border-color,opacity,transform] ${
+            className={`py-2 text-xs font-bold rounded-lg transition-all ${
               tab === 'login'
-                ? 'text-white bg-indigo-600'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Đăng nhập
+            Đăng Nhập
           </button>
           <button
             type="button"
             onClick={() => { setTab('register'); setError(null); }}
-            className={`py-2 text-xs font-medium rounded-lg transition-[color,background-color,border-color,opacity,transform] ${
+            className={`py-2 text-xs font-bold rounded-lg transition-all ${
               tab === 'register'
-                ? 'text-white bg-indigo-600'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Đăng ký mới
+            Đăng Ký Mới
           </button>
         </div>
 
@@ -122,7 +122,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {tab === 'register' && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                 Chọn Pháp Thân (Avatar):
               </label>
               <div className="flex flex-wrap gap-2 justify-center py-2 bg-slate-950/60 rounded-xl border border-slate-800">
@@ -131,7 +131,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     key={av}
                     type="button"
                     onClick={() => setSelectedAvatar(av)}
-                    className={`text-xl p-2 rounded-lg transition-[color,background-color,border-color,opacity,transform] ${
+                    className={`text-xl p-1.5 rounded-lg transition-all ${
                       selectedAvatar === av
                         ? 'bg-amber-500/20 border border-amber-400 scale-110'
                         : 'hover:bg-slate-800 opacity-70 hover:opacity-100'
@@ -145,7 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
               Tên tài khoản (Username)
             </label>
             <div className="relative">
@@ -156,14 +156,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 placeholder="VD: ArchmageAlex"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
               />
             </div>
           </div>
 
           {tab === 'register' && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Email (Tùy chọn)
               </label>
               <div className="relative">
@@ -173,14 +173,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
               Mật khẩu
             </label>
             <div className="relative">
@@ -191,7 +191,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
               />
             </div>
           </div>
@@ -199,9 +199,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 disabled:opacity-50 bg-amber-600 hover:bg-amber-500"
+            className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 font-bold text-xs rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
           >
-            {loading ? 'Đang kích hoạt ấn chú...' : tab === 'login' ? 'Đăng nhập ngay' : 'Hoàn tất đăng ký'}
+            {loading ? 'Đang kích hoạt ấn chú...' : tab === 'login' ? 'Đăng Nhập Ngay' : 'Hoàn Tất Đăng Ký'}
           </button>
         </form>
 
@@ -210,11 +210,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             type="button"
             onClick={handleGuest}
             disabled={loading}
-            className="text-xs text-amber-400/90 hover:text-amber-300 font-medium underline underline-offset-4 transition-colors"
+            className="text-xs text-amber-400/90 hover:text-amber-300 font-semibold underline underline-offset-4 transition-colors"
           >
-             Chơi nhanh với tư cách Khách (Không cần mật khẩu)
+            ⚡ Chơi nhanh với tư cách Khách (Không cần mật khẩu)
           </button>
-          <div className="mt-2 text-[11px] text-slate-500">
+          <div className="mt-2 text-[10px] text-slate-500">
           </div>
         </div>
       </div>

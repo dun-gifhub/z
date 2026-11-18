@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Check, Zap, Info } from 'lucide-react';
+import { ArrowLeft, Sparkles, Check, Zap, Info } from 'lucide-react';
 import { ALL_RUNES } from '../../shared/runes.ts';
 import { RuneCategory, RuneDef } from '../../shared/types.ts';
 import { RuneIcon } from './RuneIcon.tsx';
@@ -24,10 +24,10 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
 
   const categories: { id: string; name: string }[] = [
     { id: 'all', name: 'Tất Cả (16 Ấn Chú)' },
-    { id: 'DEFENSE', name: 'Phòng Thủ & Hồi Sinh (4 Ấn)' },
+    { id: 'DEFENSE', name: '🛡️ Phòng Thủ & Hồi Sinh (4 Ấn)' },
     { id: 'TIME', name: '⏳ Kéo Dài Thời Gian (4 Ấn)' },
-    { id: 'POINTS', name: 'Nhân Điểm & Combo (4 Ấn)' },
-    { id: 'MAGIC', name: 'Ma Thuật Huyền Bí (4 Ấn)' },
+    { id: 'POINTS', name: '💎 Nhân Điểm & Combo (4 Ấn)' },
+    { id: 'MAGIC', name: '✨ Ma Thuật Huyền Bí (4 Ấn)' },
   ];
 
   const handleSelectRune = (runeId: string) => {
@@ -53,9 +53,9 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
   const getActivationGuide = (rune: RuneDef) => {
     switch (rune.id) {
       case 'rune_revive':
-        return 'Tự động kích hoạt khi BUST: Cứu lại 50% điểm an toàn của lượt đó vào kho. Duy nhất 1 lần trong cả trận đấu';
+        return 'Tự động kích hoạt khi BUST: Cứu lại 50% điểm an toàn của lượt đó vào kho. Duy nhất 1 lần trong cả trận đấu!';
       case 'rune_shield':
-        return 'Tự động kích hoạt khi rút trùng hệ: Vô hiệu hóa cú nổ BUST đầu tiên trong mỗi lượt thi đấu';
+        return 'Tự động kích hoạt khi rút trùng hệ: Vô hiệu hóa cú nổ BUST đầu tiên trong mỗi lượt thi đấu!';
       case 'rune_insurance':
         return 'Tự động kích hoạt: Khóa lá bài điểm cao nhất trên bàn vào kho an toàn khi gom từ 2 lá trở lên (1 lần/lượt).';
       case 'rune_retry':
@@ -95,72 +95,73 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Quay lại sảnh chính</span>
+          <span>Quay Lại Sảnh Chính</span>
         </button>
 
         <div className="flex items-center gap-2 px-3 py-1 bg-purple-950/40 border border-purple-800/40 rounded-full text-xs font-mono text-purple-300">
+          <Sparkles className="w-3.5 h-3.5" />
           <span>Grimoire: Chọn Duy Nhất 1 Rune Bảo Mệnh</span>
         </div>
       </div>
 
       <div className="text-center space-y-1">
-        <h2 className="text-2xl sm:text-3xl font-medium text-purple-200">
-          Thư viện cổ ngữ RUNE & tác dụng pháp thuật
+        <h2 className="font-cinzel text-2xl sm:text-3xl font-black text-purple-200">
+          THƯ VIỆN CỔ NGỮ RUNE & TÁC DỤNG PHÁP THUẬT
         </h2>
         <p className="text-xs text-slate-400 max-w-xl mx-auto">
-          Mỗi trận đấu, pháp sư chỉ được chọn <strong>duy nhất 1 lá Rune</strong> để bảo mệnh và thi triển phép thuật. Hãy cân nhắc kỹ tác dụng của từng ấn chú
+          Mỗi trận đấu, pháp sư chỉ được chọn <strong>duy nhất 1 lá Rune</strong> để bảo mệnh và thi triển phép thuật. Hãy cân nhắc kỹ tác dụng của từng ấn chú!
         </p>
       </div>
 
       {/* CURRENTLY EQUIPPED 1-RUNE SHOWCASE */}
-      <div className="p-4 sm:p-5 border border-amber-500/80 rounded-2xl space-y-3 bg-slate-900">
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border-2 border-amber-500/80 rounded-3xl space-y-3 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-400" />
-            <span className="text-xs font-medium text-amber-300">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-bold text-amber-300 uppercase tracking-wider font-cinzel">
               1 RUNE ĐANG TRANG BỊ VÀO TRẬN ĐẤU (1/1)
             </span>
           </div>
           <button
             onClick={handleSave}
-            className="px-5 py-2 text-on-accent font-medium text-xs rounded-xl transition-[color,background-color,border-color,opacity,transform] active:scale-95 bg-amber-600 hover:bg-amber-500"
+            className="px-5 py-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95"
           >
-            {saveSuccess ? 'Đã lưu Rune vào hồ sơ' : 'Lưu trang bị này'}
+            {saveSuccess ? '✓ Đã Lưu Rune Vào Hồ Sơ!' : 'Lưu Trang Bị Này'}
           </button>
         </div>
 
         {activeRuneDef ? (
-          <div className="p-4 bg-slate-950/85 border border-indigo-500/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-4 bg-slate-950/85 border border-indigo-500/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-inner">
             <div className="flex items-center gap-4">
               <RuneStone rune={activeRuneDef} size="lg" isActive={true} />
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-lg font-medium text-amber-200">
+                  <h4 className="text-lg font-bold text-amber-200 font-cinzel">
                     {activeRuneDef.name}
                   </h4>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800">
                     {activeRuneDef.categoryNameVi}
                   </span>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-amber-950 text-amber-300 border border-amber-700">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-950 text-amber-300 border border-amber-700">
                     Tối đa {activeRuneDef.maxUses} lần/trận
                   </span>
                 </div>
-                <div className="text-xs text-amber-300/95 font-medium flex items-center gap-2 pt-1">
-                  <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="text-xs text-amber-300/95 font-medium flex items-center gap-1.5 pt-1">
+                  <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span><strong>Tác dụng:</strong> {activeRuneDef.description}</span>
                 </div>
-                <div className="text-[11px] text-slate-300 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-indigo-400 shrink-0" />
+                <div className="text-[11px] text-slate-300 font-light flex items-center gap-1.5">
+                  <Info className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                   <span>{getActivationGuide(activeRuneDef)}</span>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-xs text-slate-400 p-3">Chưa chọn Rune nào. Hãy bấm vào một Rune bên dưới.</div>
+          <div className="text-xs text-slate-400 italic p-3">Chưa chọn Rune nào. Hãy bấm vào một Rune bên dưới.</div>
         )}
       </div>
 
@@ -170,9 +171,9 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
           <button
             key={c.id}
             onClick={() => setActiveCategory(c.id)}
-            className={`px-4 py-2 text-xs font-medium rounded-xl border whitespace-nowrap transition-[color,background-color,border-color,opacity,transform] ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl border whitespace-nowrap transition-all ${
               activeCategory === c.id
-                ? 'bg-purple-600 border-purple-400 text-white scale-102'
+                ? 'bg-purple-600 border-purple-400 text-white shadow-lg scale-102'
                 : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900'
             }`}
           >
@@ -191,18 +192,18 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
               key={rune.id}
               onClick={() => handleSelectRune(rune.id)}
               style={{
-            borderColor: isSelected ? rune.color :'#334155',
-                
+                borderColor: isSelected ? rune.color : '#334155',
+                boxShadow: isSelected ? `0 0 25px ${rune.color}55` : undefined,
               }}
-              className={`p-4 rounded-2xl border cursor-pointer transition-[color,background-color,border-color,opacity,transform] duration-200 flex flex-col justify-between relative select-none ${
+              className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between hover:scale-[1.02] relative select-none ${
                 isSelected
-                  ? 'border-amber-400 ring-2 ring-amber-400/50 bg-indigo-950/80'
+                  ? 'bg-gradient-to-b from-indigo-950/80 via-slate-900 to-indigo-950/90 border-amber-400 ring-2 ring-amber-400/50 shadow-xl'
                   : 'bg-slate-900/90 hover:bg-slate-850 hover:border-slate-600'
               }`}
             >
               {isSelected && (
-                <div className="absolute top-3 right-3 px-3 py-0.5 rounded-full text-on-accent text-[11px] font-medium flex items-center gap-1 bg-amber-400">
-                  <Check className="w-3 h-3 stroke-[3]" /> Đang trang bị
+                <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 text-[10px] font-black uppercase flex items-center gap-1 shadow-lg">
+                  <Check className="w-3 h-3 stroke-[3]" /> Đang Trang Bị
                 </div>
               )}
 
@@ -210,10 +211,10 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
                 <div className="flex items-center gap-3">
                   <RuneStone rune={rune} size="md" isActive={isSelected} />
                   <div>
-                    <h3 className="text-sm font-medium text-slate-100" style={{ color: rune.color }}>
+                    <h3 className="font-cinzel text-sm font-bold text-slate-100" style={{ color: rune.color }}>
                       {rune.name}
                     </h3>
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono mt-0.5">
+                    <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono mt-0.5">
                       <span>{rune.categoryNameVi}</span>
                       <span>•</span>
                       <span className="text-amber-300">Dùng {rune.maxUses} lần/trận</span>
@@ -222,9 +223,9 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
                 </div>
 
                 {/* TÁC DỤNG CỦA RUNE */}
-                <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-xl space-y-1">
-                  <div className="text-[11px] font-medium text-amber-300 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="p-2.5 bg-slate-950/90 border border-slate-800 rounded-xl space-y-1">
+                  <div className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Tác dụng chính:</span>
                   </div>
                   <p className="text-xs text-slate-200 leading-relaxed font-normal">
@@ -233,23 +234,23 @@ export const RuneGrimoire: React.FC<RuneGrimoireProps> = ({
                 </div>
 
                 {/* HƯỚNG DẪN KÍCH HOẠT */}
-                <div className="text-[11px] text-slate-400 flex items-start gap-1">
+                <div className="text-[10px] text-slate-400 flex items-start gap-1 font-light italic">
                   <Info className="w-3 h-3 text-slate-500 shrink-0 mt-0.5" />
                   <span>{getActivationGuide(rune)}</span>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-[11px] font-mono text-slate-500">Mã: #{rune.id}</span>
+              <div className="mt-4 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <span className="text-[10px] font-mono text-slate-500">Mã: #{rune.id}</span>
                 <button
                   type="button"
-                  className={`font-medium px-3 py-1 rounded-lg text-xs transition-colors ${
+                  className={`font-bold px-3 py-1 rounded-lg text-xs transition-colors ${
                     isSelected
-                      ? 'bg-amber-400 text-on-accent font-medium'
+                      ? 'bg-amber-400 text-slate-950 font-black'
                       : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                   }`}
                 >
-                  {isSelected ? 'Đang dùng' : 'Chọn Rune này'}
+                  {isSelected ? '✓ Đang Dùng' : 'Chọn Rune Này'}
                 </button>
               </div>
             </div>

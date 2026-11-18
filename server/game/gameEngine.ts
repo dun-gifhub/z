@@ -358,7 +358,7 @@ export class GameEngine {
       type: 'rune_used',
       playerId,
       playerName: player.name,
-      message: ` ${player.name} đã chọn ấn chú nội tại: [${runeDef?.name || runeId}]! Tác dụng kích hoạt xuyên suốt cả trận đấu.`,
+      message: `⚡ ${player.name} đã chọn ấn chú nội tại: [${runeDef?.name || runeId}]! Tác dụng kích hoạt xuyên suốt cả trận đấu.`,
     });
 
     // Check if all connected players have chosen their rune
@@ -373,7 +373,7 @@ export class GameEngine {
         type: 'turn_switch',
         playerId: state.currentPlayerId,
         playerName: state.players[state.currentPlayerId]?.name || 'Pháp sư',
-        message: `Tất cả pháp sư đã chọn xong ấn chú nội tại! Trận đấu chính thức bắt đầu!`,
+        message: `✨ Tất cả pháp sư đã chọn xong ấn chú nội tại! Trận đấu chính thức bắt đầu!`,
       });
 
       this.updateNextCardPreview(state, session);
@@ -432,7 +432,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId,
           playerName: player.name,
-          message: `[KHIÊN CHẮN (1 LẦN/LƯỢT)] đã kích hoạt bảo mệnh cho ${player.name}, hóa giải BUST trùng hệ ${drawnCard.domainNameVi}! (Lượt này không thể dùng khiên thêm)`,
+          message: `🛡️ [KHIÊN CHẮN (1 LẦN/LƯỢT)] đã kích hoạt bảo mệnh cho ${player.name}, hóa giải BUST trùng hệ ${drawnCard.domainNameVi}! (Lượt này không thể dùng khiên thêm)`,
         });
         // Shield absorbed the duplicate card safely without losing points!
         return { success: true, state, isBust: false };
@@ -452,7 +452,7 @@ export class GameEngine {
           type: 'bust',
           playerId,
           playerName: player.name,
-          message: `BUST trùng hệ [${drawnCard.domainNameVi}]! Nhưng [HỒI SINH BẢO MỆNH - DUY NHẤT 1 LẦN/TRẬN] đã cứu mạng: Tự động bảo toàn 50% điểm (+${preserved}đ) vào kho an toàn! (Đã tiêu hao hết trận)`,
+          message: `🔥 BUST trùng hệ [${drawnCard.domainNameVi}]! Nhưng [HỒI SINH BẢO MỆNH - DUY NHẤT 1 LẦN/TRẬN] đã cứu mạng: Tự động bảo toàn 50% điểm (+${preserved}đ) vào kho an toàn! (Đã tiêu hao hết trận)`,
         });
 
         this.switchTurn(state);
@@ -472,7 +472,7 @@ export class GameEngine {
         type: 'bust',
         playerId,
         playerName: player.name,
-        message: `BUST (NỔ LƯỢT)! Rút trùng hệ [${drawnCard.domainNameVi}] với lá đã có trên bàn! Mất ${lostScore}đ tạm thời. Chuyển lượt!`,
+        message: `💥 BUST (NỔ LƯỢT)! Rút trùng hệ [${drawnCard.domainNameVi}] với lá đã có trên bàn! Mất ${lostScore}đ tạm thời. Chuyển lượt!`,
       });
 
       this.switchTurn(state);
@@ -594,7 +594,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId,
           playerName: player.name,
-          message: `[BỘI THU (1 LẦN/LƯỢT)] gom được chuỗi 3 lá bài trên bàn, nhận thêm +15 điểm thưởng!`,
+          message: `🌾 [BỘI THU (1 LẦN/LƯỢT)] gom được chuỗi 3 lá bài trên bàn, nhận thêm +15 điểm thưởng!`,
         });
       }
 
@@ -613,7 +613,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId,
           playerName: player.name,
-          message: `[BẢO HIỂM KHO (1 LẦN/LƯỢT)] đã tự động bảo hiểm lá bài cao nhất [${topCard.domainNameVi}] (+${topCard.pointValue}đ) thẳng vào kho an toàn!`,
+          message: `🔒 [BẢO HIỂM KHO (1 LẦN/LƯỢT)] đã tự động bảo hiểm lá bài cao nhất [${topCard.domainNameVi}] (+${topCard.pointValue}đ) thẳng vào kho an toàn!`,
         });
       }
 
@@ -631,7 +631,7 @@ export class GameEngine {
             type: 'rune_used',
             playerId,
             playerName: player.name,
-            message: `[MA HÚT (1 LẦN/LƯỢT)] hút +${stolen} điểm từ đối thủ sang kho an toàn của bạn!`,
+            message: `🦹 [MA HÚT (1 LẦN/LƯỢT)] hút +${stolen} điểm từ đối thủ sang kho an toàn của bạn!`,
           });
         }
       }
@@ -647,7 +647,7 @@ export class GameEngine {
         type: 'answer_correct',
         playerId,
         playerName: player.name,
-        message: `CHÍNH XÁC! ${player.name} giải đúng câu hỏi, nhận +${points} điểm!`,
+        message: `✓ CHÍNH XÁC! ${player.name} giải đúng câu hỏi, nhận +${points} điểm!`,
       });
 
       // Clear question & pending card
@@ -664,7 +664,7 @@ export class GameEngine {
           type: 'turn_switch',
           playerId,
           playerName: player.name,
-          message: ` ${player.name} đã đủ điểm chiến thắng! Bấm BANK để hoàn tất!`,
+          message: `⭐ ${player.name} đã đủ điểm chiến thắng! Bấm BANK để hoàn tất!`,
         });
       }
 
@@ -680,7 +680,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId,
           playerName: player.name,
-          message: `[SỬA SAI (1 LẦN/LƯỢT)] thấu triệt! ${player.name} được làm lại ngay lập tức với thêm 15 giây hồi phục! (Lượt này không thể dùng thêm)`,
+          message: `✨ [SỬA SAI (1 LẦN/LƯỢT)] thấu triệt! ${player.name} được làm lại ngay lập tức với thêm 15 giây hồi phục! (Lượt này không thể dùng thêm)`,
         });
         return { success: true, correct: false, earnedPoints: 0, state };
       }
@@ -711,7 +711,7 @@ export class GameEngine {
 
       const revealedExplanation = canSeeSolution
         ? currentFullQuestion.explanation
-        : `Bạn đã dùng hết lượt xem lời giải miễn phí hôm nay! Nâng cấp gói Premium (Hồ Sơ Pháp Sư) để xem lời giải chi tiết không giới hạn, hoặc quay lại vào ngày mai.`;
+        : `🔒 Bạn đã dùng hết lượt xem lời giải miễn phí hôm nay! Nâng cấp gói Premium (Hồ Sơ Pháp Sư) để xem lời giải chi tiết không giới hạn, hoặc quay lại vào ngày mai.`;
 
       state.lastAnswerResult = {
         correct: false,
@@ -726,7 +726,7 @@ export class GameEngine {
         type: 'answer_wrong',
         playerId,
         playerName: player.name,
-        message: `Chưa chính xác! Đáp án là: ${currentFullQuestion.answer}. Lá bài bị hủy, chuyển lượt!`,
+        message: `✗ Chưa chính xác! Đáp án là: ${currentFullQuestion.answer}. Lá bài bị hủy, chuyển lượt!`,
       });
 
       state.currentQuestion = undefined;
@@ -769,7 +769,7 @@ export class GameEngine {
         type: 'rune_used',
         playerId,
         playerName: player.name,
-        message: `[KHO BÁU (1 LẦN/LƯỢT)] kích hoạt khi Bank: Thưởng thêm +15 điểm trực tiếp vào kho an toàn!`,
+        message: `💰 [KHO BÁU (1 LẦN/LƯỢT)] kích hoạt khi Bank: Thưởng thêm +15 điểm trực tiếp vào kho an toàn!`,
       });
     }
 
@@ -783,7 +783,7 @@ export class GameEngine {
       type: 'bank',
       playerId,
       playerName: player.name,
-      message: `BANK THÀNH CÔNG! ${player.name} cất giữ +${bankScore} điểm (Tổng an toàn: ${player.safeScore}đ).`,
+      message: `🏦 BANK THÀNH CÔNG! ${player.name} cất giữ +${bankScore} điểm (Tổng an toàn: ${player.safeScore}đ).`,
     });
 
     // Check Victory
@@ -799,7 +799,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId: opp.id,
           playerName: opp.name,
-          message: `[BẤT TỬ CẢNH GIỚI - DUY NHẤT 1 LẦN/TRẬN] của ${opp.name} phát huy uy lực! Chặn đứng chiến thắng của đối thủ, giảm 30 điểm và mở ra vòng đấu lội ngược dòng! (Đã tiêu hao hết trận)`,
+          message: `👑 [BẤT TỬ CẢNH GIỚI - DUY NHẤT 1 LẦN/TRẬN] của ${opp.name} phát huy uy lực! Chặn đứng chiến thắng của đối thủ, giảm 30 điểm và mở ra vòng đấu lội ngược dòng! (Đã tiêu hao hết trận)`,
         });
         this.switchTurn(state);
         this.checkAiTurn(gameId);
@@ -814,7 +814,7 @@ export class GameEngine {
         type: 'game_over',
         playerId,
         playerName: player.name,
-        message: `CHIẾN THẮNG! ${player.name} đã chạm mốc ${state.targetScore} điểm và trở thành Nhà Vô Địch!`,
+        message: `👑 CHIẾN THẮNG! ${player.name} đã chạm mốc ${state.targetScore} điểm và trở thành Nhà Vô Địch!`,
       });
 
       this.recordGameOver(state);
@@ -853,7 +853,7 @@ export class GameEngine {
       type: 'surrender',
       playerId,
       playerName: player.name,
-      message: ` ${player.name} đã giương cờ trắng ĐẦU HÀNG! ${opponent ? `${opponent.name} giành chiến thắng vinh quang!` : 'Trận đấu kết thúc.'}`,
+      message: `🏳️ ${player.name} đã giương cờ trắng ĐẦU HÀNG! ${opponent ? `${opponent.name} giành chiến thắng vinh quang!` : 'Trận đấu kết thúc.'}`,
     });
 
     this.recordGameOver(state);
@@ -905,7 +905,7 @@ export class GameEngine {
             type: 'rune_used',
             playerId,
             playerName: player.name,
-            message: `[HOÁN ĐỔI (1 LẦN/LƯỢT)] đã đổi câu hỏi sang câu mới và làm mới thời gian!`,
+            message: `🔄 [HOÁN ĐỔI (1 LẦN/LƯỢT)] đã đổi câu hỏi sang câu mới và làm mới thời gian!`,
           });
           return { success: true, message: 'Đã đổi câu hỏi thành công!', state };
         }
@@ -921,7 +921,7 @@ export class GameEngine {
             type: 'rune_used',
             playerId,
             playerName: player.name,
-            message: `[THANH LỌC (1 LẦN/LƯỢT)] đã loại bỏ lá [${removed.domainNameVi}] khỏi bàn đấu để tránh trùng hệ!`,
+            message: `🪶 [THANH LỌC (1 LẦN/LƯỢT)] đã loại bỏ lá [${removed.domainNameVi}] khỏi bàn đấu để tránh trùng hệ!`,
           });
           return { success: true, message: `Đã thanh lọc lá ${removed.domainNameVi}!`, state };
         }
@@ -936,7 +936,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId,
           playerName: player.name,
-          message: ` ${player.name} kích hoạt Khiên Chắn (1 lần/lượt) bảo mệnh cho lần rút tiếp theo!`,
+          message: `🛡️ ${player.name} kích hoạt Khiên Chắn (1 lần/lượt) bảo mệnh cho lần rút tiếp theo!`,
         });
         return { success: true, message: 'Khiên chắn sẵn sàng!', state };
 
@@ -949,7 +949,7 @@ export class GameEngine {
           type: 'rune_used',
           playerId,
           playerName: player.name,
-          message: ` ${player.name} kích hoạt hiệu ứng nhân đôi điểm số (1 lần/lượt)!`,
+          message: `✨ ${player.name} kích hoạt hiệu ứng nhân đôi điểm số (1 lần/lượt)!`,
         });
         return { success: true, message: 'Hiệu ứng nhân điểm kích hoạt!', state };
 

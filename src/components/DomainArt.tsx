@@ -33,15 +33,28 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(239,68,68,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="primeGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#fca5a5" stopOpacity="0.9" />
+              <stop offset="45%" stopColor="#ef4444" stopOpacity="0.7" />
+              <stop offset="85%" stopColor="#991b1b" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#450a0a" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id="primeRing" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#f87171" />
+              <stop offset="50%" stopColor="#ef4444" />
+              <stop offset="100%" stopColor="#b91c1c" />
+            </linearGradient>
+          </defs>
           {/* Outer runic orbit */}
-          <circle cx="50" cy="50" r="44" stroke="#f87171" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
+          <circle cx="50" cy="50" r="44" stroke="url(#primeRing)" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
           <circle cx="50" cy="50" r="38" stroke="#f87171" strokeWidth="1" opacity="0.4" />
           {/* Flame aura core */}
+          <circle cx="50" cy="50" r="30" fill="url(#primeGlow)" />
           {/* Central Prime Star Polygon */}
           <polygon
             points="50,18 58,38 78,38 62,50 68,70 50,58 32,70 38,50 22,38 42,38"
@@ -70,12 +83,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(249,115,22,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="squareGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#fed7aa" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="#f97316" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#7c2d12" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="45" stroke="#f97316" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.5" />
+          <circle cx="50" cy="50" r="32" fill="url(#squareGlow)" />
           {/* 3 Interlocking Geometric Squares */}
           <rect x="24" y="24" width="52" height="52" stroke="#fdba74" strokeWidth="1.5" rx="4" transform="rotate(0 50 50)" fill="#ffedd5" fillOpacity="0.1" />
           <rect x="24" y="24" width="52" height="52" stroke="#ea580c" strokeWidth="1.5" rx="4" transform="rotate(45 50 50)" fill="#ea580c" fillOpacity="0.08" />
@@ -99,12 +119,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(234,179,8,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="algebraGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.85" />
+              <stop offset="60%" stopColor="#ca8a04" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#713f12" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#facc15" strokeWidth="1.5" strokeDasharray="6 3" opacity="0.6" />
+          <circle cx="50" cy="50" r="34" fill="url(#algebraGlow)" />
           {/* Astrolabe Axis Cross */}
           <line x1="50" y1="12" x2="50" y2="88" stroke="#fef08a" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.8" />
           <line x1="12" y1="50" x2="88" y2="50" stroke="#fef08a" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.8" />
@@ -125,12 +152,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(132,204,22,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="rootGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#d9f99d" stopOpacity="0.85" />
+              <stop offset="55%" stopColor="#84cc16" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#365314" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#a3e635" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6" />
+          <circle cx="50" cy="50" r="32" fill="url(#rootGlow)" />
           {/* Bioluminescent Root Tendrils */}
           <path d="M50 20 Q56 36 68 44 Q76 52 82 72" stroke="#65a30d" strokeWidth="2" fill="none" opacity="0.6" />
           <path d="M50 20 Q44 36 32 44 Q24 52 18 72" stroke="#65a30d" strokeWidth="2" fill="none" opacity="0.6" />
@@ -156,12 +190,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(16,185,129,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="expoGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#a7f3d0" stopOpacity="0.9" />
+              <stop offset="55%" stopColor="#10b981" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#064e3b" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#34d399" strokeWidth="1.5" strokeDasharray="5 2" opacity="0.6" />
+          <circle cx="50" cy="50" r="33" fill="url(#expoGlow)" />
           {/* Dual Lightning Surge */}
           <polygon
             points="54,12 30,50 48,50 40,88 72,42 52,42"
@@ -185,16 +226,24 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(6,182,212,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="voidGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#083344" stopOpacity="1" />
+              <stop offset="45%" stopColor="#0e7490" stopOpacity="0.8" />
+              <stop offset="75%" stopColor="#06b6d4" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#67e8f9" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           {/* Outer Accretion Disk */}
           <circle cx="50" cy="50" r="44" stroke="#22d3ee" strokeWidth="1.5" strokeDasharray="3 4" opacity="0.6" />
           <ellipse cx="50" cy="50" rx="42" ry="18" stroke="#67e8f9" strokeWidth="1.5" transform="rotate(-25 50 50)" opacity="0.7" />
           <ellipse cx="50" cy="50" rx="42" ry="18" stroke="#0891b2" strokeWidth="1.5" transform="rotate(25 50 50)" opacity="0.5" />
           {/* Dark Singularity Center */}
+          <circle cx="50" cy="50" r="24" fill="url(#voidGlow)" stroke="#67e8f9" strokeWidth="2" />
           {/* Negative Sign Monolith */}
           <line x1="32" y1="50" x2="68" y2="50" stroke="#ecfeff" strokeWidth="4.5" strokeLinecap="round" />
           <circle cx="50" cy="50" r="6" fill="#083344" stroke="#cffafe" strokeWidth="1.5" />
@@ -208,12 +257,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(59,130,246,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="divGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#bfdbfe" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#1e3a8a" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#60a5fa" strokeWidth="1.5" strokeDasharray="6 2" opacity="0.6" />
+          <circle cx="50" cy="50" r="32" fill="url(#divGlow)" />
           {/* Ray bundle from left to right */}
           <line x1="14" y1="50" x2="42" y2="50" stroke="#dbeafe" strokeWidth="3" />
           {/* Prism triangle */}
@@ -235,12 +291,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(139,92,246,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="fracGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ddd6fe" stopOpacity="0.9" />
+              <stop offset="55%" stopColor="#8b5cf6" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#4c1d95" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#a78bfa" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6" />
+          <circle cx="50" cy="50" r="33" fill="url(#fracGlow)" />
           {/* Top Hex Shard */}
           <polygon points="50,16 66,32 50,42 34,32" fill="#c4b5fd" stroke="#7c3aed" strokeWidth="1.5" />
           {/* Golden Fraction Bar */}
@@ -260,12 +323,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(217,70,239,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="absGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#f5d0fe" stopOpacity="0.9" />
+              <stop offset="55%" stopColor="#d946ef" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#701a75" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#e879f9" strokeWidth="1.5" strokeDasharray="5 3" opacity="0.6" />
+          <circle cx="50" cy="50" r="34" fill="url(#absGlow)" />
           {/* Royal Aegis Shield Silhouette */}
           <path
             d="M50 16 L76 26 C76 56 50 82 50 84 C50 82 24 56 24 26 Z"
@@ -292,12 +362,19 @@ export const DomainArt: React.FC<DomainArtProps> = ({ category, className = '', 
           width={w}
           height={h}
           viewBox={viewBox}
-          className={`${className}`}
+          className={`drop-shadow-[0_0_12px_rgba(236,72,153,0.6)] ${className}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          
+          <defs>
+            <radialGradient id="gcdGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#fbcfe8" stopOpacity="0.9" />
+              <stop offset="55%" stopColor="#ec4899" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#831843" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <circle cx="50" cy="50" r="44" stroke="#f472b6" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
+          <circle cx="50" cy="50" r="33" fill="url(#gcdGlow)" />
           {/* Mathematical Star Web (Factorization lattice) */}
           <polygon points="50,18 78,38 68,74 32,74 22,38" stroke="#f9a8d4" strokeWidth="1.5" fill="none" />
           <polygon points="50,82 78,62 68,26 32,26 22,62" stroke="#db2777" strokeWidth="1.5" fill="#fdf2f8" fillOpacity="0.15" />
