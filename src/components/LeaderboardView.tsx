@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Trophy } from 'lucide-react';
+import { ArrowLeft, Trophy, Medal, Crown, Flame, Sparkles } from 'lucide-react';
 import { LeaderboardEntry } from '../../shared/types.ts';
 
 interface LeaderboardViewProps {
@@ -29,23 +29,23 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack, curren
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs text-ink-400 hover:text-ink-200 transition-colors"
+          className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Quay lại sảnh chính</span>
         </button>
 
-        <div className="flex items-center gap-2 px-3 py-1 bg-gilt-950/40 border border-gilt-800/40 rounded text-xs font-mono text-gilt-300">
+        <div className="flex items-center gap-2 px-3 py-1 bg-yellow-950/40 border border-yellow-800/40 rounded-full text-xs font-mono text-yellow-300">
           <Trophy className="w-4 h-4" />
           <span>Bảng vàng danh dự</span>
         </div>
       </div>
 
       <div className="text-center space-y-1">
-        <h2 className="text-2xl sm:text-3xl font-medium text-brass-200">
+        <h2 className="text-2xl sm:text-3xl font-medium text-amber-200">
           Bảng xếp hạng pháp sư
         </h2>
-        <p className="text-xs text-ink-400 max-w-md mx-auto">
+        <p className="text-xs text-slate-400 max-w-md mx-auto">
           Vinh danh những kỳ thủ toán học có điểm số kỷ lục cao nhất và tỉ lệ thắng áp đảo.
         </p>
       </div>
@@ -60,10 +60,10 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack, curren
           <button
             key={tab.id}
             onClick={() => setFilter(tab.id as any)}
-            className={`px-4 py-2 text-xs font-medium rounded-md border transition-[color,background-color,border-color,opacity,transform] ${
+            className={`px-4 py-2 text-xs font-medium rounded-xl border transition-[color,background-color,border-color,opacity,transform] ${
               filter === tab.id
-                ? 'bg-brass-600 border-brass-400 text-on-accent'
-                : 'bg-ink-900 border-ink-800 text-ink-400 hover:bg-ink-800'
+                ? 'bg-amber-600 border-amber-400 text-on-accent'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'
             }`}
           >
             {tab.label}
@@ -72,8 +72,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack, curren
       </div>
 
       {/* Leaderboard Table */}
-      <div className="bg-ink-900 border border-ink-800 rounded-lg overflow-hidden">
-        <div className="grid grid-cols-12 px-4 py-3 bg-ink-950/80 border-b border-ink-800 text-[11px] font-mono text-ink-400">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-12 px-4 py-3 bg-slate-950/80 border-b border-slate-800 text-[11px] font-mono text-slate-400">
           <div className="col-span-2 sm:col-span-1 text-center">Hạng</div>
           <div className="col-span-6 sm:col-span-6">Pháp sư</div>
           <div className="col-span-2 sm:col-span-2 text-center">Tỉ lệ thắng</div>
@@ -81,11 +81,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack, curren
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-xs text-ink-500">Đang đồng bộ thứ hạng...</div>
+          <div className="p-8 text-center text-xs text-slate-500">Đang đồng bộ thứ hạng...</div>
         ) : entries.length === 0 ? (
-          <div className="p-8 text-center text-xs text-ink-500">Chưa có dữ liệu xếp hạng.</div>
+          <div className="p-8 text-center text-xs text-slate-500">Chưa có dữ liệu xếp hạng.</div>
         ) : (
-          <div className="divide-y divide-ink-800/60">
+          <div className="divide-y divide-slate-800/60">
             {entries.map((entry, idx) => {
               const isCurrentUser = entry.userId === currentUserId;
 
@@ -94,42 +94,50 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack, curren
                   key={entry.userId}
                   className={`grid grid-cols-12 items-center px-4 py-3 text-xs transition-colors ${
                     isCurrentUser
-                      ? 'bg-brass-500/10 border-l-4 border-brass-400'
+                      ? 'bg-amber-500/10 border-l-4 border-amber-400'
                       : idx % 2 === 0
-                      ? 'bg-ink-900/40'
-                      : 'bg-ink-900/80'
+                      ? 'bg-slate-900/40'
+                      : 'bg-slate-900/80'
                   }`}
                 >
                   {/* Rank */}
                   <div className="col-span-2 sm:col-span-1 text-center font-mono font-medium">
-                    <span className={idx < 3 ? "text-brass-300" : "text-ink-400"}>#{idx + 1}</span>
+                    {idx === 0 ? (
+                      <span className="text-xl"></span>
+                    ) : idx === 1 ? (
+                      <span className="text-xl"></span>
+                    ) : idx === 2 ? (
+                      <span className="text-xl"></span>
+                    ) : (
+                      <span className="text-slate-400">#{idx + 1}</span>
+                    )}
                   </div>
 
                   {/* Player Info */}
                   <div className="col-span-6 sm:col-span-6 flex items-center gap-3">
                     <span className="text-2xl">{entry.avatar}</span>
                     <div>
-                      <div className="font-medium text-ink-100 flex items-center gap-2">
+                      <div className="font-medium text-slate-100 flex items-center gap-2">
                         <span>{entry.username}</span>
                         {isCurrentUser && (
-                          <span className="text-[11px] px-2 py-0.2 bg-brass-500 text-on-accent font-medium rounded-md">
+                          <span className="text-[11px] px-2 py-0.2 bg-amber-500 text-on-accent font-medium rounded-md">
                             BẠN
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-brass-400/90 font-mono">
+                      <div className="text-[11px] text-amber-400/90 font-mono">
                         Cấp {entry.level} • {entry.wins} Trận Thắng
                       </div>
                     </div>
                   </div>
 
                   {/* Win Rate */}
-                  <div className="col-span-2 sm:col-span-2 text-center font-mono font-medium text-moss-400">
+                  <div className="col-span-2 sm:col-span-2 text-center font-mono font-medium text-emerald-400">
                     {entry.winRate}%
                   </div>
 
                   {/* Highest Score */}
-                  <div className="col-span-2 sm:col-span-3 text-right font-mono font-medium text-brass-300 text-sm">
+                  <div className="col-span-2 sm:col-span-3 text-right font-mono font-medium text-amber-300 text-sm">
                     {entry.score}đ
                   </div>
                 </div>

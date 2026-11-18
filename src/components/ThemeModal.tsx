@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check, Palette } from 'lucide-react';
+import { X, Check, Palette, Sparkles } from 'lucide-react';
 import { GAME_THEMES, ThemeDef } from '../utils/themeManager.ts';
 
 interface ThemeModalProps {
@@ -18,23 +18,23 @@ export const ThemeModal: React.FC<ThemeModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/80 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-ink-900 border border-brass-500/70 rounded-lg p-6 text-ink-100 space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-slate-900 border border-amber-500/70 rounded-2xl p-6 text-slate-100 space-y-4">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-ink-400 hover:text-ink-200"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center space-y-1">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-brass-500/10 text-brass-400 mb-1 border border-brass-500/30">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mb-1 border border-amber-500/30">
             <Palette className="w-6 h-6" />
           </div>
-          <h3 className="text-xl font-medium text-brass-200">
+          <h3 className="text-xl font-medium text-amber-200">
             Đổi màu nền chiến trận
           </h3>
-          <p className="text-xs text-ink-400">
+          <p className="text-xs text-slate-400">
             Chọn không gian ma thuật phù hợp với phong cách và thị giác của bạn
           </p>
         </div>
@@ -50,22 +50,22 @@ export const ThemeModal: React.FC<ThemeModalProps> = ({
                   onSelectTheme(theme);
                 }}
                 style={{ backgroundColor: theme.bgHex }}
-                className={`p-3 rounded-md border text-left flex items-center justify-between transition-[color,background-color,border-color,opacity,transform] group ${
+                className={`p-3 rounded-xl border text-left flex items-center justify-between transition-[color,background-color,border-color,opacity,transform] group ${
                   isSelected
-                    ? 'border-brass-400'
-                    : 'border-ink-800 hover:border-ink-600'
+                    ? 'border-amber-400'
+                    : 'border-slate-800 hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span aria-hidden="true" className="w-4 h-4 rounded-full border border-ink-500 shrink-0" style={{ backgroundColor: theme.previewColor }} />
+                  <span aria-hidden="true" className="w-4 h-4 rounded-full border border-slate-500 shrink-0" style={{ backgroundColor: theme.previewColor }} />
                   <div>
                     <div className={`text-xs font-medium flex items-center gap-1 ${
-                      theme.isLight ? 'text-ink-900' : 'text-ink-100'
+                      theme.isLight ? 'text-slate-900' : 'text-slate-100'
                     }`}>
                       {theme.name}
                     </div>
                     <div className={`text-[11px] line-clamp-1 ${
-                      theme.isLight ? 'text-ink-600 font-medium' : 'text-ink-400'
+                      theme.isLight ? 'text-slate-600 font-medium' : 'text-slate-400'
                     }`}>
                       {theme.description}
                     </div>
@@ -73,7 +73,7 @@ export const ThemeModal: React.FC<ThemeModalProps> = ({
                 </div>
 
                 {isSelected && (
-                  <div className="w-5 h-5 rounded-full bg-brass-400 text-on-accent flex items-center justify-center shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-amber-400 text-on-accent flex items-center justify-center shrink-0">
                     <Check className="w-4 h-4 stroke-[3]" />
                   </div>
                 )}
@@ -85,7 +85,7 @@ export const ThemeModal: React.FC<ThemeModalProps> = ({
         <div className="pt-2 text-center">
           <button
             onClick={onClose}
-            className="w-full py-3 text-on-accent font-medium text-xs rounded-md bg-brass-600 hover:bg-brass-500"
+            className="w-full py-3 text-on-accent font-medium text-xs rounded-xl bg-amber-600 hover:bg-amber-500"
           >
             Áp dụng
           </button>

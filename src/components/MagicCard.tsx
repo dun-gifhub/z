@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
 import { Card, CardRarity, MathCategory } from '../../shared/types.ts';
 import { MATH_DOMAINS } from '../../shared/cards.ts';
-import { Zap, Flame, Box, Compass, SquareDot, MinusCircle, Divide, Layers, Shield, Crown, Star, Calculator } from 'lucide-react';
+import {
+  Sparkles,
+  Zap,
+  Flame,
+  Box,
+  Compass,
+  SquareDot,
+  MinusCircle,
+  Divide,
+  Layers,
+  Shield,
+  Crown,
+  Star,
+  Calculator,
+} from 'lucide-react';
 
 export interface MagicCardProps {
   card: Card;
@@ -35,17 +49,17 @@ export const MagicCard: React.FC<MagicCardProps> = ({
   };
 
   const rarityBorders: Record<CardRarity, string> = {
-    Common: 'border-ink-600',
-    Rare: 'border-cobalt-500',
-    Epic: 'border-mauve-500',
-    Legendary: 'border-brass-400',
+    Common: 'border-slate-600',
+    Rare: 'border-blue-500',
+    Epic: 'border-purple-500',
+    Legendary: 'border-amber-400',
   };
 
   const rarityGems: Record<CardRarity, string> = {
-    Common: 'text-ink-400',
-    Rare: 'text-cobalt-400',
-    Epic: 'text-mauve-400',
-    Legendary: 'text-brass-300',
+    Common: 'text-slate-400',
+    Rare: 'text-blue-400',
+    Epic: 'text-purple-400',
+    Legendary: 'text-amber-300',
   };
 
   const getDomainIcon = (cat: MathCategory, iconClass = 'w-4 h-4') => {
@@ -119,10 +133,10 @@ export const MagicCard: React.FC<MagicCardProps> = ({
         {/* 1. CARD FACE (FRONT)                                     */}
         {/* ======================================================== */}
         <div
-          className={`absolute inset-0 backface-hidden rounded-lg border flex flex-col justify-between overflow-hidden transition-[color,background-color,border-color,opacity,transform] duration-300 ${
+          className={`absolute inset-0 backface-hidden rounded-2xl border flex flex-col justify-between overflow-hidden transition-[color,background-color,border-color,opacity,transform] duration-300 ${
             isProFoil
-              ? 'border-brass-400'
-              : rarityBorders[card.rarity] || 'border-ink-700'
+              ? 'border-amber-400'
+              : rarityBorders[card.rarity] || 'border-slate-700'
           }`}
           style={{
             backgroundColor: '#121214',
@@ -147,10 +161,10 @@ export const MagicCard: React.FC<MagicCardProps> = ({
           </div>
 
           {/* CARD TOP BAR: Domain Badge & Points */}
-          <div className="relative z-10 p-2 sm:p-3 flex items-center justify-between border-b border-ink-800/80 bg-ink-950/80">
+          <div className="relative z-10 p-2 sm:p-3 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/80">
             <div className="flex items-center gap-2 min-w-0">
               <span
-                className="p-1 rounded-md border shrink-0"
+                className="p-1 rounded-lg border shrink-0"
                 style={{
                   backgroundColor: `${card.elementColor}22`,
             borderColor: card.elementColor,
@@ -169,10 +183,10 @@ export const MagicCard: React.FC<MagicCardProps> = ({
 
             {/* Point Gem */}
             <div
-              className={`font-medium font-mono px-2 py-0.5 rounded-md border flex items-center gap-0.5 ${
+              className={`font-medium font-mono px-2 py-0.5 rounded-lg border flex items-center gap-0.5 ${
                 isProFoil
-                  ? 'text-on-accent border-brass-400 bg-brass-500'
-                  : 'text-brass-300 border-ink-700'
+                  ? 'text-on-accent border-amber-400 bg-amber-500'
+                  : 'text-amber-300 border-slate-700'
               }`}
             >
               <Star className="w-3 h-3 fill-current" />
@@ -199,7 +213,7 @@ style={{ borderColor:`${card.elementColor}44` }}
 
               {/* Central Core */}
               <div
-                className={`absolute rounded-lg flex items-center justify-center border transition-transform ${
+                className={`absolute rounded-2xl flex items-center justify-center border transition-transform ${
                   size === 'sm' ? 'w-9 h-9 text-base' : size === 'md' ? 'w-14 h-14 text-2xl' : 'w-20 h-20 text-4xl'
                 } ${isHovered ? 'scale-110' : ''}`}
                 style={{
@@ -223,7 +237,7 @@ style={{ borderColor:`${card.elementColor}44` }}
               </div>
 
               {size !== 'sm' && showDetails && (
-                <p className="text-[11px] text-ink-300 line-clamp-2 mt-0.5 leading-tight">
+                <p className="text-[11px] text-slate-300 line-clamp-2 mt-0.5 leading-tight">
                   {card.skillDesc}
                 </p>
               )}
@@ -231,18 +245,18 @@ style={{ borderColor:`${card.elementColor}44` }}
           </div>
 
           {/* CARD FOOTER: Rarity & PRO Insignia */}
-          <div className="relative z-10 px-2 py-2 bg-ink-950/90 border-t border-ink-800/80 flex items-center justify-between">
+          <div className="relative z-10 px-2 py-2 bg-slate-950/90 border-t border-slate-800/80 flex items-center justify-between">
             <span className={`text-[11px] font-medium font-mono ${rarityGems[card.rarity]}`}>
               {card.rarity}
             </span>
 
             {isProFoil ? (
-              <span className="flex items-center gap-1 text-[11px] font-medium text-brass-300 px-2 py-0.5 rounded border border-brass-500/60">
+              <span className="flex items-center gap-1 text-[11px] font-medium text-amber-300 px-2 py-0.5 rounded border border-amber-500/60">
                 <Crown className="w-3 h-3" />
                 <span>Pro</span>
               </span>
             ) : (
-              <span className="text-[11px] text-ink-500 font-mono">#{card.id}</span>
+              <span className="text-[11px] text-slate-500 font-mono">#{card.id}</span>
             )}
           </div>
         </div>
@@ -251,21 +265,21 @@ style={{ borderColor:`${card.elementColor}44` }}
         {/* 2. CARD BACK                                             */}
         {/* ======================================================== */}
         <div
-          className="absolute inset-0 backface-hidden rotate-y-180 rounded-lg border border-ink-700 flex flex-col items-center justify-center p-4 overflow-hidden"
+          className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl border border-slate-700 flex flex-col items-center justify-center p-4 overflow-hidden"
           style={{ backgroundColor: '#121214' }}
         >
-          <div className="absolute inset-2 border border-ink-700/70 rounded-md" />
-          <div className="w-20 h-20 rounded-full border border-brass-500/50 flex items-center justify-center">
-            <div className="w-14 h-14 rounded-full border border-brass-500/30 flex items-center justify-center">
-              <Calculator className="w-6 h-6 text-brass-400" />
+          <div className="absolute inset-2 border border-slate-700/70 rounded-xl" />
+          <div className="w-20 h-20 rounded-full border border-amber-500/50 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full border border-amber-500/30 flex items-center justify-center">
+              <Calculator className="w-6 h-6 text-amber-400" />
             </div>
           </div>
 
           <div className="mt-3 text-center z-10">
-            <div className="font-cinzel font-medium text-xs text-brass-300">
+            <div className="font-cinzel font-medium text-xs text-amber-300">
               Math Rune
             </div>
-            <div className="text-[11px] font-mono text-ink-500">
+            <div className="text-[11px] font-mono text-slate-500">
               Draw &amp; Solve
             </div>
           </div>

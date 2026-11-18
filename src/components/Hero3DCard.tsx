@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Crown } from 'lucide-react';
 import { DomainArt } from './DomainArt.tsx';
 import { DECK_60_CARDS, MATH_DOMAINS } from '../../shared/cards.ts';
 import { sound } from '../utils/soundEffects.ts';
@@ -92,36 +93,37 @@ export const Hero3DCard: React.FC = () => {
             : 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
           transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
         }}
-        className="group relative w-[270px] sm:w-80 h-[390px] sm:h-[460px] max-w-[88vw] rounded-lg cursor-pointer transform-style-3d transition-[color,background-color,border-color,opacity,transform] duration-300"
+        className="group relative w-[270px] sm:w-80 h-[390px] sm:h-[460px] max-w-[88vw] rounded-2xl cursor-pointer transform-style-3d transition-[color,background-color,border-color,opacity,transform] duration-300"
       >
         {/* Physical Bevel Border Frame */}
         <div
           style={{ borderColor: domainInfo.color }}
-          className="relative w-full h-full rounded-lg p-3 border overflow-hidden flex flex-col justify-between bg-ink-900"
+          className="relative w-full h-full rounded-2xl p-3 border overflow-hidden flex flex-col justify-between bg-slate-900"
         >
           
           {/* Inner Card Slab Background with Carbon / Runic Texture */}
-          <div className="absolute inset-2 rounded-md border border-ink-800 overflow-hidden bg-ink-950" />
+          <div className="absolute inset-2 rounded-xl border border-slate-800 overflow-hidden bg-slate-950" />
 
           {/* Card Top Banner: Rarity Crest & Domain Badge */}
           <div className="relative z-10 flex items-center justify-between px-2 pt-1">
-            <div className="flex items-center gap-2 px-3 py-1 rounded bg-ink-950/80 border border-ink-700 text-[11px] font-mono font-medium text-brass-300">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-950/80 border border-slate-700 text-[11px] font-mono font-medium text-amber-300">
+              <Crown className="w-4 h-4 text-amber-400" />
               <span>{currentCard.rarity}</span>
             </div>
 
             <div
               style={{ borderColor: domainInfo.color, color: domainInfo.color }}
-              className="px-3 py-1 rounded border text-[11px] font-mono font-medium"
+              className="px-3 py-1 rounded-full border text-[11px] font-mono font-medium"
             >
               Hệ {domainInfo.nameVi}
             </div>
           </div>
 
           {/* Central Artwork Window */}
-          <div className="relative z-10 my-2 mx-1 rounded-md border border-ink-800 p-4 flex flex-col items-center justify-center overflow-hidden bg-ink-900/90">
+          <div className="relative z-10 my-2 mx-1 rounded-xl border border-slate-800 p-4 flex flex-col items-center justify-center overflow-hidden bg-slate-900/90">
             {/* Ambient Rune Circle in Artwork */}
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-              <div className="w-48 h-48 rounded-full border border-dashed border-brass-400" />
+              <div className="w-48 h-48 rounded-full border border-dashed border-amber-400" />
             </div>
 
             {/* Glowing Domain Art Hero */}
@@ -130,22 +132,22 @@ export const Hero3DCard: React.FC = () => {
             </div>
 
             {/* Point Value Seal */}
-            <div className="mt-3 px-4 py-1 rounded-md text-on-accent font-medium text-lg sm:text-xl flex items-center gap-2 bg-brass-600">
+            <div className="mt-3 px-4 py-1 rounded-xl text-on-accent font-medium text-lg sm:text-xl flex items-center gap-2 bg-amber-600">
               <span>+{currentCard.pointValue} điểm</span>
             </div>
           </div>
 
           {/* Card Bottom: Skill & Magic Lore */}
-          <div className="relative z-10 p-3 rounded-lg bg-ink-950/90 border border-ink-800 space-y-1 text-left">
+          <div className="relative z-10 p-3 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-1 text-left">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-brass-200 truncate">
+              <span className="text-sm font-medium text-amber-200 truncate">
                 {currentCard.skillName}
               </span>
-              <span className="text-[11px] font-mono text-ink-500">
+              <span className="text-[11px] font-mono text-slate-500">
                 #{currentCard.id}
               </span>
             </div>
-            <p className="text-[11px] text-ink-300 leading-relaxed line-clamp-2">
+            <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-2">
               {currentCard.skillDesc}
             </p>
           </div>
@@ -154,7 +156,7 @@ export const Hero3DCard: React.FC = () => {
       </div>
 
       {/* Interactive Helper Text */}
-      <div className="mt-3 flex items-center gap-2 text-xs font-mono text-ink-400">
+      <div className="mt-3 flex items-center gap-2 text-xs font-mono text-slate-400">
         <span>Chạm để đổi thẻ ({cardIndex + 1}/{showcaseCards.length})</span>
       </div>
     </div>
